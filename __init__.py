@@ -11,8 +11,6 @@ if __name__ == '__main__':
     import requests
 
 
-
-
     # --- Get List of product winthin a category ---
 
     path = "https://fr-en.openfoodfacts.org/category/pizza.json"
