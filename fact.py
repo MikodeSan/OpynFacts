@@ -13,15 +13,14 @@ import requests
 
 # add 'main' package
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
-sys.path.append( os.path.join(os.path.dirname(__file__), '/dat' ))
-
 from utilities import backup as bkp
+
+sys.path.append(os.path.join(os.path.dirname(__file__), '/dat' ))
 from dat.database_json import ZDataBase_JSON as database
 
 
 
-class ZFact(object):
+class ZFact():
     '''
     classdocs
     '''
@@ -77,40 +76,88 @@ class ZFact(object):
         return response.json()
 
 
-    def __init_database_product(self):
+    def __init_database_product(self, n_category_max=30, n_product_max=30):
 
-        for idx, category_id in enumerate(self.__db.get_categories()):
-            category_url = self.__db.get_category_url(category_id) + '.json'
-            print(category_url)
-            self.__download_product_from_category(category_url)
+        if n_category_max > 0:
+
+            category_idx = 0
+            categories_lst = self.__db.get_categories()
+
+            # Get categories
+            while category_idx < n_category_max:
+
+                # Get category url
+                category_id = categories_lst[category_idx]
+                category_url = self.__db.get_category_url(category_id)
+                print(category_idx+1, category_id)
 
 
-    def __download_product_from_category(self, category_url, n_product_max=50):
+                # Get category pages
 
-        # --- Get List of category ---
-        path = "https://fr-en.openfoodfacts.org/%s.json"
+                is_first_page = True
+                page_idx = 0
+                n_product = 0
+                n_product_total = 1
 
-        response = requests.get(category_url)
-#        print(response)
-#        print(response.json())
 
-        product_dict = response.json()
+                while (n_product < n_product_total) and (n_product < n_product_max):
 
-        n_product_total = product_dict['count']
+                    category_page_path = category_url + '/{}.json'.format(page_idx+1)
 
-        n_product_2_get = product_dict['page_size']
-#        page_id = product_dict['page']
+                    [products_lst, n_product_2_get, n_total] = self.__download_product_from_category(category_page_path,
+                                                                                            is_first_page=is_first_page)
+                    if is_first_page:
+                        n_product_total = n_total
+                        print(n_product_total)
+                        is_first_page = False
 
-#        n_page_total = n_product_total // n_product_2_get
-#        if n_product_total % n_product_2_get:
-#            n_page_total = n_page_total + 1
-#
-#        for idx in list(range(1, n_page_total+1)):
-#            path = "https://fr-en.openfoodfacts.org/category/pizzas/{}.json".format(idx)
-#            response = requests.get(path)
-#            print(idx, response)
-#            page_dict = response.json()
-#
+                    n_product = n_product + n_product_2_get
+
+
+                # add product lst to db
+
+
+                    page_idx = page_idx + 1
+
+                category_idx = category_idx + 1
+
+
+        else:
+
+            for idx, category_id in enumerate(self.__db.get_categories()):
+                category_url = self.__db.get_category_url(category_id) + '.json'
+                print(category_url)
+                self.__download_product_from_category(category_url)
+
+
+    def __download_product_from_category(self, category_page_path, is_first_page=True, n_product_max=50):
+
+        response = requests.get(category_page_path)
+#                    print(response)
+
+        category_page_dict = response.json()
+
+        # Get n total products
+        n_product_total = 0
+        if is_first_page:
+
+            n_product_total = category_page_dict['count']
+
+
+        # Get products from page
+        products_dict = category_page_dict['products']
+        n_product_2_get = len(products_dict)
+
+        products_lst = []
+        for product_idx, product in enumerate(products_dict):
+
+            # get basic data
+            code = product['code']
+            products_lst.append({'code':code}) # , 'brands':product['brands']
+
+            # Get products basic data from dict
+            print(product_idx+1, product['code']) # , product['generic_name_en']
+
 #            for product_idx, product_dict in enumerate(page_dict['products']):
 #                if 'product_name' in product_dict:
 #                    print(product_idx, product_dict['code'], product_dict['product_name'])
@@ -119,7 +166,10 @@ class ZFact(object):
 #                else:
 #                    print(product_idx, product_dict['code'], 'No Name')
 #
-#        return response.json()
+        print(products_lst)
+
+
+        return [products_lst, n_product_2_get, n_product_total]
 
     def __save_db(self, is_temp):
 
