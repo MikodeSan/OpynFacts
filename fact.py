@@ -104,17 +104,18 @@ class ZFact():
 
                     category_page_path = category_url + '/{}.json'.format(page_idx+1)
 
-                    [products_lst, n_product_2_get, n_total] = self.__download_product_from_category(category_page_path,
+                    [products_lst, n_total] = self.__download_product_from_category(category_page_path,
                                                                                             is_first_page=is_first_page)
                     if is_first_page:
                         n_product_total = n_total
                         print(n_product_total)
                         is_first_page = False
 
-                    n_product = n_product + n_product_2_get
+                    n_product = n_product + len(products_lst)
 
 
-                # add product lst to db
+                    # add product lst to db
+#                    self.__db.add_product(products_lst)
 
 
                     page_idx = page_idx + 1
@@ -140,36 +141,69 @@ class ZFact():
         # Get n total products
         n_product_total = 0
         if is_first_page:
-
             n_product_total = category_page_dict['count']
 
-
         # Get products from page
-        products_dict = category_page_dict['products']
-        n_product_2_get = len(products_dict)
+        page_products_lst = category_page_dict['products']
 
         products_lst = []
-        for product_idx, product in enumerate(products_dict):
+        for product_idx, product_dict in enumerate(page_products_lst):
+            # Get product data
+            product_data_dict = self.__product_data(product_dict)
 
-            # get basic data
-            code = product['code']
-            products_lst.append({'code':code}) # , 'brands':product['brands']
+            if product_data_dict:
+                products_lst.append(product_data_dict)
+                print(product_idx+1, product_data_dict)
 
-            # Get products basic data from dict
-            print(product_idx+1, product['code']) # , product['generic_name_en']
+        return [products_lst, n_product_total]
 
-#            for product_idx, product_dict in enumerate(page_dict['products']):
-#                if 'product_name' in product_dict:
-#                    print(product_idx, product_dict['code'], product_dict['product_name'])
-#                elif 'generic_name' in product_dict:
-#                    print(product_idx, product_dict['code'], product_dict['generic_name'])
-#                else:
-#                    print(product_idx, product_dict['code'], 'No Name')
-#
-        print(products_lst)
+    def __product_data(self, product_dict):
+
+        extracted_data_dict = {}
+
+        # -- Get products basic data from dict --
+
+        # code
+        extracted_data_dict['code'] = product_dict['code']
+
+        # name
+        name = ''
+        lg_lst = ['fr', 'en', 'es', '']
+        key_generic_base = 'generic_name'
+        key_product_base = 'product_name'
+        lg_idx = 0
+        is_found = False
+        while lg_idx < len(lg_lst) and not is_found:
+
+            key_generic = key_generic_base + lg_lst[lg_idx]
+            key_product = key_product_base + lg_lst[lg_idx]
+
+            if key_generic in product_dict:
+                if product_dict[key_generic] != '':
+                    name = product_dict[key_generic]
+                    is_found = True
+
+                elif key_product in product_dict:
+                    if product_dict[key_product] != '':
+                        name = product_dict[key_product]
+                        is_found = True
+
+            lg_idx = lg_idx + 1
+
+        if name != '':
+            extracted_data_dict['name'] = name
+
+        # brands
+        if 'brands' in product_dict:
+            extracted_data_dict['brands'] = product_dict['brands']
+
+        if len(extracted_data_dict) < 3:
+            extracted_data_dict = {}
+
+        return extracted_data_dict
 
 
-        return [products_lst, n_product_2_get, n_product_total]
+
 
     def __save_db(self, is_temp):
 
