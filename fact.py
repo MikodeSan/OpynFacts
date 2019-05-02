@@ -12,8 +12,6 @@ import os
 import requests
 
 # add 'main' package
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from utilities import backup as bkp
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '/dat' ))
 from dat.database_json import ZDataBase_JSON as database
@@ -33,34 +31,16 @@ class ZFact():
         Constructor
         '''
 
-        # Get Matchs list
-#        path_to_file = ZFact.__db_path()
-#
-#        self._db = bkp.open_db(path_to_file)
-#
-#        self._db = {}
-
         self.__db = database()
 
-#        if not self._db:
-        category_dict = self.__download_categories()
+        if not self.__db.get_categories():
+            category_dict = self.__download_categories()
 
-        self.__db.init_categories(category_dict)
+            self.__db.init_categories(category_dict)
 
-        self.__init_database_product()
+            self.__init_database_product()
 
-
-        # init. product into db
-        # clear products db
-        # download products from category
-        # db add products
-
-#            self._db = self.__init_db()
-#            self.__save_db(True)
-
-#        self._data_frame_label = self.__DATA_FRAME_LABEL
-#
-#        self.__cur_project_id = self._db['properties']['project_id_cur']
+            self.__db.save_db()
 
 
     def __download_categories(self):
@@ -71,7 +51,6 @@ class ZFact():
 
         response = requests.get(path)
         print(response)
-        #        print(response.json())
 
         return response.json()
 
@@ -97,14 +76,15 @@ class ZFact():
                 is_first_page = True
                 page_idx = 0
                 n_product = 0
+                n_scan = 0
                 n_product_total = 1
 
 
-                while (n_product < n_product_total) and (n_product < n_product_max):
+                while (n_scan < n_product_total) and (n_product < n_product_max):
 
                     category_page_path = category_url + '/{}.json'.format(page_idx+1)
 
-                    [products_lst, n_total] = self.__download_product_from_category(category_page_path,
+                    [products_lst, n_scanned, n_total] = self.__download_product_from_category(category_page_path,
                                                                                             is_first_page=is_first_page)
                     if is_first_page:
                         n_product_total = n_total
@@ -112,10 +92,11 @@ class ZFact():
                         is_first_page = False
 
                     n_product = n_product + len(products_lst)
+                    n_scan = n_scan + n_scanned
 
 
                     # add product lst to db
-#                    self.__db.add_product(products_lst)
+                    self.__db.add_product(products_lst)
 
 
                     page_idx = page_idx + 1
@@ -155,7 +136,7 @@ class ZFact():
                 products_lst.append(product_data_dict)
                 print(product_idx+1, product_data_dict)
 
-        return [products_lst, n_product_total]
+        return [products_lst, len(page_products_lst), n_product_total]
 
     def __product_data(self, product_dict):
 
@@ -201,17 +182,6 @@ class ZFact():
             extracted_data_dict = {}
 
         return extracted_data_dict
-
-
-
-
-    def __save_db(self, is_temp):
-
-        if is_temp:
-
-            bkp.modif_db(ZFact.__db_path(), self._db)
-        else:
-            pass
 
 
 #    @staticmethod

@@ -6,6 +6,13 @@ Created on Mon Apr 29 15:37:19 2019
 @author: doZan
 """
 
+import sys
+import os
+
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+from utilities import backup as bkp
+
+
 class ZDataBase_JSON(object):
     '''
     classdocs
@@ -18,7 +25,15 @@ class ZDataBase_JSON(object):
 
     def __init__(self, observer=None):
 
-        self.__data = self.__init_db()
+        # Get Matchs list
+        path_to_file = self.__db_path()
+
+        self.__data = bkp.open_db(path_to_file)
+        if not self.__data:
+            self.__data = self.__init_db()
+            self.save_db(True)
+
+
 
 
     def init_categories(self, json, observer=None):
@@ -59,6 +74,7 @@ class ZDataBase_JSON(object):
 #        print("Openfoodfacts categories:", categories_dict.keys())
 #        print("Openfoodfacts World Categories values:", categories_dict.values())
         print("N redundancy:", n_redundancy)
+#        self.__save_db(True)
 
 
     def get_categories(self):
@@ -68,6 +84,38 @@ class ZDataBase_JSON(object):
     def get_category_url(self, category_id):
 
         return self.__data[self.KEY_CATEGORY][category_id]['url']
+
+    def add_product(self, products_lst):
+
+        existing_product_lst = []
+
+        for product_idx, product_dict in enumerate(products_lst):
+
+            code = product_dict['code']
+
+            db_products_dict = self.__data[self.KEY_PRODUCT]
+            if code not in db_products_dict:
+                db_products_dict[code] = product_dict
+                print(db_products_dict[code])
+
+            else:
+                # TODO: Update product data
+                existing_product_lst.append({'code': code, 'name':product_dict['name']})
+
+        print('N existing product into db', len(existing_product_lst))
+
+#        self.__save_db(True)
+
+        return existing_product_lst
+
+
+    def save_db(self, is_temp=True):
+
+        if is_temp:
+
+            bkp.modif_db(self.__db_path(), self.__data)
+        else:
+            pass
 
     @classmethod
     def __init_db(cls):
@@ -92,3 +140,15 @@ class ZDataBase_JSON(object):
 #        print(db)
 
         return db
+
+    @staticmethod
+    def __db_path():
+
+        directory_path = os.path.dirname(__file__)
+        # with this path, we go inside the folder `data` and get the file.
+        path_to_file = os.path.join(directory_path, "food_facts_db.json")
+#        print('db path_to_file', path_to_file)
+
+        return path_to_file
+
+
