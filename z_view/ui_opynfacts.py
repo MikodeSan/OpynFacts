@@ -2,16 +2,17 @@
 
 # Form implementation generated from reading ui file '.\z_view\form.ui'
 #
-# Created by: PyQt5 UI code generator 5.9.2
+# Created by: PyQt5 UI code generator 5.12.1
 #
 # WARNING! All changes made in this file will be lost!
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
+
 class Ui_Form(object):
     def setupUi(self, Form):
         Form.setObjectName("Form")
-        Form.resize(400, 300)
+        Form.resize(406, 300)
         self.verticalLayout = QtWidgets.QVBoxLayout(Form)
         self.verticalLayout.setObjectName("verticalLayout")
         self.groupBox = QtWidgets.QGroupBox(Form)
@@ -22,9 +23,9 @@ class Ui_Form(object):
         self.groupBox_3.setObjectName("groupBox_3")
         self.horizontalLayout_2 = QtWidgets.QHBoxLayout(self.groupBox_3)
         self.horizontalLayout_2.setObjectName("horizontalLayout_2")
-        self.treeView = QtWidgets.QTreeView(self.groupBox_3)
-        self.treeView.setObjectName("treeView")
-        self.horizontalLayout_2.addWidget(self.treeView)
+        self.category_trview = QtWidgets.QTreeView(self.groupBox_3)
+        self.category_trview.setObjectName("category_trview")
+        self.horizontalLayout_2.addWidget(self.category_trview)
         self.listView = QtWidgets.QListView(self.groupBox_3)
         self.listView.setObjectName("listView")
         self.horizontalLayout_2.addWidget(self.listView)
@@ -81,4 +82,5 @@ class Ui_Form(object):
         self.label.setText(_translate("Form", "TextLabel"))
         self.label_2.setText(_translate("Form", "TextLabel"))
         self.pushButton.setText(_translate("Form", "Update db"))
+
 

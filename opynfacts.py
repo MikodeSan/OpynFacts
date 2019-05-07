@@ -13,6 +13,11 @@ import logging as lg
 
 import requests
 
+# add 'model' package
+sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'z_model'))
+from fact import ZFact as ZModel
+
+
 # add 'view' package
 # current working directory os.getcwd()
 
@@ -54,9 +59,15 @@ def main():
 #        print('unknown file extension')
 #
 #    lg.info('Start Application')
+
+
+        # model
+    model = ZModel()
+
+
     APP = QApplication(sys.argv)
 
-    UI = ZView()
+    UI = ZView(model)
     UI.show()
 
     sys.exit(APP.exec_())

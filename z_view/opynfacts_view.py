@@ -29,7 +29,7 @@ class ZOpynFacts_View(QWidget):
     PROJECT_NONE = "None"
 #    __CREDIT_TREE_DATA_LABEL = ['Label', 'Id.', 'Capital']
 
-    def __init__(self, parent=None):
+    def __init__(self, model, parent=None):
 
         super(ZOpynFacts_View, self).__init__(parent)
 
@@ -37,9 +37,32 @@ class ZOpynFacts_View(QWidget):
 #        self.ui_credit_command = None
 
         # Model
-#        self.__model = ZFunding(observer=self)
+        self.__model = model
+        # Set observer
+#        self.__model.add_observer(self)
 
         self.__create_widgets()
+        self.category_stdmodel = QStandardItemModel()
+        self.ui.category_trview.setModel(self.category_stdmodel)
+
+        self.__update_view_category()
+
+
+#        # Get selected row
+##        row_list = [select.row() for select in self.ui.table_view.selectedIndexes()]
+#        row_list = [1,2,3,4,5,6,7,8,9]
+#
+#        row_list = list(set(row_list))
+#        print('selected row list', row_list)
+#
+#        # Get event id. list
+#        id_list = list()
+#        for row in row_list:
+#            print('data:', self.ui.table_model.item(row, self.__model._data_frame_label.index('Id.')).data())
+##            id_list.append(int(self.ui.table_model.item(row, self.__model._data_frame_label.index('Id.')).text()))
+#            id_list.append(self.ui.table_model.item(row, self.__model._data_frame_label.index('Id.')).data())
+
+
 
         #        print(self.__model)
 
@@ -464,30 +487,34 @@ class ZOpynFacts_View(QWidget):
 #        cost, cost_rate = self.__model.credit.estimated_total_cost()
 #        self.ui.outCost_dspin.setValue( cost )
 #        self.ui.outCostRate_dspin.setValue( cost_rate )
-#
-#    def __update_event_table_view(self):
-#
-#        # Table view
+
+    def __update_view_category(self):
+
+        # Table view
 #        data = self.__model._data_array
-#
-#        self.ui.table_model.clear()
-##        table_view_header.setVisible(False)
-#
-#
-##        label_lst = ZFunding.DATA_FRAME_LABEL
-#
+
+        self.category_stdmodel
+
+
 #        label_lst = self.__model._data_frame_label
+        label_lst = ['a','b','c','d','e']
 #        n_rows = data.shape[0]
-#        for row_idx in range(n_rows):
-#
-#            for col_idx, label in enumerate(label_lst):
-#
-#                item = QStandardItem( str(data[row_idx, col_idx]) )
-#                item.setData(data[row_idx, col_idx])
-#                item.setTextAlignment(Qt.AlignRight | Qt.AlignVCenter)
-#                self.ui.table_model.setItem(row_idx, col_idx, item)
-#
-#
+        n_rows = 20
+        for row_idx in range(n_rows):
+
+            for col_idx, label in enumerate(label_lst):
+
+                item = QStandardItem( 'str_{}'.format(row_idx+col_idx) )
+                item.setData(row_idx+col_idx)
+                item.setTextAlignment(Qt.AlignRight | Qt.AlignVCenter)
+
+                item_0 = QStandardItem( 'str_{}'.format((row_idx+col_idx)*10) )
+                item.appendRow(item_0)
+                item_1 = QStandardItem( 'str_{}'.format((row_idx+col_idx)*100) )
+                item_0.appendRow(item_1)
+                self.category_stdmodel.setItem(row_idx, col_idx, item)
+
+
 #        for col_idx, label in enumerate(label_lst):
 #
 #            s = label.replace("P:", "Project\n")
@@ -505,11 +532,11 @@ class ZOpynFacts_View(QWidget):
 #        self.ui.table_view.verticalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
 ##        self.ui.table_view.hideColumn(label_lst.index('Id.'))
 #        self.ui.table_view.hideColumn(label_lst.index('Entity'))
-#
-##        print('please print scheduler')
-##        data = credit.estimated_schedule()
-#
-#
+
+#        print('please print scheduler')
+#        data = credit.estimated_schedule()
+
+
 ##class ZTest(QWidget):
 ##
 ##    def __init__(self, parent=None):
@@ -522,9 +549,17 @@ class ZOpynFacts_View(QWidget):
 
 if __name__ == "__main__":
 
+    # add 'model' package
+    sys.path.append(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'z_model'))
+    from fact import ZFact as ZModel
+
+
     app = QApplication(sys.argv)
 
-    ui = ZOpynFacts_View()
+
+    model = ZModel()
+
+    ui = ZOpynFacts_View(model)
     ui.show()
 
 #    ui = QDialog()
