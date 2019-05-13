@@ -21,6 +21,7 @@ class ZDataBase_JSON(object):
     DB_PATH = './'
     KEY_CATEGORY = 'category'
     KEY_PRODUCT = 'product'
+    KEY_CATEGORY_2_PRODUCT_RELATION = 'category2product'
 
 
     def __init__(self, observer=None):
@@ -32,9 +33,6 @@ class ZDataBase_JSON(object):
         if not self.__data:
             self.__data = self.__init_db()
             self.save_db(True)
-
-
-
 
     def init_categories(self, json, observer=None):
 
@@ -85,13 +83,19 @@ class ZDataBase_JSON(object):
 
         return self.__data[self.KEY_CATEGORY][category_id]['url']
 
-    def add_product(self, products_lst):
+    def add_product(self, category_id, products_lst):
 
         existing_product_lst = []
+        relation_lst = self.__data[self.KEY_CATEGORY_2_PRODUCT_RELATION]
 
         for product_idx, product_dict in enumerate(products_lst):
 
             code = product_dict['code']
+
+ 
+            relation = [category_id, code]
+            if relation not in relation_lst:
+                relation_lst.append(relation)
 
             db_products_dict = self.__data[self.KEY_PRODUCT]
             if code not in db_products_dict:
@@ -136,6 +140,10 @@ class ZDataBase_JSON(object):
 #        categories_dict['label'] = 'default'
 
         db[cls.KEY_PRODUCT] = products_dict
+
+        # db relation
+        relation_lst = []
+        db[cls.KEY_CATEGORY_2_PRODUCT_RELATION] = relation_lst
 
 #        print(db)
 

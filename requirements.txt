@@ -1,2 +1,4 @@
 requests
 pyqt5
+mysql-connector
+mysql-connector-python

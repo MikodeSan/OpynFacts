@@ -96,7 +96,7 @@ class ZFact():
 
 
                     # add product lst to db
-                    self.__db.add_product(products_lst)
+                    self.__db.add_product(category_id, products_lst)
 
 
                     page_idx = page_idx + 1
