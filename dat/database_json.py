@@ -21,7 +21,9 @@ class ZDataBase_JSON(object):
     DB_PATH = './'
     KEY_CATEGORY = 'category'
     KEY_PRODUCT = 'product'
-    KEY_CATEGORY_2_PRODUCT_RELATION = 'category2product'
+    KEY_RELATION_CATEGORY_2_PRODUCT = 'category2product'
+    KEY_CATEGORY_ID = 'category_id'
+    KEY_PRODUCT_CODE = 'product_code'
 
 
     def __init__(self, observer=None):
@@ -79,6 +81,30 @@ class ZDataBase_JSON(object):
 
         return list(self.__data[self.KEY_CATEGORY].keys())
 
+    def get_categories_from_relation(self):
+        """Get valid categories from the category/product relation table
+        Then return the category data"""
+
+
+        categories_lst = []
+
+        for element_dct in self.__data[self.KEY_RELATION_CATEGORY_2_PRODUCT]:
+
+            category_id = element_dct[self.KEY_CATEGORY_ID]
+            db_category_lst = self.__data[self.KEY_CATEGORY]
+            if category_id in db_category_lst:
+
+                if category_id not in categories_lst:
+                    category_dct = dict(db_category_lst[category_id])
+                    category_dct[self.KEY_CATEGORY_ID] = category_id
+                    del category_dct['url']
+
+                    categories_lst.append(category_dct)
+
+        print(categories_lst)
+
+        return categories_lst
+
     def get_category_url(self, category_id):
 
         return self.__data[self.KEY_CATEGORY][category_id]['url']
@@ -86,14 +112,14 @@ class ZDataBase_JSON(object):
     def add_product(self, category_id, products_lst):
 
         existing_product_lst = []
-        relation_lst = self.__data[self.KEY_CATEGORY_2_PRODUCT_RELATION]
+        relation_lst = self.__data[self.KEY_RELATION_CATEGORY_2_PRODUCT]
 
         for product_idx, product_dict in enumerate(products_lst):
 
-            code = product_dict['code']
+            code = product_dict.pop('code')
 
  
-            relation = [category_id, code]
+            relation = {self.KEY_CATEGORY_ID:category_id, self.KEY_PRODUCT_CODE:code}
             if relation not in relation_lst:
                 relation_lst.append(relation)
 
@@ -143,7 +169,7 @@ class ZDataBase_JSON(object):
 
         # db relation
         relation_lst = []
-        db[cls.KEY_CATEGORY_2_PRODUCT_RELATION] = relation_lst
+        db[cls.KEY_RELATION_CATEGORY_2_PRODUCT] = relation_lst
 
 #        print(db)
 

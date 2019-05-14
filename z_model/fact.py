@@ -13,7 +13,8 @@ import requests
 
 # add 'main' package
 
-sys.path.append(os.path.join(os.path.dirname(__file__), '/dat' ))
+# sys.path.append(os.path.join(os.path.dirname(os.path.dirname(__file__)), '/dat' ))
+sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 from dat.database_json import ZDataBase_JSON as database
 
 
@@ -42,12 +43,19 @@ class ZFact():
 
             self.__db.save_db()
 
+            self.__db.get_categories_from_relation()
+
+    def categories(self):
+        
+        return self.__db.get_categories_from_relation()
+
 
     def __download_categories(self):
 
         # --- Get List of category ---
-        path = "https://fr-en.openfoodfacts.org/categories.json"
-        #    path = "https://world.openfoodfacts.org/categories.json"
+        path = "https://fr-fr.openfoodfacts.org/categories.json"
+        # path = "https://fr-en.openfoodfacts.org/categories.json"
+        # path = "https://world.openfoodfacts.org/categories.json"
 
         response = requests.get(path)
         print(response)
@@ -115,7 +123,7 @@ class ZFact():
     def __download_product_from_category(self, category_page_path, is_first_page=True, n_product_max=50):
 
         response = requests.get(category_page_path)
-#                    print(response)
+        #                    print(response)
 
         category_page_dict = response.json()
 
@@ -191,7 +199,7 @@ class ZFact():
         directory_path = os.path.dirname(__file__)
         # with this path, we go inside the folder `data` and get the file.
         path_to_file = os.path.join(directory_path, cls.DB_PATH)
-#        print('db path_to_file', path_to_file)
+        #        print('db path_to_file', path_to_file)
 
         return path_to_file
 
