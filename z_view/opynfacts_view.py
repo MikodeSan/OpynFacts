@@ -23,6 +23,10 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 #from credit import ZCredit
 #from event import ZEvent, ZEvent_Owner
 
+# add 'database' interface package
+sys.path.append(os.path.dirname(os.path.dirname(__file__)))
+from dat.database_json import ZDataBase_JSON as database
+
 
 class ZOpynFacts_View(QWidget):
 
@@ -490,29 +494,46 @@ class ZOpynFacts_View(QWidget):
 
     def __update_view_category(self):
 
+        # get category data
+        category_data_dct = self.__model.categories()
+        
         # Table view
 #        data = self.__model._data_array
 
-        self.category_stdmodel
+        self.category_stdmodel.clear()
 
+        # for row_idx, category_data_dct in enumerate(category_data_dct):
+        row_idx = 0
+        for category_id, data_dct in category_data_dct.items():
 
-#        label_lst = self.__model._data_frame_label
-        label_lst = ['a','b','c','d','e']
-#        n_rows = data.shape[0]
-        n_rows = 20
-        for row_idx in range(n_rows):
+            item = QStandardItem( data_dct['name'] )
+            item.setData(category_id)
+            item.setTextAlignment(Qt.AlignLeft | Qt.AlignVCenter)
 
-            for col_idx, label in enumerate(label_lst):
+                # item_0 = QStandardItem( 'str_{}'.format((row_idx+col_idx)*10) )
+                # item.appendRow(item_0)
+                # item_1 = QStandardItem( 'str_{}'.format((row_idx+col_idx)*100) )
+                # item_0.appendRow(item_1)
+            self.category_stdmodel.setItem(row_idx, item)
+            row_idx = row_idx + 1
 
-                item = QStandardItem( 'str_{}'.format(row_idx+col_idx) )
-                item.setData(row_idx+col_idx)
-                item.setTextAlignment(Qt.AlignRight | Qt.AlignVCenter)
+# #        label_lst = self.__model._data_frame_label
+#         label_lst = ['a','b','c','d','e']
+# #        n_rows = data.shape[0]
+#         n_rows = 20
+#         for row_idx in range(n_rows):
 
-                item_0 = QStandardItem( 'str_{}'.format((row_idx+col_idx)*10) )
-                item.appendRow(item_0)
-                item_1 = QStandardItem( 'str_{}'.format((row_idx+col_idx)*100) )
-                item_0.appendRow(item_1)
-                self.category_stdmodel.setItem(row_idx, col_idx, item)
+#             for col_idx, label in enumerate(label_lst):
+
+#                 item = QStandardItem( 'str_{}'.format(row_idx+col_idx) )
+#                 item.setData(row_idx+col_idx)
+#                 item.setTextAlignment(Qt.AlignRight | Qt.AlignVCenter)
+
+#                 item_0 = QStandardItem( 'str_{}'.format((row_idx+col_idx)*10) )
+#                 item.appendRow(item_0)
+#                 item_1 = QStandardItem( 'str_{}'.format((row_idx+col_idx)*100) )
+#                 item_0.appendRow(item_1)
+#                 self.category_stdmodel.setItem(row_idx, col_idx, item)
 
 
 #        for col_idx, label in enumerate(label_lst):

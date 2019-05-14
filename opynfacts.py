@@ -73,26 +73,26 @@ def main():
     sys.exit(APP.exec_())
 
 
-    # --- Get List of category ---
+#     # --- Get List of category ---
 
-    path = "https://fr-en.openfoodfacts.org/categories.json"
-#    path = "https://world.openfoodfacts.org/categories.json"
+#     path = "https://fr-en.openfoodfacts.org/categories.json"
+# #    path = "https://world.openfoodfacts.org/categories.json"
 
-    response = requests.get(path)
-    print(response)
+#     response = requests.get(path)
+#     print(response)
 
-    category_dict = response.json()
-    print('N categories: {}'.format(category_dict['count']))
+#     category_dict = response.json()
+#     print('N categories: {}'.format(category_dict['count']))
 
 
-    category_lst = []
-    for idx, tag_dict in enumerate(category_dict['tags']):
-#        print('#', idx, '.\t\t:', tag_dict['id'])
-        category_lst.append(tag_dict['id'])
+#     category_lst = []
+#     for idx, tag_dict in enumerate(category_dict['tags']):
+# #        print('#', idx, '.\t\t:', tag_dict['id'])
+#         category_lst.append(tag_dict['id'])
 
-    print("Openfoodfacts World Categories:", category_lst)
+#     print("Openfoodfacts World Categories:", category_lst)
 
-    print(len(category_lst))
+#     print(len(category_lst))
 
 
 if __name__ == "__main__":
