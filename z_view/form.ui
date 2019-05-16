@@ -30,7 +30,7 @@
           <widget class="QTreeView" name="category_trview"/>
          </item>
          <item>
-          <widget class="QListView" name="listView"/>
+          <widget class="QListView" name="product_lstview"/>
          </item>
         </layout>
        </widget>

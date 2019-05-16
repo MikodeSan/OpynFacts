@@ -8,7 +8,7 @@ Created on Fri Mar  4 14:14:16 2016
 import sys
 import os
 
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, QModelIndex
 from PyQt5.QtGui import QStandardItem, QStandardItemModel
 from PyQt5.QtWidgets import QApplication, QWidget
 from PyQt5.QtWidgets import QHeaderView, QTreeWidgetItem, QInputDialog
@@ -31,19 +31,19 @@ from dat.database_json import ZDataBase_JSON as database
 class ZOpynFacts_View(QWidget):
 
     PROJECT_NONE = "None"
-#    __CREDIT_TREE_DATA_LABEL = ['Label', 'Id.', 'Capital']
+    #    __CREDIT_TREE_DATA_LABEL = ['Label', 'Id.', 'Capital']
 
     def __init__(self, model, parent=None):
 
         super(ZOpynFacts_View, self).__init__(parent)
 
-#        self.ui_project_command = None
-#        self.ui_credit_command = None
+        #        self.ui_project_command = None
+        #        self.ui_credit_command = None
 
         # Model
         self.__model = model
         # Set observer
-#        self.__model.add_observer(self)
+        #        self.__model.add_observer(self)
 
         self.__create_widgets()
         self.category_stdmodel = QStandardItemModel()
@@ -51,6 +51,8 @@ class ZOpynFacts_View(QWidget):
 
         self.__update_view_category()
 
+        selectionModel = self.ui.category_trview.selectionModel()
+        selectionModel.currentChanged[QModelIndex, QModelIndex].connect(ZOpynFacts_View.test)
 
 #        # Get selected row
 ##        row_list = [select.row() for select in self.ui.table_view.selectedIndexes()]
@@ -517,6 +519,9 @@ class ZOpynFacts_View(QWidget):
             self.category_stdmodel.setItem(row_idx, item)
             row_idx = row_idx + 1
 
+        selectionModel = self.ui.category_trview.selectionModel()
+        print('current index', self.ui.category_trview.currentIndex().row(), self.ui.category_trview.currentIndex().column(), selectionModel)
+
 # #        label_lst = self.__model._data_frame_label
 #         label_lst = ['a','b','c','d','e']
 # #        n_rows = data.shape[0]
@@ -556,6 +561,10 @@ class ZOpynFacts_View(QWidget):
 
 #        print('please print scheduler')
 #        data = credit.estimated_schedule()
+
+    @staticmethod
+    def test(index0, index1):
+        print(index0.row(), index0.column(), index1.row(), index1.column())
 
 
 ##class ZTest(QWidget):
