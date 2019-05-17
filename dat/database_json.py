@@ -124,7 +124,6 @@ class ZDataBase_JSON(object):
         for product_idx, product_dict in enumerate(products_lst):
 
             code = product_dict.pop('code')
-
  
             relation = {self.KEY_CATEGORY_ID:category_id, self.KEY_PRODUCT_CODE:code}
             if relation not in relation_lst:

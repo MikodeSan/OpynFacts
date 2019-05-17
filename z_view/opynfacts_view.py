@@ -7,11 +7,12 @@ Created on Fri Mar  4 14:14:16 2016
 
 import sys
 import os
+import logging as lg
 
-from PyQt5.QtCore import Qt, QModelIndex
+from PyQt5.QtCore import Qt, QItemSelection, QModelIndex
 from PyQt5.QtGui import QStandardItem, QStandardItemModel
 from PyQt5.QtWidgets import QApplication, QWidget
-from PyQt5.QtWidgets import QHeaderView, QTreeWidgetItem, QInputDialog
+from PyQt5.QtWidgets import QAbstractItemView #, QHeaderView, QTreeWidgetItem, QInputDialog
 
 from ui_opynfacts import Ui_Form
 #from event_view import ZEventView
@@ -40,19 +41,31 @@ class ZOpynFacts_View(QWidget):
         #        self.ui_project_command = None
         #        self.ui_credit_command = None
 
+        self.__lg = lg
+        self.__lg.basicConfig(level=lg.DEBUG)
+
         # Model
         self.__model = model
+
+        # view data
+        self.__selected_category_lst = []
+
+
         # Set observer
         #        self.__model.add_observer(self)
 
+        # Initialize main UI form
         self.__create_widgets()
+
+        # set model for category view
         self.category_stdmodel = QStandardItemModel()
-        self.ui.category_trview.setModel(self.category_stdmodel)
+        self.ui.category_view.setModel(self.category_stdmodel)
+        self.ui.category_view.setSelectionMode(QAbstractItemView.ExtendedSelection)
 
+        # populate category view model
         self.__update_view_category()
-
-        selectionModel = self.ui.category_trview.selectionModel()
-        selectionModel.currentChanged[QModelIndex, QModelIndex].connect(ZOpynFacts_View.test)
+        selectionModel = self.ui.category_view.selectionModel()
+        selectionModel.selectionChanged[QItemSelection, QItemSelection].connect(self.__update_selected_categories)
 
 #        # Get selected row
 ##        row_list = [select.row() for select in self.ui.table_view.selectedIndexes()]
@@ -123,6 +136,52 @@ class ZOpynFacts_View(QWidget):
 #
 #        self.ui_credit_command._action_new.triggered[bool].connect(self.print_test)
 
+    def __create_widgets(self):
+
+        self.ui = Ui_Form()
+        self.ui.setupUi(self)
+
+
+    def __update_view_category(self):
+
+        # get category data
+        category_data_dct = self.__model.categories()
+        
+        # Table view
+        self.category_stdmodel.clear()
+
+        row_idx = 0
+        for category_id, data_dct in category_data_dct.items():
+
+            item = QStandardItem( data_dct['name'] )
+            item.setData(category_id)
+            item.setTextAlignment(Qt.AlignLeft | Qt.AlignVCenter)
+
+            self.category_stdmodel.setItem(row_idx, item)
+            row_idx = row_idx + 1
+
+
+    def __update_selected_categories(self, selected_item, deselected_item):
+        """ Get the list of selected category items, then get item data back and update the list of selected category id. """
+
+        # new selected items
+        for model_index in selected_item.indexes():
+
+            category_id = model_index.data(Qt.UserRole+1)
+            
+            if category_id not in self.__selected_category_lst:
+                self.__selected_category_lst.append(category_id)
+        
+        # deselected items
+        for model_index in deselected_item.indexes():
+
+            category_id = model_index.data(Qt.UserRole+1)
+            
+            if category_id in self.__selected_category_lst:
+                self.__selected_category_lst.remove(category_id)
+
+        self.__lg.debug('Selected categories: {}'.format(self.__selected_category_lst))
+
 
     def print_test(self, check):
 ##        print(newAct.iconText(), newAct.text())
@@ -137,10 +196,7 @@ class ZOpynFacts_View(QWidget):
 #        print(text)
         pass
 
-    def __create_widgets(self):
-
-        self.ui = Ui_Form()
-        self.ui.setupUi(self)
+        
 
 #        self.ui.project_list_combo.addItem("None")
 #
@@ -494,33 +550,7 @@ class ZOpynFacts_View(QWidget):
 #        self.ui.outCost_dspin.setValue( cost )
 #        self.ui.outCostRate_dspin.setValue( cost_rate )
 
-    def __update_view_category(self):
 
-        # get category data
-        category_data_dct = self.__model.categories()
-        
-        # Table view
-#        data = self.__model._data_array
-
-        self.category_stdmodel.clear()
-
-        # for row_idx, category_data_dct in enumerate(category_data_dct):
-        row_idx = 0
-        for category_id, data_dct in category_data_dct.items():
-
-            item = QStandardItem( data_dct['name'] )
-            item.setData(category_id)
-            item.setTextAlignment(Qt.AlignLeft | Qt.AlignVCenter)
-
-                # item_0 = QStandardItem( 'str_{}'.format((row_idx+col_idx)*10) )
-                # item.appendRow(item_0)
-                # item_1 = QStandardItem( 'str_{}'.format((row_idx+col_idx)*100) )
-                # item_0.appendRow(item_1)
-            self.category_stdmodel.setItem(row_idx, item)
-            row_idx = row_idx + 1
-
-        selectionModel = self.ui.category_trview.selectionModel()
-        print('current index', self.ui.category_trview.currentIndex().row(), self.ui.category_trview.currentIndex().column(), selectionModel)
 
 # #        label_lst = self.__model._data_frame_label
 #         label_lst = ['a','b','c','d','e']
@@ -561,11 +591,6 @@ class ZOpynFacts_View(QWidget):
 
 #        print('please print scheduler')
 #        data = credit.estimated_schedule()
-
-    @staticmethod
-    def test(index0, index1):
-        print(index0.row(), index0.column(), index1.row(), index1.column())
-
 
 ##class ZTest(QWidget):
 ##

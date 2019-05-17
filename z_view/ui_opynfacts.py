@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file '.\z_view\form.ui'
+# Form implementation generated from reading ui file 'z_view\form.ui'
 #
 # Created by: PyQt5 UI code generator 5.12.1
 #
@@ -12,10 +12,11 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_Form(object):
     def setupUi(self, Form):
         Form.setObjectName("Form")
-        Form.resize(406, 300)
+        Form.resize(641, 479)
         self.verticalLayout = QtWidgets.QVBoxLayout(Form)
         self.verticalLayout.setObjectName("verticalLayout")
         self.groupBox = QtWidgets.QGroupBox(Form)
+        self.groupBox.setTitle("")
         self.groupBox.setObjectName("groupBox")
         self.horizontalLayout = QtWidgets.QHBoxLayout(self.groupBox)
         self.horizontalLayout.setObjectName("horizontalLayout")
@@ -23,12 +24,34 @@ class Ui_Form(object):
         self.groupBox_3.setObjectName("groupBox_3")
         self.horizontalLayout_2 = QtWidgets.QHBoxLayout(self.groupBox_3)
         self.horizontalLayout_2.setObjectName("horizontalLayout_2")
-        self.category_trview = QtWidgets.QTreeView(self.groupBox_3)
-        self.category_trview.setObjectName("category_trview")
-        self.horizontalLayout_2.addWidget(self.category_trview)
-        self.listView = QtWidgets.QListView(self.groupBox_3)
-        self.listView.setObjectName("listView")
-        self.horizontalLayout_2.addWidget(self.listView)
+        self.groupBox_6 = QtWidgets.QGroupBox(self.groupBox_3)
+        self.groupBox_6.setObjectName("groupBox_6")
+        self.verticalLayout_2 = QtWidgets.QVBoxLayout(self.groupBox_6)
+        self.verticalLayout_2.setObjectName("verticalLayout_2")
+        self.groupBox_8 = QtWidgets.QGroupBox(self.groupBox_6)
+        self.groupBox_8.setTitle("")
+        self.groupBox_8.setFlat(False)
+        self.groupBox_8.setObjectName("groupBox_8")
+        self.horizontalLayout_5 = QtWidgets.QHBoxLayout(self.groupBox_8)
+        self.horizontalLayout_5.setObjectName("horizontalLayout_5")
+        spacerItem = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        self.horizontalLayout_5.addItem(spacerItem)
+        self.select_all_btn = QtWidgets.QPushButton(self.groupBox_8)
+        self.select_all_btn.setObjectName("select_all_btn")
+        self.horizontalLayout_5.addWidget(self.select_all_btn)
+        self.verticalLayout_2.addWidget(self.groupBox_8)
+        self.category_view = QtWidgets.QTreeView(self.groupBox_6)
+        self.category_view.setObjectName("category_view")
+        self.verticalLayout_2.addWidget(self.category_view)
+        self.horizontalLayout_2.addWidget(self.groupBox_6)
+        self.groupBox_7 = QtWidgets.QGroupBox(self.groupBox_3)
+        self.groupBox_7.setObjectName("groupBox_7")
+        self.verticalLayout_3 = QtWidgets.QVBoxLayout(self.groupBox_7)
+        self.verticalLayout_3.setObjectName("verticalLayout_3")
+        self.product_view = QtWidgets.QListView(self.groupBox_7)
+        self.product_view.setObjectName("product_view")
+        self.verticalLayout_3.addWidget(self.product_view)
+        self.horizontalLayout_2.addWidget(self.groupBox_7)
         self.horizontalLayout.addWidget(self.groupBox_3)
         self.groupBox_4 = QtWidgets.QGroupBox(self.groupBox)
         self.groupBox_4.setObjectName("groupBox_4")
@@ -74,8 +97,10 @@ class Ui_Form(object):
     def retranslateUi(self, Form):
         _translate = QtCore.QCoreApplication.translate
         Form.setWindowTitle(_translate("Form", "Form"))
-        self.groupBox.setTitle(_translate("Form", "GroupBox"))
-        self.groupBox_3.setTitle(_translate("Form", "GroupBox"))
+        self.groupBox_3.setTitle(_translate("Form", "Selection"))
+        self.groupBox_6.setTitle(_translate("Form", "Category"))
+        self.select_all_btn.setText(_translate("Form", "Select All"))
+        self.groupBox_7.setTitle(_translate("Form", "Product"))
         self.groupBox_4.setTitle(_translate("Form", "GroupBox"))
         self.groupBox_5.setTitle(_translate("Form", "GroupBox"))
         self.groupBox_2.setTitle(_translate("Form", "Criteria"))

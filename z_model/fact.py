@@ -43,8 +43,6 @@ class ZFact():
 
             self.__db.save_db()
 
-            self.__db.get_categories_from_relation()
-
     def categories(self):
         
         return self.__db.get_categories_from_relation()
@@ -80,7 +78,6 @@ class ZFact():
 
 
                 # Get category pages
-
                 is_first_page = True
                 page_idx = 0
                 n_product = 0
@@ -102,10 +99,8 @@ class ZFact():
                     n_product = n_product + len(products_lst)
                     n_scan = n_scan + n_scanned
 
-
                     # add product lst to db
                     self.__db.add_product(category_id, products_lst)
-
 
                     page_idx = page_idx + 1
 
