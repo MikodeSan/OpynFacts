@@ -45,7 +45,7 @@ class ZDataBase_JSON(object):
 
         for idx, tag_dict in enumerate(remote_data_dict['tags']):
 
-#        print('#', idx, '.\t\t:', tag_dict['id'])
+            #        print('#', idx, '.\t\t:', tag_dict['id'])
             category_id = tag_dict.pop("id")
 
             # check category id.
@@ -108,13 +108,39 @@ class ZDataBase_JSON(object):
 
                     #     categories_lst.append(category_dct)
 
-        print(categories_dct)
+        # print(categories_dct)
 
         return categories_dct
 
     def get_category_url(self, category_id):
 
         return self.__data[self.KEY_CATEGORY][category_id]['url']
+
+    def products(self, categories_lst):
+
+        products_dct = {}
+
+        # Get list of product code
+        if not categories_lst:
+            products_dct = dict(self.__data[self.KEY_PRODUCT])
+
+        else:
+            product_code_lst = []
+            for idx, category_id in enumerate(categories_lst):
+
+                for relation_dct in self.__data[self.KEY_RELATION_CATEGORY_2_PRODUCT]:
+
+                    if category_id == relation_dct[self.KEY_CATEGORY_ID]:
+                        product_code = relation_dct[self.KEY_PRODUCT_CODE]
+
+                        if relation_dct[self.KEY_PRODUCT_CODE] not in product_code_lst:
+                            product_code_lst.append(product_code)
+                            products_dct[product_code] = self.__data[self.KEY_PRODUCT][product_code]
+                            # print('product code', product_code)
+
+        return products_dct
+
+    # def products_from_category(self):
 
     def add_product(self, category_id, products_lst):
 

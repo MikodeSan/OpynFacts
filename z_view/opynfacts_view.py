@@ -64,26 +64,19 @@ class ZOpynFacts_View(QWidget):
 
         # populate category view model
         self.__update_view_category()
-        selectionModel = self.ui.category_view.selectionModel()
-        selectionModel.selectionChanged[QItemSelection, QItemSelection].connect(self.__update_selected_categories)
+        category_selection_model = self.ui.category_view.selectionModel()
+        category_selection_model.selectionChanged[QItemSelection, QItemSelection].connect(self.__update_data_selected_categories)
 
-#        # Get selected row
-##        row_list = [select.row() for select in self.ui.table_view.selectedIndexes()]
-#        row_list = [1,2,3,4,5,6,7,8,9]
-#
-#        row_list = list(set(row_list))
-#        print('selected row list', row_list)
-#
-#        # Get event id. list
-#        id_list = list()
-#        for row in row_list:
-#            print('data:', self.ui.table_model.item(row, self.__model._data_frame_label.index('Id.')).data())
-##            id_list.append(int(self.ui.table_model.item(row, self.__model._data_frame_label.index('Id.')).text()))
-#            id_list.append(self.ui.table_model.item(row, self.__model._data_frame_label.index('Id.')).data())
+        # set model for product view
+        self.product_mdl = QStandardItemModel()
+        self.ui.product_view.setModel(self.product_mdl)
+        self.ui.product_view.setSelectionMode(QAbstractItemView.SingleSelection)
 
+        # populate category view model
+        self.__update_view_product()
+        product_selection_model = self.ui.product_view.selectionModel()
+        # product_selection_model.selectionChanged[QItemSelection, QItemSelection].connect(self.__update_data_selected_categories)
 
-
-        #        print(self.__model)
 
         # Init. parameters from model
 #        project_lst = self.__model.get_project_list()
@@ -99,16 +92,12 @@ class ZOpynFacts_View(QWidget):
 #            self.ui.project_list_combo.addItems(project_lst)
 #            self.ui.project_list_combo.setCurrentIndex(self.__model.current_project_id)
 #
-#
-#
 #        self.ui.table_model = QStandardItemModel()
 #        self.ui.table_view.setModel(self.ui.table_model)
 #
 ##        self.__load_project()
 ##        self.__model.load_project(self.__model.current_project_id)
 #        self.update(ZFunding.OBS_MSG_INIT_PROJECT)
-#
-#
 #
 #        self.ui.project_list_combo.currentIndexChanged[int].connect(self.combo_current_index_changed)
 #        self.ui_project_command._action_new.triggered[bool].connect(self.__new_project)
@@ -147,7 +136,7 @@ class ZOpynFacts_View(QWidget):
         # get category data
         category_data_dct = self.__model.categories()
         
-        # Table view
+        # view
         self.category_stdmodel.clear()
 
         row_idx = 0
@@ -161,7 +150,26 @@ class ZOpynFacts_View(QWidget):
             row_idx = row_idx + 1
 
 
-    def __update_selected_categories(self, selected_item, deselected_item):
+    def __update_view_product(self, categories_lst=[]):
+
+        # get product data
+        product_data_dct = self.__model.products(categories_lst)
+        
+        # view
+        self.product_mdl.clear()
+
+        row_idx = 0
+        for product_code, data_dct in product_data_dct.items():
+
+            item = QStandardItem( data_dct['name'] )
+            item.setData(product_code)
+            item.setTextAlignment(Qt.AlignLeft | Qt.AlignVCenter)
+
+            self.product_mdl.setItem(row_idx, item)
+            row_idx = row_idx + 1
+
+
+    def __update_data_selected_categories(self, selected_item, deselected_item):
         """ Get the list of selected category items, then get item data back and update the list of selected category id. """
 
         # new selected items
@@ -180,7 +188,14 @@ class ZOpynFacts_View(QWidget):
             if category_id in self.__selected_category_lst:
                 self.__selected_category_lst.remove(category_id)
 
-        self.__lg.debug('Selected categories: {}'.format(self.__selected_category_lst))
+        self.__lg.debug('{} Selected categories: {}'.format(len(self.__selected_category_lst), self.__selected_category_lst))
+
+        self.__update_view_product(self.__selected_category_lst)
+
+
+    def __product_selection(self, selected_item, deselected_item):
+
+        print('selected product', selected_item.indexes()[0].data())
 
 
     def print_test(self, check):

@@ -47,6 +47,9 @@ class ZFact():
         
         return self.__db.get_categories_from_relation()
 
+    def products(self, categories_lst):
+
+        return self.__db.products(categories_lst)
 
     def __download_categories(self):
 
@@ -59,7 +62,6 @@ class ZFact():
         print(response)
 
         return response.json()
-
 
     def __init_database_product(self, n_category_max=70, n_product_max=70):
 
@@ -113,7 +115,6 @@ class ZFact():
                 category_url = self.__db.get_category_url(category_id) + '.json'
                 print(category_url)
                 self.__download_product_from_category(category_url)
-
 
     def __download_product_from_category(self, category_page_path, is_first_page=True, n_product_max=50):
 
