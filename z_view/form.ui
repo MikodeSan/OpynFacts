@@ -6,9 +6,15 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>809</width>
-    <height>655</height>
+    <width>800</width>
+    <height>600</height>
    </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>800</width>
+    <height>600</height>
+   </size>
   </property>
   <property name="windowTitle">
    <string>Form</string>
@@ -25,11 +31,17 @@
         <property name="title">
          <string>Selection</string>
         </property>
+        <property name="flat">
+         <bool>true</bool>
+        </property>
         <layout class="QHBoxLayout" name="horizontalLayout_2">
          <item>
           <widget class="QGroupBox" name="groupBox_6">
            <property name="title">
             <string>Category</string>
+           </property>
+           <property name="flat">
+            <bool>true</bool>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_2">
             <item>
@@ -38,7 +50,7 @@
                <string/>
               </property>
               <property name="flat">
-               <bool>false</bool>
+               <bool>true</bool>
               </property>
               <layout class="QHBoxLayout" name="horizontalLayout_5">
                <item>
@@ -75,9 +87,12 @@
            <property name="title">
             <string>Product</string>
            </property>
+           <property name="flat">
+            <bool>true</bool>
+           </property>
            <layout class="QVBoxLayout" name="verticalLayout_3">
             <item>
-             <widget class="QListView" name="product_view"/>
+             <widget class="QTreeView" name="product_view"/>
             </item>
            </layout>
           </widget>
@@ -88,11 +103,14 @@
       <item>
        <widget class="QGroupBox" name="groupBox_4">
         <property name="title">
-         <string>GroupBox</string>
+         <string>Alternative</string>
+        </property>
+        <property name="flat">
+         <bool>true</bool>
         </property>
         <layout class="QHBoxLayout" name="horizontalLayout_3">
          <item>
-          <widget class="QListView" name="listView_2"/>
+          <widget class="QListView" name="alternative_view"/>
          </item>
         </layout>
        </widget>
@@ -100,11 +118,67 @@
       <item>
        <widget class="QGroupBox" name="groupBox_5">
         <property name="title">
-         <string>GroupBox</string>
+         <string>Favorite</string>
+        </property>
+        <property name="flat">
+         <bool>true</bool>
         </property>
         <layout class="QHBoxLayout" name="horizontalLayout_4">
          <item>
-          <widget class="QListView" name="listView_3"/>
+          <widget class="QListView" name="favorite_view"/>
+         </item>
+         <item>
+          <widget class="QGroupBox" name="groupBox_9">
+           <property name="title">
+            <string>GroupBox</string>
+           </property>
+           <layout class="QVBoxLayout" name="verticalLayout_4">
+            <item>
+             <widget class="QGroupBox" name="groupBox_10">
+              <property name="title">
+               <string>GroupBox</string>
+              </property>
+              <layout class="QVBoxLayout" name="verticalLayout_5">
+               <item>
+                <widget class="QLabel" name="label_4">
+                 <property name="text">
+                  <string>TextLabel</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QLabel" name="label_7">
+                 <property name="text">
+                  <string>TextLabel</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QLabel" name="label_6">
+                 <property name="text">
+                  <string>TextLabel</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QLabel" name="label_5">
+                 <property name="text">
+                  <string>TextLabel</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </widget>
+            </item>
+            <item>
+             <widget class="QGroupBox" name="groupBox_11">
+              <property name="title">
+               <string>GroupBox</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
          </item>
         </layout>
        </widget>
@@ -117,31 +191,44 @@
      <property name="title">
       <string>Criteria</string>
      </property>
+     <property name="flat">
+      <bool>true</bool>
+     </property>
      <layout class="QGridLayout" name="gridLayout">
-      <item row="1" column="1">
-       <widget class="QSpinBox" name="spinBox"/>
-      </item>
-      <item row="1" column="0">
-       <widget class="QLabel" name="label">
-        <property name="text">
-         <string>TextLabel</string>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="0">
+      <item row="4" column="1">
        <widget class="QLabel" name="label_2">
         <property name="text">
          <string>TextLabel</string>
         </property>
        </widget>
       </item>
-      <item row="2" column="1">
+      <item row="4" column="2">
        <widget class="QComboBox" name="comboBox"/>
       </item>
-      <item row="0" column="1">
+      <item row="3" column="2">
+       <widget class="QSpinBox" name="spinBox"/>
+      </item>
+      <item row="1" column="2">
        <widget class="QPushButton" name="pushButton">
         <property name="text">
          <string>Update db</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="1">
+       <widget class="QLabel" name="label">
+        <property name="text">
+         <string>TextLabel</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="QComboBox" name="altern_category_cbox"/>
+      </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="label_3">
+        <property name="text">
+         <string>Alternative category</string>
         </property>
        </widget>
       </item>

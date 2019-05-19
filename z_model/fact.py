@@ -8,23 +8,23 @@ Created on Mon Apr 29 12:50:20 2019
 
 import sys
 import os
+import shutil
 
 import requests
 
 # add 'main' package
 
-# sys.path.append(os.path.join(os.path.dirname(os.path.dirname(__file__)), '/dat' ))
-sys.path.append(os.path.dirname(os.path.dirname(__file__)))
-from dat.database_json import ZDataBase_JSON as database
-
-
+sys.path.append(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'dat' ))
+sys.path.append(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'dat\\im' ))
+from database_json import ZDataBase_JSON as database
 
 class ZFact():
     '''
     classdocs
     '''
 
-    DB_PATH = 'data/funding_db.json'
+    DB_PATH = 'data\funding_db.json'
+    IMAGE_PATH = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'dat\\im')
 
 
     def __init__(self, observer=None):
@@ -59,7 +59,7 @@ class ZFact():
         # path = "https://world.openfoodfacts.org/categories.json"
 
         response = requests.get(path)
-        print(response)
+        # print(response)
 
         return response.json()
 
@@ -76,7 +76,7 @@ class ZFact():
                 # Get category url
                 category_id = categories_lst[category_idx]
                 category_url = self.__db.get_category_url(category_id)
-                print(category_idx+1, category_id)
+                # print(category_idx+1, category_id)
 
 
                 # Get category pages
@@ -95,7 +95,7 @@ class ZFact():
                                                                                             is_first_page=is_first_page)
                     if is_first_page:
                         n_product_total = n_total
-                        print(n_product_total)
+                        # print(n_product_total)
                         is_first_page = False
 
                     n_product = n_product + len(products_lst)
@@ -113,10 +113,10 @@ class ZFact():
 
             for idx, category_id in enumerate(self.__db.get_categories()):
                 category_url = self.__db.get_category_url(category_id) + '.json'
-                print(category_url)
+                # print(category_url)
                 self.__download_product_from_category(category_url)
 
-    def __download_product_from_category(self, category_page_path, is_first_page=True, n_product_max=50):
+    def __download_product_from_category(self, category_page_path, is_first_page=True):
 
         response = requests.get(category_page_path)
         #                    print(response)
@@ -138,7 +138,7 @@ class ZFact():
 
             if product_data_dict:
                 products_lst.append(product_data_dict)
-                print(product_idx+1, product_data_dict)
+                # print(product_idx+1, product_data_dict)
 
         return [products_lst, len(page_products_lst), n_product_total]
 
@@ -175,14 +175,109 @@ class ZFact():
 
             lg_idx = lg_idx + 1
 
-        if name != '':
+        if name:
             extracted_data_dict['name'] = name
+        else:
+            extracted_data_dict['name'] = ''
 
         # brands
+        extracted_data_dict['brands'] = ""
         if 'brands' in product_dict:
             extracted_data_dict['brands'] = product_dict['brands']
 
-        if len(extracted_data_dict) < 3:
+        # url
+        extracted_data_dict['url'] = ""
+        if 'url' in product_dict:
+            extracted_data_dict['url'] = product_dict['url']
+        
+        # stores
+        if 'stores' in product_dict:
+            extracted_data_dict['stores'] = product_dict['stores'] # .split(',')
+        else:
+            extracted_data_dict['stores'] = ""
+
+        # category hierarchy
+        if 'categories_hierarchy' in product_dict:
+            extracted_data_dict['categories_hierarchy'] = product_dict['categories_hierarchy']
+        else:
+            extracted_data_dict['categories_hierarchy'] = []
+
+        # image
+        extracted_data_dict['image'] = ""
+        image_url = ""
+        if 'image_url' in product_dict:
+            image_url = product_dict['image_url']
+        elif 'image_front_url' in product_dict:
+            image_url = product_dict['image_front_url']
+        
+        if image_url:
+            r = requests.get(image_url, stream=True)
+            if r.status_code == 200:
+                image_path = self.IMAGE_PATH + "/{}".format(extracted_data_dict['code']) + "." + image_url.split(".")[-1]
+                # print(image_path)
+                with open(image_path, 'wb') as out_file:
+                    r.raw.decode_content = True
+                    shutil.copyfileobj(r.raw, out_file)
+                    extracted_data_dict['image'] = image_path
+
+            del r
+
+        # nova group
+        extracted_data_dict['nova_group'] = -1
+        if 'nova_group' in product_dict:
+            extracted_data_dict['nova_group'] = int(product_dict['nova_group'])
+                
+        # nutrition grade
+        extracted_data_dict['nutrition_grades'] = ""
+        if 'nutrition_grades' in product_dict:
+            extracted_data_dict['nutrition_grades'] = product_dict['nutrition_grades']
+
+        # nutrition score
+        extracted_data_dict['nutrition_score'] = -1
+        if 'nutriments' in product_dict:
+            nutriments_dct = product_dict['nutriments']
+            if 'nutrition-score-uk_100g' in nutriments_dct:
+                score = nutriments_dct['nutrition-score-uk_100g']
+            elif 'nutrition-score-fr_100g' in nutriments_dct:
+                score = nutriments_dct['nutrition-score-fr_100g']
+            elif 'nutrition-score-uk' in nutriments_dct:
+                score = nutriments_dct['nutrition-score-uk']
+            elif 'nutrition-score-fr' in nutriments_dct:
+                score = nutriments_dct['nutrition-score-fr']
+
+        # nutrient level
+        extracted_data_dict['nutrient_levels'] = {}
+        if 'nutrient_levels' in product_dict:
+            extracted_data_dict['nutrient_levels'] = product_dict['nutrient_levels']
+
+        # nutrition score beverage
+        extracted_data_dict['nutrition_score_beverage'] = -1
+        if 'nutrition_score_beverage' in product_dict:
+            extracted_data_dict['nutrition_score_beverage'] = product_dict['nutrition_score_beverage']
+
+        # unique_scans_n
+        extracted_data_dict['unique_scans_n'] = -1
+        if 'unique_scans_n' in product_dict:
+            extracted_data_dict['unique_scans_n'] = product_dict['unique_scans_n']
+
+        # nutrition score beverage
+        extracted_data_dict['nutrition_score_beverage'] = -1
+        if 'nutrition_score_beverage' in product_dict:
+            extracted_data_dict['nutrition_score_beverage'] = product_dict['nutrition_score_beverage']
+        
+        # created time
+        extracted_data_dict['created_t'] = -1
+        if 'created_t' in product_dict:
+            extracted_data_dict['created_t'] = product_dict['created_t']
+        
+        # last modified time
+        extracted_data_dict['last_modified_t'] = -1
+        if 'last_modified_t' in product_dict:
+            extracted_data_dict['last_modified_t'] = product_dict['last_modified_t']
+
+        # if len(extracted_data_dict) < 3:
+        #     extracted_data_dict = {}
+        if not extracted_data_dict['name']:
             extracted_data_dict = {}
 
         return extracted_data_dict

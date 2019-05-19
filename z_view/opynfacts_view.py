@@ -9,7 +9,7 @@ import sys
 import os
 import logging as lg
 
-from PyQt5.QtCore import Qt, QItemSelection, QModelIndex
+from PyQt5.QtCore import Qt, QItemSelection, QModelIndex, QDateTime
 from PyQt5.QtGui import QStandardItem, QStandardItemModel
 from PyQt5.QtWidgets import QApplication, QWidget
 from PyQt5.QtWidgets import QAbstractItemView #, QHeaderView, QTreeWidgetItem, QInputDialog
@@ -25,8 +25,8 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 #from event import ZEvent, ZEvent_Owner
 
 # add 'database' interface package
-sys.path.append(os.path.dirname(os.path.dirname(__file__)))
-from dat.database_json import ZDataBase_JSON as database
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from database_json import ZDataBase_JSON as database
 
 
 class ZOpynFacts_View(QWidget):
@@ -75,7 +75,7 @@ class ZOpynFacts_View(QWidget):
         # populate category view model
         self.__update_view_product()
         product_selection_model = self.ui.product_view.selectionModel()
-        # product_selection_model.selectionChanged[QItemSelection, QItemSelection].connect(self.__update_data_selected_categories)
+        product_selection_model.selectionChanged[QItemSelection, QItemSelection].connect(self.__product_selection)
 
 
         # Init. parameters from model
@@ -161,11 +161,64 @@ class ZOpynFacts_View(QWidget):
         row_idx = 0
         for product_code, data_dct in product_data_dct.items():
 
+            header_lst = []
+            item_lst = []
+
             item = QStandardItem( data_dct['name'] )
             item.setData(product_code)
             item.setTextAlignment(Qt.AlignLeft | Qt.AlignVCenter)
+            header_lst.append('Name')
+            item_lst.append(item)
 
-            self.product_mdl.setItem(row_idx, item)
+            item = QStandardItem( data_dct['brands'] )
+            item.setTextAlignment(Qt.AlignLeft | Qt.AlignVCenter)
+            header_lst.append('Brand')
+            item_lst.append(item)
+
+            item = QStandardItem( ''.join(data_dct['stores']) )
+            item.setTextAlignment(Qt.AlignLeft | Qt.AlignVCenter)
+            header_lst.append('Store')
+            item_lst.append(item)
+
+            nova = data_dct['nova_group']
+            # print(nova)
+            if int(nova) > 0:
+                s = str(nova)
+            else:
+                s = ""
+            item = QStandardItem( s )
+            item.setTextAlignment(Qt.AlignLeft | Qt.AlignVCenter)
+            header_lst.append('Nova score')
+            item_lst.append(item)
+
+            item = QStandardItem( data_dct['nutrition_grades'] )
+            item.setTextAlignment(Qt.AlignLeft | Qt.AlignVCenter)
+            header_lst.append('Nutri-Score')
+            item_lst.append(item)
+
+            nutrition_score = data_dct['nutrition_score']
+            if nutrition_score >= 0:
+                s = str(nutrition_score)
+            else:
+                s = ""
+            item = QStandardItem( s )
+            item.setTextAlignment(Qt.AlignLeft | Qt.AlignVCenter)
+            header_lst.append('UK Nutri-Score')
+            item_lst.append(item)
+
+            time = data_dct['last_modified_t']
+            if time >= 0:
+                s = str(QDateTime().setTime_t(time))
+            else:
+                s = ""
+            item = QStandardItem( s )
+            item.setTextAlignment(Qt.AlignLeft | Qt.AlignVCenter)
+            header_lst.append('Edited')
+            item_lst.append(item)
+
+            self.product_mdl.setHorizontalHeaderLabels(header_lst)
+            self.product_mdl.appendRow(item_lst)
+            # self.product_mdl.setItem(row_idx, item)
             row_idx = row_idx + 1
 
 
