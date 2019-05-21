@@ -110,7 +110,7 @@
         </property>
         <layout class="QHBoxLayout" name="horizontalLayout_3">
          <item>
-          <widget class="QListView" name="alternative_view"/>
+          <widget class="QTreeView" name="alternative_view"/>
          </item>
         </layout>
        </widget>

@@ -62,7 +62,7 @@ class Ui_Form(object):
         self.groupBox_4.setObjectName("groupBox_4")
         self.horizontalLayout_3 = QtWidgets.QHBoxLayout(self.groupBox_4)
         self.horizontalLayout_3.setObjectName("horizontalLayout_3")
-        self.alternative_view = QtWidgets.QListView(self.groupBox_4)
+        self.alternative_view = QtWidgets.QTreeView(self.groupBox_4)
         self.alternative_view.setObjectName("alternative_view")
         self.horizontalLayout_3.addWidget(self.alternative_view)
         self.horizontalLayout.addWidget(self.groupBox_4)

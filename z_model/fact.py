@@ -58,6 +58,10 @@ class ZFact():
 
         return self.__db.product_data(product_code_lst)
 
+    def alternative_products(self, product_code, category_id):
+
+        return self.__db.products([category_id])
+
     def __download_categories(self):
 
         # --- Get List of category ---
@@ -141,7 +145,7 @@ class ZFact():
         products_lst = []
         for product_idx, product_dict in enumerate(page_products_lst):
             # Get product data
-            product_data_dict = self.__product_data(product_dict)
+            product_data_dict = self.__product_data_from_source(product_dict)
 
             if product_data_dict:
                 products_lst.append(product_data_dict)

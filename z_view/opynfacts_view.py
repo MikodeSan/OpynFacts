@@ -15,14 +15,9 @@ from PyQt5.QtWidgets import QApplication, QWidget
 from PyQt5.QtWidgets import QAbstractItemView #, QHeaderView, QTreeWidgetItem, QInputDialog
 
 from ui_opynfacts import Ui_Form
-#from event_view import ZEventView
-#from view_command import ZView_Command
 
 # add 'model' package
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-#from funding_model import ZFunding
-#from credit import ZCredit
-#from event import ZEvent, ZEvent_Owner
 
 # add 'database' interface package
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -38,9 +33,6 @@ class ZOpynFacts_View(QWidget):
 
         super(ZOpynFacts_View, self).__init__(parent)
 
-        #        self.ui_project_command = None
-        #        self.ui_credit_command = None
-
         self.__lg = lg
         self.__lg.basicConfig(level=lg.DEBUG)
 
@@ -49,10 +41,6 @@ class ZOpynFacts_View(QWidget):
 
         # view data
         self.__selected_category_lst = []
-
-
-        # Set observer
-        #        self.__model.add_observer(self)
 
         # Initialize main UI form
         self.__create_widgets()
@@ -72,10 +60,37 @@ class ZOpynFacts_View(QWidget):
         self.ui.product_view.setModel(self.product_mdl)
         self.ui.product_view.setSelectionMode(QAbstractItemView.SingleSelection)
 
-        # populate category view model
-        self.__update_view_product()
+        # populate product view model
+        product_data_dct = self.__model.products_from_categories([])        
+        self.__update_view_product('product', product_data_dct)
         product_selection_model = self.ui.product_view.selectionModel()
         product_selection_model.selectionChanged[QItemSelection, QItemSelection].connect(self.__update_data_selected_product)
+
+        # set model for alternative product view
+        self.alternative_mdl = QStandardItemModel()
+        self.ui.alternative_view.setModel(self.alternative_mdl)
+        self.ui.alternative_view.setSelectionMode(QAbstractItemView.SingleSelection)
+
+        altern_category_cbox = self.ui.altern_category_cbox
+        altern_category_cbox.currentIndexChanged[int].connect(self.__update_data_alternative_product)
+
+
+
+        # # populate product view model
+        # self.__update_selected_alternative()
+        # alternative_selection_model = self.ui.alternative_view.selectionModel()
+        # alternative_selection_model.selectionChanged[QItemSelection, QItemSelection].connect(self.__update_data_selected_alternative)
+
+        # # set model for favorite view
+        # self.category_stdmodel = QStandardItemModel()
+        # self.ui.category_view.setModel(self.category_stdmodel)
+        # self.ui.category_view.setSelectionMode(QAbstractItemView.ExtendedSelection)
+
+        # # populate favorite view model
+        # self.__update_view_category()
+        # category_selection_model = self.ui.category_view.selectionModel()
+        # category_selection_model.selectionChanged[QItemSelection, QItemSelection].connect(self.__update_data_selected_categories)
+
 
         # Init. parameters from model
 #        project_lst = self.__model.get_project_list()
@@ -149,76 +164,83 @@ class ZOpynFacts_View(QWidget):
             row_idx = row_idx + 1
 
 
-    def __update_view_product(self, categories_lst=[]):
+    def __update_view_product(self, model_type, product_data_dct):
 
-        # get product data
-        product_data_dct = self.__model.products_from_categories(categories_lst)
-        
         # view
-        self.product_mdl.clear()
+        is_checked = True
 
-        row_idx = 0
-        for product_code, data_dct in product_data_dct.items():
+        if model_type == 'product':
+            model = self.product_mdl
+        elif model_type == 'alternative':
+            model = self.alternative_mdl
+        else:
+            is_checked = False
 
-            header_lst = []
-            item_lst = []
+        if is_checked:
 
-            item = QStandardItem( data_dct['name'] )
-            item.setData(product_code)
-            item.setTextAlignment(Qt.AlignLeft | Qt.AlignVCenter)
-            header_lst.append('Name')
-            item_lst.append(item)
+            model.clear()
 
-            item = QStandardItem( data_dct['brands'] )
-            item.setTextAlignment(Qt.AlignLeft | Qt.AlignVCenter)
-            header_lst.append('Brand')
-            item_lst.append(item)
+            header_lst = ['Name', 'code', 'Brand', 'Store', 'Nutri-Score', 'Nova score', 'UK Nutri-Score', 'Edited']
+            model.setHorizontalHeaderLabels(header_lst)
 
-            item = QStandardItem( ''.join(data_dct['stores']) )
-            item.setTextAlignment(Qt.AlignLeft | Qt.AlignVCenter)
-            header_lst.append('Store')
-            item_lst.append(item)
 
-            nova = data_dct['nova_group']
-            # print(nova)
-            if int(nova) > 0:
-                s = str(nova)
-            else:
-                s = ""
-            item = QStandardItem( s )
-            item.setTextAlignment(Qt.AlignLeft | Qt.AlignVCenter)
-            header_lst.append('Nova score')
-            item_lst.append(item)
+            row_idx = 0
+            for product_code, data_dct in product_data_dct.items():
 
-            item = QStandardItem( data_dct['nutrition_grades'] )
-            item.setTextAlignment(Qt.AlignLeft | Qt.AlignVCenter)
-            header_lst.append('Nutri-Score')
-            item_lst.append(item)
+                item_lst = []
 
-            nutrition_score = data_dct['nutrition_score']
-            if nutrition_score >= 0:
-                s = str(nutrition_score)
-            else:
-                s = ""
-            item = QStandardItem( s )
-            item.setTextAlignment(Qt.AlignLeft | Qt.AlignVCenter)
-            header_lst.append('UK Nutri-Score')
-            item_lst.append(item)
+                item = QStandardItem( data_dct['name'] )
+                item.setData(product_code)
+                item.setTextAlignment(Qt.AlignLeft | Qt.AlignVCenter)
+                item_lst.append(item)
 
-            time = data_dct['last_modified_t']
-            if time >= 0:
-                s = str(QDateTime().setTime_t(time))
-            else:
-                s = ""
-            item = QStandardItem( s )
-            item.setTextAlignment(Qt.AlignLeft | Qt.AlignVCenter)
-            header_lst.append('Edited')
-            item_lst.append(item)
+                item = QStandardItem( str(product_code) )
+                item.setTextAlignment(Qt.AlignLeft | Qt.AlignVCenter)
+                item_lst.append(item)
 
-            self.product_mdl.setHorizontalHeaderLabels(header_lst)
-            self.product_mdl.appendRow(item_lst)
-            # self.product_mdl.setItem(row_idx, item)
-            row_idx = row_idx + 1
+                item = QStandardItem( data_dct['brands'] )
+                item.setTextAlignment(Qt.AlignLeft | Qt.AlignVCenter)
+                item_lst.append(item)
+
+                item = QStandardItem( ''.join(data_dct['stores']) )
+                item.setTextAlignment(Qt.AlignLeft | Qt.AlignVCenter)
+                item_lst.append(item)
+
+                item = QStandardItem( data_dct['nutrition_grades'] )
+                item.setTextAlignment(Qt.AlignLeft | Qt.AlignVCenter)
+                item_lst.append(item)
+
+                nova = data_dct['nova_group']
+                # print(nova)
+                if int(nova) > 0:
+                    s = str(nova)
+                else:
+                    s = ""
+                item = QStandardItem( s )
+                item.setTextAlignment(Qt.AlignLeft | Qt.AlignVCenter)
+                item_lst.append(item)
+
+                nutrition_score = data_dct['nutrition_score']
+                if nutrition_score >= 0:
+                    s = str(nutrition_score)
+                else:
+                    s = ""
+                item = QStandardItem( s )
+                item.setTextAlignment(Qt.AlignLeft | Qt.AlignVCenter)
+                item_lst.append(item)
+
+                time = data_dct['last_modified_t']
+                if time >= 0:
+                    s = str(QDateTime().setTime_t(time))
+                else:
+                    s = ""
+                item = QStandardItem( s )
+                item.setTextAlignment(Qt.AlignLeft | Qt.AlignVCenter)
+                item_lst.append(item)
+
+                model.appendRow(item_lst)
+                # model.setItem(row_idx, item)
+                row_idx = row_idx + 1
 
 
     def __update_data_selected_categories(self, selected_item, deselected_item):
@@ -242,8 +264,8 @@ class ZOpynFacts_View(QWidget):
 
         self.__lg.debug('{} Selected categories: {}'.format(len(self.__selected_category_lst), self.__selected_category_lst))
 
-        self.__update_view_product(self.__selected_category_lst)
-
+        product_data_dct = self.__model.products_from_categories(self.__selected_category_lst)
+        self.__update_view_product('product', product_data_dct)
 
     def __update_data_selected_product(self, selected_item, deselected_item):
 
@@ -268,7 +290,18 @@ class ZOpynFacts_View(QWidget):
         if cnt > 0:
             altern_category_cbox.setCurrentIndex(cnt-1)
 
+    def __update_data_alternative_product(self, category_index):
 
+        product_code = self.ui.product_view.selectionModel().selectedIndexes()[0].data(Qt.UserRole+1)
+        
+        category_id = self.ui.altern_category_cbox.itemData(category_index)
+        # category_id = self.ui.altern_category_cbox.currentData()
+
+        print(self.__model.alternative_products(product_code, category_id))
+
+
+        product_data_dct = self.__model.products_from_categories([category_id])
+        self.__update_view_product('alternative', product_data_dct)
 
 
     def print_test(self, check):

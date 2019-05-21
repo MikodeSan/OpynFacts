@@ -144,7 +144,7 @@ class ZDataBase_JSON(object):
             db_products_dict = self.__data[self.KEY_PRODUCT]
             if code not in db_products_dict:
                 db_products_dict[code] = product_dict
-                print(db_products_dict[code])
+                # print(db_products_dict[code])
 
             else:
                 # TODO: Update product data
@@ -175,7 +175,7 @@ class ZDataBase_JSON(object):
 
                         if relation_dct[self.KEY_PRODUCT_CODE] not in product_code_lst:
                             product_code_lst.append(product_code)
-                            products_dct[product_code] = self.__data[self.KEY_PRODUCT][product_code]
+                            products_dct[product_code] = dict(self.__data[self.KEY_PRODUCT][product_code])
                             # print('product code', product_code)
 
         return products_dct
