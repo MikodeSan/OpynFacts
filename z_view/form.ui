@@ -189,47 +189,82 @@
    <item>
     <widget class="QGroupBox" name="groupBox_2">
      <property name="title">
-      <string>Criteria</string>
+      <string>Search of alternatives</string>
      </property>
      <property name="flat">
       <bool>true</bool>
      </property>
      <layout class="QGridLayout" name="gridLayout">
-      <item row="4" column="1">
-       <widget class="QLabel" name="label_2">
+      <item row="3" column="0">
+       <widget class="QComboBox" name="altern_category_cbox"/>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="label_3">
         <property name="text">
-         <string>TextLabel</string>
+         <string>Category</string>
         </property>
        </widget>
       </item>
-      <item row="4" column="2">
-       <widget class="QComboBox" name="comboBox"/>
-      </item>
-      <item row="3" column="2">
-       <widget class="QSpinBox" name="spinBox"/>
-      </item>
-      <item row="1" column="2">
+      <item row="0" column="0">
        <widget class="QPushButton" name="pushButton">
         <property name="text">
          <string>Update db</string>
         </property>
        </widget>
       </item>
-      <item row="3" column="1">
-       <widget class="QLabel" name="label">
-        <property name="text">
-         <string>TextLabel</string>
+      <item row="4" column="0">
+       <widget class="QGroupBox" name="groupBox_12">
+        <property name="title">
+         <string>GroupBox</string>
         </property>
-       </widget>
-      </item>
-      <item row="2" column="1">
-       <widget class="QComboBox" name="altern_category_cbox"/>
-      </item>
-      <item row="2" column="0">
-       <widget class="QLabel" name="label_3">
-        <property name="text">
-         <string>Alternative category</string>
-        </property>
+        <layout class="QHBoxLayout" name="horizontalLayout_6">
+         <item>
+          <widget class="QLabel" name="label">
+           <property name="text">
+            <string>Criteria</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QComboBox" name="comboBox"/>
+         </item>
+         <item>
+          <spacer name="horizontalSpacer_3">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_2">
+           <property name="text">
+            <string>TextLabel</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QComboBox" name="comboBox_2"/>
+         </item>
+         <item>
+          <spacer name="horizontalSpacer_2">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+        </layout>
        </widget>
       </item>
      </layout>

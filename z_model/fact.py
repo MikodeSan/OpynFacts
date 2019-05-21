@@ -47,9 +47,16 @@ class ZFact():
         
         return self.__db.get_categories_from_relation()
 
-    def products(self, categories_lst):
+    def category_data(self, category_id_lst):
+        return self.__db.get_categories_data(category_id_lst)
+
+    def products_from_categories(self, categories_lst):
 
         return self.__db.products(categories_lst)
+
+    def products(self, product_code_lst):
+
+        return self.__db.product_data(product_code_lst)
 
     def __download_categories(self):
 
@@ -142,7 +149,7 @@ class ZFact():
 
         return [products_lst, len(page_products_lst), n_product_total]
 
-    def __product_data(self, product_dict):
+    def __product_data_from_source(self, product_dict):
 
         extracted_data_dict = {}
 
@@ -202,26 +209,6 @@ class ZFact():
         else:
             extracted_data_dict['categories_hierarchy'] = []
 
-        # image
-        extracted_data_dict['image'] = ""
-        image_url = ""
-        if 'image_url' in product_dict:
-            image_url = product_dict['image_url']
-        elif 'image_front_url' in product_dict:
-            image_url = product_dict['image_front_url']
-        
-        if image_url:
-            r = requests.get(image_url, stream=True)
-            if r.status_code == 200:
-                image_path = self.IMAGE_PATH + "/{}".format(extracted_data_dict['code']) + "." + image_url.split(".")[-1]
-                # print(image_path)
-                with open(image_path, 'wb') as out_file:
-                    r.raw.decode_content = True
-                    shutil.copyfileobj(r.raw, out_file)
-                    extracted_data_dict['image'] = image_path
-
-            del r
-
         # nova group
         extracted_data_dict['nova_group'] = -1
         if 'nova_group' in product_dict:
@@ -275,9 +262,31 @@ class ZFact():
         if 'last_modified_t' in product_dict:
             extracted_data_dict['last_modified_t'] = product_dict['last_modified_t']
 
-        # if len(extracted_data_dict) < 3:
-        #     extracted_data_dict = {}
-        if not extracted_data_dict['name']:
+        extracted_data_dict['image'] = ""
+
+        # if product data are valid
+        if extracted_data_dict['name']:
+
+            # image
+            image_url = ""
+            if 'image_url' in product_dict:
+                image_url = product_dict['image_url']
+            elif 'image_front_url' in product_dict:
+                image_url = product_dict['image_front_url']
+            
+            if image_url:
+                r = requests.get(image_url, stream=True)
+                if r.status_code == 200:
+                    image_path = self.IMAGE_PATH + "/{}".format(extracted_data_dict['code']) + "." + image_url.split(".")[-1]
+                    # print(image_path)
+                    with open(image_path, 'wb') as out_file:
+                        r.raw.decode_content = True
+                        shutil.copyfileobj(r.raw, out_file)
+                        extracted_data_dict['image'] = image_path
+
+                del r
+        
+        else:
             extracted_data_dict = {}
 
         return extracted_data_dict

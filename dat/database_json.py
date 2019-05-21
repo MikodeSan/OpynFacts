@@ -102,43 +102,29 @@ class ZDataBase_JSON(object):
                     # del dct['sameAs']
                     categories_dct[category_id] = data_dct
 
-                    # category_dct = dict(db_category_dct[category_id])
-                    #     category_dct[self.KEY_CATEGORY_ID] = category_id
-                    #     del category_dct['url']
+        return categories_dct
 
-                    #     categories_lst.append(category_dct)
+    def get_categories_data(self, category_id_lst):
 
-        # print(categories_dct)
+        categories_dct = {}
+        db_categories_dct = self.__data[self.KEY_CATEGORY]
+
+        if category_id_lst:
+
+            for category_id in category_id_lst:
+
+                if category_id in db_categories_dct:
+                    categories_dct[category_id] = db_categories_dct[category_id]
+
+        else:
+            categories_dct = dict(db_categories_dct)
 
         return categories_dct
+
 
     def get_category_url(self, category_id):
 
         return self.__data[self.KEY_CATEGORY][category_id]['url']
-
-    def products(self, categories_lst):
-
-        products_dct = {}
-
-        # Get list of product code
-        if not categories_lst:
-            products_dct = dict(self.__data[self.KEY_PRODUCT])
-
-        else:
-            product_code_lst = []
-            for idx, category_id in enumerate(categories_lst):
-
-                for relation_dct in self.__data[self.KEY_RELATION_CATEGORY_2_PRODUCT]:
-
-                    if category_id == relation_dct[self.KEY_CATEGORY_ID]:
-                        product_code = relation_dct[self.KEY_PRODUCT_CODE]
-
-                        if relation_dct[self.KEY_PRODUCT_CODE] not in product_code_lst:
-                            product_code_lst.append(product_code)
-                            products_dct[product_code] = self.__data[self.KEY_PRODUCT][product_code]
-                            # print('product code', product_code)
-
-        return products_dct
 
     # def products_from_category(self):
 
@@ -170,6 +156,41 @@ class ZDataBase_JSON(object):
 
         return existing_product_lst
 
+    def products(self, categories_lst):
+
+        products_dct = {}
+
+        # Get list of product code
+        if not categories_lst:
+            products_dct = dict(self.__data[self.KEY_PRODUCT])
+
+        else:
+            product_code_lst = []
+            for idx, category_id in enumerate(categories_lst):
+
+                for relation_dct in self.__data[self.KEY_RELATION_CATEGORY_2_PRODUCT]:
+
+                    if category_id == relation_dct[self.KEY_CATEGORY_ID]:
+                        product_code = relation_dct[self.KEY_PRODUCT_CODE]
+
+                        if relation_dct[self.KEY_PRODUCT_CODE] not in product_code_lst:
+                            product_code_lst.append(product_code)
+                            products_dct[product_code] = self.__data[self.KEY_PRODUCT][product_code]
+                            # print('product code', product_code)
+
+        return products_dct
+
+    def product_data(self, product_code_lst):
+
+        products_dct = {}
+        for product_code in product_code_lst:
+
+            db_products_dct = self.__data[self.KEY_PRODUCT]
+
+            if product_code in db_products_dct:
+                products_dct[product_code] = db_products_dct[product_code]
+
+        return products_dct
 
     def save_db(self, is_temp=True):
 

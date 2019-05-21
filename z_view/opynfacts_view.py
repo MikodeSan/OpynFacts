@@ -75,8 +75,7 @@ class ZOpynFacts_View(QWidget):
         # populate category view model
         self.__update_view_product()
         product_selection_model = self.ui.product_view.selectionModel()
-        product_selection_model.selectionChanged[QItemSelection, QItemSelection].connect(self.__product_selection)
-
+        product_selection_model.selectionChanged[QItemSelection, QItemSelection].connect(self.__update_data_selected_product)
 
         # Init. parameters from model
 #        project_lst = self.__model.get_project_list()
@@ -153,7 +152,7 @@ class ZOpynFacts_View(QWidget):
     def __update_view_product(self, categories_lst=[]):
 
         # get product data
-        product_data_dct = self.__model.products(categories_lst)
+        product_data_dct = self.__model.products_from_categories(categories_lst)
         
         # view
         self.product_mdl.clear()
@@ -246,9 +245,30 @@ class ZOpynFacts_View(QWidget):
         self.__update_view_product(self.__selected_category_lst)
 
 
-    def __product_selection(self, selected_item, deselected_item):
+    def __update_data_selected_product(self, selected_item, deselected_item):
 
-        print('selected product', selected_item.indexes()[0].data())
+        product_code = selected_item.indexes()[0].data(Qt.UserRole+1)
+        print('selected product', selected_item.indexes()[0].data(), product_code )
+
+        product_data_dct = self.__model.products([product_code])
+        
+        categories_dct = self.__model.category_data(product_data_dct[product_code]['categories_hierarchy'])
+
+        altern_category_cbox = self.ui.altern_category_cbox
+
+        altern_category_cbox.blockSignals(True)
+        altern_category_cbox.clear()
+
+        for category_id, category_data in categories_dct.items():
+            # altern_category_cbox.insertItem(-1, category_data['name'], category_id)
+            altern_category_cbox.addItem(category_data['name'], category_id)
+
+        altern_category_cbox.blockSignals(False)
+        cnt = altern_category_cbox.count()
+        if cnt > 0:
+            altern_category_cbox.setCurrentIndex(cnt-1)
+
+
 
 
     def print_test(self, check):
