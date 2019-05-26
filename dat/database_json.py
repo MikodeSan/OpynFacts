@@ -21,6 +21,9 @@ class ZDataBase_JSON(object):
     DB_PATH = './'
     KEY_CATEGORY = 'category'
     KEY_PRODUCT = 'product'
+    KEY_RELATION_CATEGORY_2_PRODUCT = 'category2product'
+    KEY_CATEGORY_ID = 'category_id'
+    KEY_PRODUCT_CODE = 'product_code'
 
 
     def __init__(self, observer=None):
@@ -33,9 +36,6 @@ class ZDataBase_JSON(object):
             self.__data = self.__init_db()
             self.save_db(True)
 
-
-
-
     def init_categories(self, json, observer=None):
 
         remote_data_dict = json
@@ -45,7 +45,7 @@ class ZDataBase_JSON(object):
 
         for idx, tag_dict in enumerate(remote_data_dict['tags']):
 
-#        print('#', idx, '.\t\t:', tag_dict['id'])
+            #        print('#', idx, '.\t\t:', tag_dict['id'])
             category_id = tag_dict.pop("id")
 
             # check category id.
@@ -81,22 +81,73 @@ class ZDataBase_JSON(object):
 
         return list(self.__data[self.KEY_CATEGORY].keys())
 
+    def get_categories_from_relation(self):
+        """Get valid categories from the category/product relation table
+        Then return the category data"""
+
+        category_id_lst = []
+        categories_lst = []
+        db_category_dct = self.__data[self.KEY_CATEGORY]
+
+        for element_dct in self.__data[self.KEY_RELATION_CATEGORY_2_PRODUCT]:
+
+            category_id = element_dct[self.KEY_CATEGORY_ID]
+
+            if category_id not in category_id_lst:
+
+                # store collected category id 
+                category_id_lst.append(category_id)
+                
+                data_dct = dict(db_category_dct[category_id])
+                data_dct['id'] = category_id
+                del data_dct['url']
+                if 'sameAs' in data_dct:
+                    del data_dct['sameAs']
+                categories_lst.append(data_dct)
+
+        return categories_lst
+
+
+    def get_categories_data(self, category_id_lst):
+
+        categories_dct = {}
+        db_categories_dct = self.__data[self.KEY_CATEGORY]
+
+        if category_id_lst:
+
+            for category_id in category_id_lst:
+
+                if category_id in db_categories_dct:
+                    categories_dct[category_id] = db_categories_dct[category_id]
+
+        else:
+            categories_dct = dict(db_categories_dct)
+
+        return categories_dct
+
+
     def get_category_url(self, category_id):
 
         return self.__data[self.KEY_CATEGORY][category_id]['url']
 
-    def add_product(self, products_lst):
+
+    def add_product(self, category_id, products_lst):
 
         existing_product_lst = []
+        relation_lst = self.__data[self.KEY_RELATION_CATEGORY_2_PRODUCT]
 
         for product_idx, product_dict in enumerate(products_lst):
 
-            code = product_dict['code']
+            code = product_dict.pop('code')
+ 
+            relation = {self.KEY_CATEGORY_ID:category_id, self.KEY_PRODUCT_CODE:code}
+            if relation not in relation_lst:
+                relation_lst.append(relation)
 
             db_products_dict = self.__data[self.KEY_PRODUCT]
             if code not in db_products_dict:
                 db_products_dict[code] = product_dict
-                print(db_products_dict[code])
+                # print(db_products_dict[code])
 
             else:
                 # TODO: Update product data
@@ -108,6 +159,51 @@ class ZDataBase_JSON(object):
 
         return existing_product_lst
 
+    def products(self, categories_lst):
+
+        products_lst = []
+        db_products_dct = {}
+
+        # Get list of product code
+        if not categories_lst:
+
+            db_products_dct = dict(self.__data[self.KEY_PRODUCT])
+
+            for product_code, product_data_dct in db_products_dct.items():
+
+                products_dct = product_data_dct
+                products_dct[self.KEY_PRODUCT_CODE] = product_code
+                products_lst.append(products_dct)
+
+        else:
+            product_code_lst = []
+            for category_id in categories_lst:
+
+                for relation_dct in self.__data[self.KEY_RELATION_CATEGORY_2_PRODUCT]:
+
+                    if category_id == relation_dct[self.KEY_CATEGORY_ID]:
+                        product_code = relation_dct[self.KEY_PRODUCT_CODE]
+
+                        if product_code not in product_code_lst:
+                            product_code_lst.append(product_code)
+                            products_dct = dict(self.__data[self.KEY_PRODUCT][product_code])
+                            products_dct[self.KEY_PRODUCT_CODE] = product_code
+                            products_lst.append(products_dct)
+                            # print('product code', product_code)
+
+        return products_lst
+
+    def product_data(self, product_code_lst):
+
+        products_dct = {}
+        db_products_dct = self.__data[self.KEY_PRODUCT]
+        
+        for product_code in product_code_lst:
+
+            if product_code in db_products_dct:
+                products_dct[product_code] = dict(db_products_dct[product_code])
+
+        return products_dct
 
     def save_db(self, is_temp=True):
 
@@ -136,6 +232,10 @@ class ZDataBase_JSON(object):
 #        categories_dict['label'] = 'default'
 
         db[cls.KEY_PRODUCT] = products_dict
+
+        # db relation
+        relation_lst = []
+        db[cls.KEY_RELATION_CATEGORY_2_PRODUCT] = relation_lst
 
 #        print(db)
 
