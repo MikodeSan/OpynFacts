@@ -9,6 +9,7 @@ Created on Mon Apr 29 12:50:20 2019
 import sys
 import os
 import shutil
+import operator
 
 import requests
 
@@ -45,7 +46,10 @@ class ZFact():
 
     def categories(self):
         
-        return self.__db.get_categories_from_relation()
+        categories_lst = self.__db.get_categories_from_relation()
+        categories_lst.sort(key=operator.itemgetter('name'))
+
+        return categories_lst
 
     def category_data(self, category_id_lst):
         return self.__db.get_categories_data(category_id_lst)

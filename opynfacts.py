@@ -35,8 +35,6 @@ def parse_arguments():
 
     return parser.parse_args()
 
-
-
 def main():
 
 #        args = parse_arguments()

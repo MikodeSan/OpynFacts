@@ -85,24 +85,28 @@ class ZDataBase_JSON(object):
         """Get valid categories from the category/product relation table
         Then return the category data"""
 
-        categories_dct = {}
+        category_id_lst = []
+        categories_lst = []
         db_category_dct = self.__data[self.KEY_CATEGORY]
 
         for element_dct in self.__data[self.KEY_RELATION_CATEGORY_2_PRODUCT]:
 
             category_id = element_dct[self.KEY_CATEGORY_ID]
 
-            if category_id not in categories_dct:
+            if category_id not in category_id_lst:
 
-                if category_id in db_category_dct:
+                # store collected category id 
+                category_id_lst.append(category_id)
+                
+                data_dct = dict(db_category_dct[category_id])
+                data_dct['id'] = category_id
+                del data_dct['url']
+                if 'sameAs' in data_dct:
+                    del data_dct['sameAs']
+                categories_lst.append(data_dct)
 
-                    # store collected category id 
-                    data_dct = dict(db_category_dct[category_id])
-                    del data_dct['url']
-                    # del dct['sameAs']
-                    categories_dct[category_id] = data_dct
+        return categories_lst
 
-        return categories_dct
 
     def get_categories_data(self, category_id_lst):
 

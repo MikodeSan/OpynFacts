@@ -59,6 +59,7 @@ class ZOpynFacts_View(QWidget):
         self.product_mdl = QStandardItemModel()
         self.ui.product_view.setModel(self.product_mdl)
         self.ui.product_view.setSelectionMode(QAbstractItemView.SingleSelection)
+        self.ui.product_view.setSortingEnabled(True)
 
         # populate product view model
         product_data_dct = self.__model.products_from_categories([])        
@@ -70,99 +71,36 @@ class ZOpynFacts_View(QWidget):
         self.alternative_mdl = QStandardItemModel()
         self.ui.alternative_view.setModel(self.alternative_mdl)
         self.ui.alternative_view.setSelectionMode(QAbstractItemView.SingleSelection)
+        self.ui.alternative_view.setSortingEnabled(True)
 
         altern_category_cbox = self.ui.altern_category_cbox
         altern_category_cbox.currentIndexChanged[int].connect(self.__update_data_alternative_product)
 
-
-
-        # # populate product view model
-        # self.__update_selected_alternative()
-        # alternative_selection_model = self.ui.alternative_view.selectionModel()
-        # alternative_selection_model.selectionChanged[QItemSelection, QItemSelection].connect(self.__update_data_selected_alternative)
-
-        # # set model for favorite view
-        # self.category_stdmodel = QStandardItemModel()
-        # self.ui.category_view.setModel(self.category_stdmodel)
-        # self.ui.category_view.setSelectionMode(QAbstractItemView.ExtendedSelection)
-
-        # # populate favorite view model
-        # self.__update_view_category()
-        # category_selection_model = self.ui.category_view.selectionModel()
-        # category_selection_model.selectionChanged[QItemSelection, QItemSelection].connect(self.__update_data_selected_categories)
-
-
-        # Init. parameters from model
-#        project_lst = self.__model.get_project_list()
-
-#        print(project_lst)
-
-#        if(project_lst != []):
-#
-#            item = self.ui.project_list_combo.findText(self.PROJECT_NONE)
-#            if(item != -1):
-#                self.ui.project_list_combo.removeItem(item)
-#
-#            self.ui.project_list_combo.addItems(project_lst)
-#            self.ui.project_list_combo.setCurrentIndex(self.__model.current_project_id)
-#
-#        self.ui.table_model = QStandardItemModel()
-#        self.ui.table_view.setModel(self.ui.table_model)
-#
-##        self.__load_project()
-##        self.__model.load_project(self.__model.current_project_id)
-#        self.update(ZFunding.OBS_MSG_INIT_PROJECT)
-#
-#        self.ui.project_list_combo.currentIndexChanged[int].connect(self.combo_current_index_changed)
-#        self.ui_project_command._action_new.triggered[bool].connect(self.__new_project)
-#        self.ui_project_command._action_edit.triggered[bool].connect(self.__edit_project)
-#        self.ui_project_command._action_delete.triggered[bool].connect(self.__delete_project)
-#
-#        self.ui.inCapital_spin.valueChanged[int].connect(self.__model.set_capital)
-#        self.ui.inYearlyRate_dspin.valueChanged['double'].connect(self.__model.set_yearly_rate)
-#        self.ui.inPeriod_yr_dspin.valueChanged['double'].connect(self.set_period_yr)
-#        self.ui.inPeriod_mth_spin.valueChanged[int].connect(self.set_period_mth)
-#        self.ui.inMonthlyPayment_dspin.valueChanged['double'].connect(self.__model.set_payment_per_month)
-#
-##self.__model.set_capital
-#
-#        self.ui.copy_capital_pshbtn.clicked[bool].connect(self.set_capital_from_output)
-#        self.ui.copy_rate_pshbtn.clicked[bool].connect(self.set_rate_from_output)
-#        self.ui.copy_period_pshbtn.clicked[bool].connect(self.set_period_from_output)
-#        self.ui.copy_payment_pshbtn.clicked[bool].connect(self.set_payment_from_output)
-#
-#        self.ui.event_new_pshbtn.clicked[bool].connect(self.__create_event)
-#        self.ui.event_edit_pshbtn.clicked[bool].connect(self.__edit_event)
-#        self.ui.event_remove_pshbtn.clicked[bool].connect(self.__remove_event)
-#
-#        self.ui.credit_tree_widget.itemSelectionChanged.connect(self.__select_credit)
-#
-#        self.ui_credit_command._action_new.triggered[bool].connect(self.print_test)
 
     def __create_widgets(self):
 
         self.ui = Ui_Form()
         self.ui.setupUi(self)
 
-
     def __update_view_category(self):
 
         # get category data
-        category_data_dct = self.__model.categories()
+        category_data_lst = self.__model.categories()
         
         # view
+        self.ui.category_view.setSortingEnabled(False)
         self.category_stdmodel.clear()
+        self.category_stdmodel.setHorizontalHeaderLabels(['Category'])
 
-        row_idx = 0
-        for category_id, data_dct in category_data_dct.items():
+        for data_dct in category_data_lst:
 
             item = QStandardItem( data_dct['name'] )
-            item.setData(category_id)
+            item.setData(data_dct['id'])
             item.setTextAlignment(Qt.AlignLeft | Qt.AlignVCenter)
 
-            self.category_stdmodel.setItem(row_idx, item)
-            row_idx = row_idx + 1
+            self.category_stdmodel.appendRow(item)
 
+        self.ui.category_view.setSortingEnabled(True)
 
     def __update_view_product(self, model_type, product_data_dct):
 
