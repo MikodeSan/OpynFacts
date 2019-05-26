@@ -130,7 +130,6 @@ class ZDataBase_JSON(object):
 
         return self.__data[self.KEY_CATEGORY][category_id]['url']
 
-    # def products_from_category(self):
 
     def add_product(self, category_id, products_lst):
 
@@ -162,37 +161,47 @@ class ZDataBase_JSON(object):
 
     def products(self, categories_lst):
 
-        products_dct = {}
+        products_lst = []
+        db_products_dct = {}
 
         # Get list of product code
         if not categories_lst:
-            products_dct = dict(self.__data[self.KEY_PRODUCT])
+
+            db_products_dct = dict(self.__data[self.KEY_PRODUCT])
+
+            for product_code, product_data_dct in db_products_dct.items():
+
+                products_dct = product_data_dct
+                products_dct[self.KEY_PRODUCT_CODE] = product_code
+                products_lst.append(products_dct)
 
         else:
             product_code_lst = []
-            for idx, category_id in enumerate(categories_lst):
+            for category_id in categories_lst:
 
                 for relation_dct in self.__data[self.KEY_RELATION_CATEGORY_2_PRODUCT]:
 
                     if category_id == relation_dct[self.KEY_CATEGORY_ID]:
                         product_code = relation_dct[self.KEY_PRODUCT_CODE]
 
-                        if relation_dct[self.KEY_PRODUCT_CODE] not in product_code_lst:
+                        if product_code not in product_code_lst:
                             product_code_lst.append(product_code)
-                            products_dct[product_code] = dict(self.__data[self.KEY_PRODUCT][product_code])
+                            products_dct = dict(self.__data[self.KEY_PRODUCT][product_code])
+                            products_dct[self.KEY_PRODUCT_CODE] = product_code
+                            products_lst.append(products_dct)
                             # print('product code', product_code)
 
-        return products_dct
+        return products_lst
 
     def product_data(self, product_code_lst):
 
         products_dct = {}
+        db_products_dct = self.__data[self.KEY_PRODUCT]
+        
         for product_code in product_code_lst:
 
-            db_products_dct = self.__data[self.KEY_PRODUCT]
-
             if product_code in db_products_dct:
-                products_dct[product_code] = db_products_dct[product_code]
+                products_dct[product_code] = dict(db_products_dct[product_code])
 
         return products_dct
 

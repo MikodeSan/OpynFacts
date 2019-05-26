@@ -56,14 +56,13 @@ class ZOpynFacts_View(QWidget):
         category_selection_model.selectionChanged[QItemSelection, QItemSelection].connect(self.__update_data_selected_categories)
 
         # set model for product view
-        self.product_mdl = QStandardItemModel()
-        self.ui.product_view.setModel(self.product_mdl)
+        self.__product_mdl = QStandardItemModel()
+        self.ui.product_view.setModel(self.__product_mdl)
         self.ui.product_view.setSelectionMode(QAbstractItemView.SingleSelection)
-        self.ui.product_view.setSortingEnabled(True)
 
         # populate product view model
-        product_data_dct = self.__model.products_from_categories([])        
-        self.__update_view_product('product', product_data_dct)
+        product_data_lst = self.__model.products_from_categories([])        
+        self.__update_view_product('product', product_data_lst)
         product_selection_model = self.ui.product_view.selectionModel()
         product_selection_model.selectionChanged[QItemSelection, QItemSelection].connect(self.__update_data_selected_product)
 
@@ -71,7 +70,6 @@ class ZOpynFacts_View(QWidget):
         self.alternative_mdl = QStandardItemModel()
         self.ui.alternative_view.setModel(self.alternative_mdl)
         self.ui.alternative_view.setSelectionMode(QAbstractItemView.SingleSelection)
-        self.ui.alternative_view.setSortingEnabled(True)
 
         altern_category_cbox = self.ui.altern_category_cbox
         altern_category_cbox.currentIndexChanged[int].connect(self.__update_data_alternative_product)
@@ -102,13 +100,13 @@ class ZOpynFacts_View(QWidget):
 
         self.ui.category_view.setSortingEnabled(True)
 
-    def __update_view_product(self, model_type, product_data_dct):
+    def __update_view_product(self, model_type, product_data_lst):
 
         # view
         is_checked = True
 
         if model_type == 'product':
-            model = self.product_mdl
+            model = self.__product_mdl
         elif model_type == 'alternative':
             model = self.alternative_mdl
         else:
@@ -118,25 +116,25 @@ class ZOpynFacts_View(QWidget):
 
             model.clear()
 
-            header_lst = ['Name', 'code', 'Brand', 'Store', 'Nutri-Score', 'Nova score', 'UK Nutri-Score', 'Edited']
+            header_lst = ['Brand', 'Name', 'code', 'Store', 'Nutri-Score', 'Nova score', 'UK Nutri-Score', 'Edited']
             model.setHorizontalHeaderLabels(header_lst)
 
 
             row_idx = 0
-            for product_code, data_dct in product_data_dct.items():
+            for data_dct in product_data_lst:
 
                 item_lst = []
 
-                item = QStandardItem( data_dct['name'] )
-                item.setData(product_code)
-                item.setTextAlignment(Qt.AlignLeft | Qt.AlignVCenter)
-                item_lst.append(item)
-
-                item = QStandardItem( str(product_code) )
-                item.setTextAlignment(Qt.AlignLeft | Qt.AlignVCenter)
-                item_lst.append(item)
-
                 item = QStandardItem( data_dct['brands'] )
+                item.setTextAlignment(Qt.AlignLeft | Qt.AlignVCenter)
+                item_lst.append(item)
+
+                item = QStandardItem( data_dct['name'] )
+                item.setData(data_dct['product_code'])
+                item.setTextAlignment(Qt.AlignLeft | Qt.AlignVCenter)
+                item_lst.append(item)
+
+                item = QStandardItem( data_dct['product_code'] )
                 item.setTextAlignment(Qt.AlignLeft | Qt.AlignVCenter)
                 item_lst.append(item)
 
@@ -184,14 +182,6 @@ class ZOpynFacts_View(QWidget):
     def __update_data_selected_categories(self, selected_item, deselected_item):
         """ Get the list of selected category items, then get item data back and update the list of selected category id. """
 
-        # new selected items
-        for model_index in selected_item.indexes():
-
-            category_id = model_index.data(Qt.UserRole+1)
-            
-            if category_id not in self.__selected_category_lst:
-                self.__selected_category_lst.append(category_id)
-        
         # deselected items
         for model_index in deselected_item.indexes():
 
@@ -200,15 +190,23 @@ class ZOpynFacts_View(QWidget):
             if category_id in self.__selected_category_lst:
                 self.__selected_category_lst.remove(category_id)
 
+        # new selected items
+        for model_index in selected_item.indexes():
+
+            category_id = model_index.data(Qt.UserRole+1)
+            
+            if category_id not in self.__selected_category_lst:
+                self.__selected_category_lst.append(category_id)
+        
         self.__lg.debug('{} Selected categories: {}'.format(len(self.__selected_category_lst), self.__selected_category_lst))
 
-        product_data_dct = self.__model.products_from_categories(self.__selected_category_lst)
-        self.__update_view_product('product', product_data_dct)
+        product_data_lst = self.__model.products_from_categories(self.__selected_category_lst)
+        self.__update_view_product('product', product_data_lst)
 
     def __update_data_selected_product(self, selected_item, deselected_item):
 
-        product_code = selected_item.indexes()[0].data(Qt.UserRole+1)
-        print('selected product', selected_item.indexes()[0].data(), product_code )
+        product_code = selected_item.indexes()[1].data(Qt.UserRole+1)
+        print('selected product', selected_item.indexes()[1].data(), product_code )
 
         product_data_dct = self.__model.products([product_code])
         
@@ -230,16 +228,13 @@ class ZOpynFacts_View(QWidget):
 
     def __update_data_alternative_product(self, category_index):
 
-        product_code = self.ui.product_view.selectionModel().selectedIndexes()[0].data(Qt.UserRole+1)
+        product_code = self.ui.product_view.selectionModel().selectedIndexes()[1].data(Qt.UserRole+1)
         
         category_id = self.ui.altern_category_cbox.itemData(category_index)
         # category_id = self.ui.altern_category_cbox.currentData()
 
-        print(self.__model.alternative_products(product_code, category_id))
-
-
-        product_data_dct = self.__model.products_from_categories([category_id])
-        self.__update_view_product('alternative', product_data_dct)
+        product_data_lst = self.__model.alternative_products(product_code, category_id)
+        self.__update_view_product('alternative', product_data_lst)
 
 
     def print_test(self, check):

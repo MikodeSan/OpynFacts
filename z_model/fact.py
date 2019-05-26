@@ -56,7 +56,11 @@ class ZFact():
 
     def products_from_categories(self, categories_lst):
 
-        return self.__db.products(categories_lst)
+        selected_product_lst = self.__db.products(categories_lst)
+
+        selected_product_lst.sort(key=operator.itemgetter('brands', 'name', 'nutrition_grades', 'nova_group'))
+        
+        return selected_product_lst
 
     def products(self, product_code_lst):
 
@@ -64,7 +68,29 @@ class ZFact():
 
     def alternative_products(self, product_code, category_id):
 
-        return self.__db.products([category_id])
+        product_data_dct = self.__db.product_data([product_code])
+        selected_product_data_dct = product_data_dct[product_code]
+        selected_product_data_dct[database.KEY_PRODUCT_CODE] = product_code
+        print(selected_product_data_dct)
+
+        selected_product_data_lst = self.__db.products([category_id])
+        alternative_product_lst = []
+
+        for product_data_dct in selected_product_data_lst:
+
+            if product_data_dct[database.KEY_PRODUCT_CODE] != selected_product_data_dct[database.KEY_PRODUCT_CODE] \
+                and (product_data_dct['nutrition_grades'] < selected_product_data_dct['nutrition_grades'] \
+                or (product_data_dct['nutrition_grades'] == selected_product_data_dct['nutrition_grades'] \
+                    and product_data_dct['nova_group'] < selected_product_data_dct['nova_group'])) :
+
+                # print(product_data_dct)
+                # selected_product_data_lst.remove(product_data_dct)
+                alternative_product_lst.append(product_data_dct)
+                # print(len(selected_product_data_lst))
+
+        alternative_product_lst.sort(key=operator.itemgetter('nutrition_grades', 'nova_group', 'brands', 'name'))
+
+        return alternative_product_lst
 
     def __download_categories(self):
 
