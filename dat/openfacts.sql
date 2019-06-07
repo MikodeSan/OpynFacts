@@ -1,0 +1,37 @@
+SHOW WARNINGS;
+
+DROP DATABASE IF EXISTS openfacts;
+
+CREATE DATABASE openfacts CHARACTER SET 'utf8';
+CREATE DATABASE openfacts CHARACTER SET 'utf8';
+
+DROP DATABASE IF EXISTS openfacts;
+
+DROP DATABASE IF EXISTS openfacts;
+
+CREATE DATABASE openfacts CHARACTER SET 'utf8';
+
+USE openfacts;
+
+CREATE TABLE IF NOT EXISTS category (
+    id VARCHAR(127) NOT NULL,
+    label VARCHAR(255),
+    n_product MEDIUMINT UNSIGNED NOT NULL DEFAULT 0,
+    url_str VARCHAR(255),
+    same_as VARCHAR(255),
+    PRIMARY KEY (id)
+)
+ENGINE = INNODB;
+
+
+SHOW TABLES;
+DESCRIBE category;
+
+
+DROP TABLE IF EXISTS category;
+
+SHOW TABLES;
+DESCRIBE category;
+
+
+
