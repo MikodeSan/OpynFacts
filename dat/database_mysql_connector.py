@@ -32,22 +32,105 @@ class ZDataBase_MySQL(object):
 #     KEY_CATEGORY_ID = 'category_id'
 #     KEY_PRODUCT_CODE = 'product_code'
 
+    TABLES = {}
+    TABLES['category'] = (
+        "CREATE TABLE `category` ("
+        "  `id` VARCHAR(127) NOT NULL,"
+        "  `label` VARCHAR(255),"
+        "  `n_product` MEDIUMINT UNSIGNED NOT NULL DEFAULT 0,"
+        "  `url_str` VARCHAR(255),"
+        "  `same_as` VARCHAR(255),"
+        "  PRIMARY KEY (`id`)"
+        ") ENGINE=InnoDB")
+
+    TABLES['product'] = (
+        "CREATE TABLE `product` ("
+        "  `code` MEDIUMINT UNSIGNED NOT NULL,"
+        "  `label` VARCHAR(255),"
+        "  `brand` VARCHAR(255),"
+        "  `product_url` VARCHAR(255),"
+        "  `same_as` VARCHAR(255),"
+        "  `nova_group` TINYINT UNSIGNED,"
+        "  `nutrition_grades` CHAR(1),"
+        "  `image_url` VARCHAR(255),"
+        "  PRIMARY KEY (`code`)"
+        # "categories_hierarchy": [
+        #             "en:biscuits-and-cakes",
+        #             "en:cakes",
+        #             "fr:financiers",
+        #             "fr:P\u00e2tisseries fondantes \u00e0 la poudre d'amande"
+        #         ],
+        #         "created_t": 1480541444,
+        #         "last_modified_t": 1558712294,
+        #         "name": "P\u00e2tisseries fondantes \u00e0 la poudre d'amande.",
+        #         "nutrient_levels": {
+        #             "fat": "high",
+        #             "salt": "moderate",
+        #             "saturated-fat": "high",
+        #             "sugars": "high"
+        #         },
+        #         "nutrition_score": -1,
+        #         "nutrition_score_beverage": 0,
+        #         "stores": "Bordeaux,Brive,Limoges,Saint-Yrieix",
+        #         "unique_scans_n": -1,
+        ") ENGINE=InnoDB")
+
+    TABLES['relation_category_product'] = (
+        "CREATE TABLE `relation_category_product` ("
+        "  `category_id` VARCHAR(127) NOT NULL,"
+        "  `product_code` MEDIUMINT UNSIGNED NOT NULL,"
+        "  PRIMARY KEY (`category_id`, `product_code`)"
+        ") ENGINE=InnoDB")
 
     def __init__(self, observer=None):
 
         # Connect to Relational Database Management System
         db_conn = self.connect()
 
-        # Check database
-        # if database not exists, create database
+        if db_conn:
 
-#         # Get Matchs list
-#         path_to_file = self.__db_path()
+            # Check database
+            cursor = db_conn.cursor()
 
-#         self.__data = bkp.open_db(path_to_file)
-#         if not self.__data:
-#             self.__data = self.__init_db()
-#             self.save_db(True)
+            try:
+                cursor.execute("DROP DATABASE IF EXISTS {}".format(self.DB_NAME))
+
+            except mysql.connector.Error as err:
+            #     # if err.errno == errorcode.ER_BAD_DB_ERROR:
+                print("Drop database error")
+                print(err)
+                
+            try:
+                cursor.execute("USE {}".format(self.DB_NAME))
+                print("Use Database {}".format(self.DB_NAME))
+
+            except mysql.connector.Error as err:
+
+                print("Database {} does not exists.".format(self.DB_NAME))
+                if err.errno == errorcode.ER_BAD_DB_ERROR:
+                    self.create_database(cursor)
+                    print("Database {} created successfully.".format(self.DB_NAME))
+                    db_conn.database = self.DB_NAME
+                else:
+                    print(err)
+                    exit(1)
+
+
+            # if database not exists, create database
+
+    #         # Get Matchs list
+    #         path_to_file = self.__db_path()
+
+    #         self.__data = bkp.open_db(path_to_file)
+    #         if not self.__data:
+    #             self.__data = self.__init_db()
+    #             self.save_db(True)
+
+            self.close_connection(db_conn)
+        
+        else:
+            print("db connection failed")
+
 
 #     def init_categories(self, json, observer=None):
 
@@ -264,59 +347,6 @@ class ZDataBase_MySQL(object):
 
 #         return path_to_file
 
-    TABLES = {}
-    TABLES['category'] = (
-        "CREATE TABLE `category` ("
-        "  `id` VARCHAR(127) NOT NULL,"
-        "  `label` VARCHAR(255),"
-        "  `n_product` MEDIUMINT UNSIGNED NOT NULL DEFAULT 0,"
-        "  `url_str` VARCHAR(255),"
-        "  `same_as` VARCHAR(255),"
-        "  PRIMARY KEY (`id`)"
-        ") ENGINE=InnoDB")
-
-    TABLES['product'] = (
-        "CREATE TABLE `product` ("
-        "  `code` MEDIUMINT UNSIGNED NOT NULL,"
-        "  `label` VARCHAR(255),"
-        "  `brand` VARCHAR(255),"
-        "  `product_url` VARCHAR(255),"
-        "  `same_as` VARCHAR(255),"
-        "  `nova_group` TINYINT UNSIGNED,"
-        "  `nutrition_grades` CHAR(1),"
-        "  `image_url` VARCHAR(255),"
-        "  PRIMARY KEY (`code`)"
-        # "categories_hierarchy": [
-        #             "en:biscuits-and-cakes",
-        #             "en:cakes",
-        #             "fr:financiers",
-        #             "fr:P\u00e2tisseries fondantes \u00e0 la poudre d'amande"
-        #         ],
-        #         "created_t": 1480541444,
-        #         "last_modified_t": 1558712294,
-        #         "name": "P\u00e2tisseries fondantes \u00e0 la poudre d'amande.",
-        #         "nutrient_levels": {
-        #             "fat": "high",
-        #             "salt": "moderate",
-        #             "saturated-fat": "high",
-        #             "sugars": "high"
-        #         },
-        #         "nutrition_score": -1,
-        #         "nutrition_score_beverage": 0,
-        #         "stores": "Bordeaux,Brive,Limoges,Saint-Yrieix",
-        #         "unique_scans_n": -1,
-        ") ENGINE=InnoDB")
-
-    TABLES['relation_category_product'] = (
-        "CREATE TABLE `relation_category_product` ("
-        "  `category_id` VARCHAR(127) NOT NULL,"
-        "  `product_code` MEDIUMINT UNSIGNED NOT NULL,"
-        "  PRIMARY KEY (`category_id`, `product_code`)"
-        ") ENGINE=InnoDB")
-
-
-
-
     def connect(self):
         """ Connect to MySQL database """
     
@@ -326,7 +356,7 @@ class ZDataBase_MySQL(object):
             'user': 'app',
             'password': 'My@pp23',
             'host': 'localhost',
-            'database': 'openfacts',
+            # 'database': 'openfacts',
             'raise_on_warnings': True
             }
     
@@ -337,36 +367,18 @@ class ZDataBase_MySQL(object):
 
             if cnx.is_connected():
                 print('Connected to MySQL database')
-
-            cursor = cnx.cursor()
-
-            try:
-                cursor.execute("USE {}".format(self.DB_NAME))
-            except mysql.connector.Error as err:
-                print("Database {} does not exists.".format(self.DB_NAME))
-                if err.errno == errorcode.ER_BAD_DB_ERROR:
-                    create_database(cursor)
-                    print("Database {} created successfully.".format(self.DB_NAME))
-                    cnx.database = self.DB_NAME
-                else:
-                    print(err)
-                    exit(1)
-
-            for table_name in self.TABLES:
-                table_description = self.TABLES[table_name]
-                try:
-                    print("Creating table {}: ".format(table_name), end='')
-                    cursor.execute(table_description)
-                except mysql.connector.Error as err:
-                    if err.errno == errorcode.ER_TABLE_EXISTS_ERROR:
-                        print("already exists.")
-                    else:
-                        print(err.msg)
-                else:
-                    print("OK")
-
-            cursor.close()
-            cnx.close()
+            # for table_name in self.TABLES:
+            #     table_description = self.TABLES[table_name]
+            #     try:
+            #         print("Creating table {}: ".format(table_name), end='')
+            #         cursor.execute(table_description)
+            #     except mysql.connector.Error as err:
+            #         if err.errno == errorcode.ER_TABLE_EXISTS_ERROR:
+            #             print("already exists.")
+            #         else:
+            #             print(err.msg)
+            #     else:
+            #         print("OK")
 
 
         except mysql.connector.Error as err:
@@ -411,11 +423,17 @@ class ZDataBase_MySQL(object):
         
     def create_database(self, cursor):
         try:
-            cursor.execute(
-                "CREATE DATABASE {} DEFAULT CHARACTER SET 'utf8'".format(self.DB_NAME))
+            cursor.execute("CREATE DATABASE {} DEFAULT CHARACTER SET 'UTF8MB4'".format(self.DB_NAME))
+
         except mysql.connector.Error as err:
             print("Failed creating database: {}".format(err))
             exit(1)
+
+    @staticmethod
+    def close_connection(connection):
+
+        connection.cursor().close()
+        connection.close()
 
 
 if __name__ == '__main__':
