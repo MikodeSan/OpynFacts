@@ -14,12 +14,18 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 # from utilities import backup as bkp
 
 
-# class ZDataBase_JSON(object):
-#     '''
-#     classdocs
-#     '''
+from distutils.sysconfig import get_python_lib
+from mysql.connector import errorcode
+from configparser import ConfigParser
 
-#     DB_PATH = './'
+
+
+class ZDataBase_MySQL(object):
+    '''
+    classdocs
+    '''
+
+    DB_NAME = 'openfacts'
 #     KEY_CATEGORY = 'category'
 #     KEY_PRODUCT = 'product'
 #     KEY_RELATION_CATEGORY_2_PRODUCT = 'category2product'
@@ -27,7 +33,13 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 #     KEY_PRODUCT_CODE = 'product_code'
 
 
-#     def __init__(self, observer=None):
+    def __init__(self, observer=None):
+
+        # Connect to Relational Database Management System
+        db_conn = self.connect()
+
+        # Check database
+        # if database not exists, create database
 
 #         # Get Matchs list
 #         path_to_file = self.__db_path()
@@ -252,33 +264,162 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 #         return path_to_file
 
-if __name__ == '__main__':
+    TABLES = {}
+    TABLES['category'] = (
+        "CREATE TABLE `category` ("
+        "  `id` VARCHAR(127) NOT NULL,"
+        "  `label` VARCHAR(255),"
+        "  `n_product` MEDIUMINT UNSIGNED NOT NULL DEFAULT 0,"
+        "  `url_str` VARCHAR(255),"
+        "  `same_as` VARCHAR(255),"
+        "  PRIMARY KEY (`id`)"
+        ") ENGINE=InnoDB")
 
-    from distutils.sysconfig import get_python_lib
-    from mysql.connector import errorcode
+    TABLES['product'] = (
+        "CREATE TABLE `product` ("
+        "  `code` MEDIUMINT UNSIGNED NOT NULL,"
+        "  `label` VARCHAR(255),"
+        "  `brand` VARCHAR(255),"
+        "  `product_url` VARCHAR(255),"
+        "  `same_as` VARCHAR(255),"
+        "  `nova_group` TINYINT UNSIGNED,"
+        "  `nutrition_grades` CHAR(1),"
+        "  `image_url` VARCHAR(255),"
+        "  PRIMARY KEY (`code`)"
+        # "categories_hierarchy": [
+        #             "en:biscuits-and-cakes",
+        #             "en:cakes",
+        #             "fr:financiers",
+        #             "fr:P\u00e2tisseries fondantes \u00e0 la poudre d'amande"
+        #         ],
+        #         "created_t": 1480541444,
+        #         "last_modified_t": 1558712294,
+        #         "name": "P\u00e2tisseries fondantes \u00e0 la poudre d'amande.",
+        #         "nutrient_levels": {
+        #             "fat": "high",
+        #             "salt": "moderate",
+        #             "saturated-fat": "high",
+        #             "sugars": "high"
+        #         },
+        #         "nutrition_score": -1,
+        #         "nutrition_score_beverage": 0,
+        #         "stores": "Bordeaux,Brive,Limoges,Saint-Yrieix",
+        #         "unique_scans_n": -1,
+        ") ENGINE=InnoDB")
+
+    TABLES['relation_category_product'] = (
+        "CREATE TABLE `relation_category_product` ("
+        "  `category_id` VARCHAR(127) NOT NULL,"
+        "  `product_code` MEDIUMINT UNSIGNED NOT NULL,"
+        "  PRIMARY KEY (`category_id`, `product_code`)"
+        ") ENGINE=InnoDB")
+
+
+
+
+    def connect(self):
+        """ Connect to MySQL database """
+    
+        db_config = self.read_db_config()
+
+        db_config = {
+            'user': 'app',
+            'password': 'My@pp23',
+            'host': 'localhost',
+            'database': 'openfacts',
+            'raise_on_warnings': True
+            }
+    
+        cnx = None
+
+        try:
+            cnx = mysql.connector.connect(**db_config)
+
+            if cnx.is_connected():
+                print('Connected to MySQL database')
+
+            cursor = cnx.cursor()
+
+            try:
+                cursor.execute("USE {}".format(self.DB_NAME))
+            except mysql.connector.Error as err:
+                print("Database {} does not exists.".format(self.DB_NAME))
+                if err.errno == errorcode.ER_BAD_DB_ERROR:
+                    create_database(cursor)
+                    print("Database {} created successfully.".format(self.DB_NAME))
+                    cnx.database = self.DB_NAME
+                else:
+                    print(err)
+                    exit(1)
+
+            for table_name in self.TABLES:
+                table_description = self.TABLES[table_name]
+                try:
+                    print("Creating table {}: ".format(table_name), end='')
+                    cursor.execute(table_description)
+                except mysql.connector.Error as err:
+                    if err.errno == errorcode.ER_TABLE_EXISTS_ERROR:
+                        print("already exists.")
+                    else:
+                        print(err.msg)
+                else:
+                    print("OK")
+
+            cursor.close()
+            cnx.close()
+
+
+        except mysql.connector.Error as err:
+        
+            if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
+                print("Something is wrong with your user name or password")
+            elif err.errno == errorcode.ER_BAD_DB_ERROR:
+                print("Database does not exist")
+            else:
+                print(err)
+
+        return cnx
+
+    def read_db_config(self, filename='config.ini', section='sql_db'):
+        """ Read database configuration file and return a dictionary object
+        :param filename: name of the configuration file
+        :param section: section of database configuration
+        :return: a dictionary of database parameters
+        """
+        # create parser and read ini configuration file
+        parser = ConfigParser()
+        print(parser.read(filename))
+    
+        # print(parser)
+        # print(parser.sections())
+        # print(parser['DEFAULT'])
+        # print(parser['bitbucket.org']['User'])
+        # print(parser['topsecret.server.com'])
+        # print(parser['DEFAULT'])
+        
+        # get section, default to mysql
+        db = {}
+        if parser.has_section(section):
+            items = parser.items(section)
+            print(items)
+            for item in items:
+                db[item[0]] = item[1]
+        # else:
+        #     raise Exception('{0} not found in the {1} file'.format(section, filename))
+    
+        return db
+        
+    def create_database(self, cursor):
+        try:
+            cursor.execute(
+                "CREATE DATABASE {} DEFAULT CHARACTER SET 'utf8'".format(self.DB_NAME))
+        except mysql.connector.Error as err:
+            print("Failed creating database: {}".format(err))
+            exit(1)
+
+
+if __name__ == '__main__':
 
     print(get_python_lib())
 
-    try:
-        cnx = mysql.connector.connect(user='app',
-                                        database='openfacts',
-                                        host='localhost',
-                                        password='My@pp23',
-                                        raise_on_warning=True
-                                        )
-        if conn.is_connected():
-            print('Connected to MySQL database')
-
-    except mysql.connector.Error as err:
-       
-        if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
-            print("Something is wrong with your user name or password")
-        elif err.errno == errorcode.ER_BAD_DB_ERROR:
-            print("Database does not exist")
-        else:
-            print(err)
-    else:
-        cnx.close()
-
-    
-
+    db = ZDataBase_MySQL()
