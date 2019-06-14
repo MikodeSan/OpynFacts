@@ -18,6 +18,7 @@ import requests
 sys.path.append(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'dat' ))
 sys.path.append(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'dat\\im' ))
 from database_json import ZDataBase_JSON as database
+from database_mysql_connector import ZDataBase_MySQL as database_mysql
 
 class ZFact():
     '''
@@ -34,6 +35,8 @@ class ZFact():
         '''
 
         self.__db = database()
+        self.__db_sql = database_mysql()
+
 
         if not self.__db.get_categories():
             category_dict = self.__download_categories()

@@ -8,6 +8,8 @@ Created on Mon Apr 29 15:37:19 2019
 
 import sys
 import os
+import logging as lg
+
 import mysql.connector
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
@@ -82,7 +84,11 @@ class ZDataBase_MySQL(object):
         "  PRIMARY KEY (`category_id`, `product_code`)"
         ") ENGINE=InnoDB")
 
+
     def __init__(self, observer=None):
+
+        self.__lg = lg
+        self.__lg.basicConfig(level=lg.DEBUG)
 
         # Connect to Relational Database Management System
         db_conn = self.connect()
@@ -92,31 +98,26 @@ class ZDataBase_MySQL(object):
             # Check database
             cursor = db_conn.cursor()
 
-            try:
-                cursor.execute("DROP DATABASE IF EXISTS {}".format(self.DB_NAME))
+            # drop database
+            self.drop_database(cursor)
 
-            except mysql.connector.Error as err:
-            #     # if err.errno == errorcode.ER_BAD_DB_ERROR:
-                print("Drop database error")
-                print(err)
-                
+            # Use database
             try:
+                self.__lg.info("\t> Use database '{}'".format(self.DB_NAME))
                 cursor.execute("USE {}".format(self.DB_NAME))
-                print("Use Database {}".format(self.DB_NAME))
+                self.__lg.info("\t  - Database {} used".format(self.DB_NAME))
 
             except mysql.connector.Error as err:
+                # if database not exists, create database
 
-                print("Database {} does not exists.".format(self.DB_NAME))
+                self.__lg.warning("\t  - Database '{}' does not exists.".format(self.DB_NAME))
                 if err.errno == errorcode.ER_BAD_DB_ERROR:
                     self.create_database(cursor)
-                    print("Database {} created successfully.".format(self.DB_NAME))
                     db_conn.database = self.DB_NAME
                 else:
-                    print(err)
+                    self.__lg.error(err)
                     exit(1)
 
-
-            # if database not exists, create database
 
     #         # Get Matchs list
     #         path_to_file = self.__db_path()
@@ -354,7 +355,7 @@ class ZDataBase_MySQL(object):
 
         db_config = {
             'user': 'app',
-            'password': 'My@pp23',
+            'password': 'No@pp23',
             'host': 'localhost',
             # 'database': 'openfacts',
             'raise_on_warnings': True
@@ -366,29 +367,16 @@ class ZDataBase_MySQL(object):
             cnx = mysql.connector.connect(**db_config)
 
             if cnx.is_connected():
-                print('Connected to MySQL database')
-            # for table_name in self.TABLES:
-            #     table_description = self.TABLES[table_name]
-            #     try:
-            #         print("Creating table {}: ".format(table_name), end='')
-            #         cursor.execute(table_description)
-            #     except mysql.connector.Error as err:
-            #         if err.errno == errorcode.ER_TABLE_EXISTS_ERROR:
-            #             print("already exists.")
-            #         else:
-            #             print(err.msg)
-            #     else:
-            #         print("OK")
-
+                self.__lg.info('\t  - Connected to MySQL database')
 
         except mysql.connector.Error as err:
         
             if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
-                print("Something is wrong with your user name or password")
+                self.__lg.warning("\t  - Something is wrong with your user name or password")
             elif err.errno == errorcode.ER_BAD_DB_ERROR:
-                print("Database does not exist")
+                self.__lg.warning("\t  - Database does not exist")
             else:
-                print(err)
+                self.__lg.warning(err)
 
         return cnx
 
@@ -400,7 +388,7 @@ class ZDataBase_MySQL(object):
         """
         # create parser and read ini configuration file
         parser = ConfigParser()
-        print(parser.read(filename))
+        # print(parser.read(filename))
     
         # print(parser)
         # print(parser.sections())
@@ -422,12 +410,53 @@ class ZDataBase_MySQL(object):
         return db
         
     def create_database(self, cursor):
+
+        is_success = True
+
+        self.drop_database(cursor)
+
         try:
+            self.__lg.debug("\t> Create database '{}'".format(self.DB_NAME))
             cursor.execute("CREATE DATABASE {} DEFAULT CHARACTER SET 'UTF8MB4'".format(self.DB_NAME))
+            self.__lg.debug("\t  - Database created successfully.")
+            self.__lg.debug("\t> Use database '{}'".format(self.DB_NAME))
+            cursor.execute("USE {}".format(self.DB_NAME))
+            self.__lg.debug("\t  - Database '{}' used".format(self.DB_NAME))
 
         except mysql.connector.Error as err:
-            print("Failed creating database: {}".format(err))
-            exit(1)
+            is_success = False
+
+            self.__lg.error("\t  - Failed creating database: {}".format(err))
+
+        if is_success:
+
+            for table_name, table_description in self.TABLES.items():
+                    
+                    try:
+                        self.__lg.debug("\t> Create table '{}' ".format(table_name))
+                        cursor.execute(table_description)
+
+                    except mysql.connector.Error as err:
+
+                        is_success = False
+
+                        if err.errno == errorcode.ER_TABLE_EXISTS_ERROR:
+                            self.__lg.error("\t  - Table '{}' already exists".format(table_name))
+                        else:
+                            self.__lg.error("\t  - {} ".format(err))
+
+
+    def drop_database(self, cursor):
+
+        try:
+            self.__lg.debug('\t> Drop database')
+            cursor.execute("DROP DATABASE IF EXISTS {}".format(self.DB_NAME))
+
+        except mysql.connector.Error as err:
+            # if err.errno == errorcode.ER_DB_DROP_EXISTS:
+            #     self.__lg.warning('\t  - {}'.format(err))
+            # else:
+            self.__lg.warning('\t  - {}'.format(err))
 
     @staticmethod
     def close_connection(connection):
