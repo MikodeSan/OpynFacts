@@ -71,10 +71,10 @@ class ZDataBase_JSON(object):
 
 
         print("N World categories detected: {}/{}".format(n_categories_detected, remote_data_dict['count']))
-#        print("Openfoodfacts categories:", categories_dict.keys())
-#        print("Openfoodfacts World Categories values:", categories_dict.values())
+        #        print("Openfoodfacts categories:", categories_dict.keys())
+        #        print("Openfoodfacts World Categories values:", categories_dict.values())
         print("N redundancy:", n_redundancy)
-#        self.__save_db(True)
+        #        self.__save_db(True)
 
 
     def get_categories(self):
@@ -155,7 +155,7 @@ class ZDataBase_JSON(object):
 
         print('N existing product into db', len(existing_product_lst))
 
-#        self.__save_db(True)
+        #        self.__save_db(True)
 
         return existing_product_lst
 
@@ -223,21 +223,18 @@ class ZDataBase_JSON(object):
 
         # db categories
         categories_dict = {}
-#        categories_dict['label'] = 'default'
 
         db[cls.KEY_CATEGORY] = categories_dict
 
         # db products
         products_dict = {}
-#        categories_dict['label'] = 'default'
 
         db[cls.KEY_PRODUCT] = products_dict
 
         # db relation
         relation_lst = []
         db[cls.KEY_RELATION_CATEGORY_2_PRODUCT] = relation_lst
-
-#        print(db)
+        #        print(db)
 
         return db
 
@@ -247,7 +244,7 @@ class ZDataBase_JSON(object):
         directory_path = os.path.dirname(__file__)
         # with this path, we go inside the folder `data` and get the file.
         path_to_file = os.path.join(directory_path, "food_facts_db.json")
-#        print('db path_to_file', path_to_file)
+        #        print('db path_to_file', path_to_file)
 
         return path_to_file
 

@@ -35,12 +35,18 @@ class ZDataBase_MySQL(object):
 #     KEY_PRODUCT_CODE = 'product_code'
 
     TABLES = {}
+    TABLES['version'] = (
+        "CREATE TABLE `version` ("
+        "  `id` CHAR(5) NOT NULL DEFAULT '1.0.0',"
+        "  PRIMARY KEY (`id`)"
+        ") ENGINE=InnoDB")
+
     TABLES['category'] = (
         "CREATE TABLE `category` ("
         "  `id` VARCHAR(127) NOT NULL,"
         "  `label` VARCHAR(255),"
         "  `n_product` MEDIUMINT UNSIGNED NOT NULL DEFAULT 0,"
-        "  `url_str` VARCHAR(255),"
+        "  `category_url` VARCHAR(255),"
         "  `same_as` VARCHAR(255),"
         "  PRIMARY KEY (`id`)"
         ") ENGINE=InnoDB")
@@ -91,7 +97,7 @@ class ZDataBase_MySQL(object):
         self.__lg.basicConfig(level=lg.DEBUG)
 
         # Connect to Relational Database Management System
-        db_conn = self.connect()
+        db_conn = self.__connect()
 
         if db_conn:
 
@@ -99,7 +105,7 @@ class ZDataBase_MySQL(object):
             cursor = db_conn.cursor()
 
             # drop database
-            self.drop_database(cursor)
+            self.__drop_database(cursor)
 
             # Use database
             try:
@@ -112,66 +118,123 @@ class ZDataBase_MySQL(object):
 
                 self.__lg.warning("\t  - Database '{}' does not exists.".format(self.DB_NAME))
                 if err.errno == errorcode.ER_BAD_DB_ERROR:
-                    self.create_database(cursor)
+                    self.__create_database(cursor)
                     db_conn.database = self.DB_NAME
                 else:
                     self.__lg.error(err)
                     exit(1)
 
 
-    #         # Get Matchs list
-    #         path_to_file = self.__db_path()
+        #         # Get Matchs list
+        #         path_to_file = self.__db_path()
 
-    #         self.__data = bkp.open_db(path_to_file)
-    #         if not self.__data:
-    #             self.__data = self.__init_db()
-    #             self.save_db(True)
+        #         self.__data = bkp.open_db(path_to_file)
+        #         if not self.__data:
+        #             self.__data = self.__init_db()
+        #             self.save_db(True)
 
-            self.close_connection(db_conn)
+            self.__close_connection(db_conn)
         
         else:
             print("db connection failed")
 
 
-#     def init_categories(self, json, observer=None):
+    def add_category(self, json=None, observer=None):
 
-#         remote_data_dict = json
-#         categories_dict = self.__data[self.KEY_CATEGORY]
-#         n_categories_detected = 0
-#         n_redundancy = 0
+        is_success = True
 
-#         for idx, tag_dict in enumerate(remote_data_dict['tags']):
+        db_conn = self.__connect()
 
-#             #        print('#', idx, '.\t\t:', tag_dict['id'])
-#             category_id = tag_dict.pop("id")
+        if db_conn:
 
-#             # check category id.
-#             is_valid = False
-#             category = category_id.split(':')
+            cursor = db_conn.cursor()
 
-#             if len(category) == 2:
-#                 is_valid = True
-#             else:
-#                 print('/!\\ Warning /!\\ Maybe category id. has an unknown format', category)
+            # Use database
+            try:
+                self.__lg.debug("\t> Use database '{}'".format(self.DB_NAME))
+                cursor.execute("USE {}".format(self.DB_NAME))
+                self.__lg.debug("\t  - Database {} used".format(self.DB_NAME))
 
-#             if is_valid:
+            except mysql.connector.Error as err:
+                self.__lg.error("\t  - {}".format(err))
+                is_success = False
+                exit(1)
 
-#                 language_code = category[0]
-#                 label = category[-1]
+            if is_success:
+                add_category = ("INSERT INTO category "
+                            "(id, label, n_product, category_url, same_as) "
+                            "VALUES (%(id)s, %(label)s, %(n_product)s, %(category_url)s, %(same_as)s)")
+                            # "VALUES (%s, %s, %s, %s, %s)")
 
-#                 if category_id not in categories_dict:
-#                     categories_dict[category_id] = tag_dict
-#                     n_categories_detected = n_categories_detected + 1
-#                 else:
-#                     print('/!\\ Warning /!\\ id. key:{} already exist'.format(n_categories_detected, category_id))
-#                     n_redundancy = n_redundancy + 1
+                # data_category = ('totot', 'azerty', 123, 'M', 'aedaef')
+                data_category = {'id': 'totot', 'label': 'azerty', 'n_product': 123, 'category_url': 'M', 'same_as': 'aedaef'}
 
 
-#         print("N World categories detected: {}/{}".format(n_categories_detected, remote_data_dict['count']))
-# #        print("Openfoodfacts categories:", categories_dict.keys())
-# #        print("Openfoodfacts World Categories values:", categories_dict.values())
-#         print("N redundancy:", n_redundancy)
-# #        self.__save_db(True)
+                # Insert new category
+                try:
+                    self.__lg.debug("\t> Insert new category '{}'".format('toto'))
+                    cursor.execute(add_category, data_category)
+                except mysql.connector.Error as err:
+                    self.__lg.error("\t  - {}".format(err))
+                # emp_no = cursor.lastrowid
+
+                # Make sure data is committed to the database
+                db_conn.commit()
+
+                # cursor.execute("DESCRIBE category ")
+
+
+                query = ("SELECT id, label, n_product, category_url, same_as FROM category ")
+
+                cursor.execute(query)
+
+                for (id, label, n_product, category_url, same_as) in cursor:
+                    print("{}, {}, {}, {}, {}".format(id, label, n_product, category_url, same_as))
+
+
+
+
+
+            self.__close_connection(db_conn)
+
+
+        #         remote_data_dict = json
+        #         categories_dict = self.__data[self.KEY_CATEGORY]
+        #         n_categories_detected = 0
+        #         n_redundancy = 0
+
+        #         for idx, tag_dict in enumerate(remote_data_dict['tags']):
+
+        #             #        print('#', idx, '.\t\t:', tag_dict['id'])
+        #             category_id = tag_dict.pop("id")
+
+        #             # check category id.
+        #             is_valid = False
+        #             category = category_id.split(':')
+
+        #             if len(category) == 2:
+        #                 is_valid = True
+        #             else:
+        #                 print('/!\\ Warning /!\\ Maybe category id. has an unknown format', category)
+
+        #             if is_valid:
+
+        #                 language_code = category[0]
+        #                 label = category[-1]
+
+        #                 if category_id not in categories_dict:
+        #                     categories_dict[category_id] = tag_dict
+        #                     n_categories_detected = n_categories_detected + 1
+        #                 else:
+        #                     print('/!\\ Warning /!\\ id. key:{} already exist'.format(n_categories_detected, category_id))
+        #                     n_redundancy = n_redundancy + 1
+
+
+        #         print("N World categories detected: {}/{}".format(n_categories_detected, remote_data_dict['count']))
+        # #        print("Openfoodfacts categories:", categories_dict.keys())
+        # #        print("Openfoodfacts World Categories values:", categories_dict.values())
+        #         print("N redundancy:", n_redundancy)
+        # #        self.__save_db(True)
 
 
 #     def get_categories(self):
@@ -348,10 +411,10 @@ class ZDataBase_MySQL(object):
 
 #         return path_to_file
 
-    def connect(self):
+    def __connect(self):
         """ Connect to MySQL database """
     
-        db_config = self.read_db_config()
+        db_config = self.__read_db_config()
 
         db_config = {
             'user': 'app',
@@ -380,7 +443,7 @@ class ZDataBase_MySQL(object):
 
         return cnx
 
-    def read_db_config(self, filename='config.ini', section='sql_db'):
+    def __read_db_config(self, filename='config.ini', section='sql_db'):
         """ Read database configuration file and return a dictionary object
         :param filename: name of the configuration file
         :param section: section of database configuration
@@ -409,11 +472,11 @@ class ZDataBase_MySQL(object):
     
         return db
         
-    def create_database(self, cursor):
+    def __create_database(self, cursor):
 
         is_success = True
 
-        self.drop_database(cursor)
+        self.__drop_database(cursor)
 
         try:
             self.__lg.debug("\t> Create database '{}'".format(self.DB_NAME))
@@ -445,8 +508,7 @@ class ZDataBase_MySQL(object):
                         else:
                             self.__lg.error("\t  - {} ".format(err))
 
-
-    def drop_database(self, cursor):
+    def __drop_database(self, cursor):
 
         try:
             self.__lg.debug('\t> Drop database')
@@ -458,8 +520,9 @@ class ZDataBase_MySQL(object):
             # else:
             self.__lg.warning('\t  - {}'.format(err))
 
+
     @staticmethod
-    def close_connection(connection):
+    def __close_connection(connection):
 
         connection.cursor().close()
         connection.close()
@@ -470,3 +533,4 @@ if __name__ == '__main__':
     print(get_python_lib())
 
     db = ZDataBase_MySQL()
+    db.add_category()
