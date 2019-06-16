@@ -42,6 +42,7 @@ class ZFact():
             category_dict = self.__download_categories()
 
             self.__db.init_categories(category_dict)
+            self.__db_sql.add_category(category_dict)
 
             self.__init_database_product()
 
@@ -107,7 +108,7 @@ class ZFact():
 
         return response.json()
 
-    def __init_database_product(self, n_category_max=70, n_product_max=70):
+    def __init_database_product(self, n_category_max=10, n_product_max=10):
 
         if n_category_max > 0:
 
@@ -344,11 +345,11 @@ class ZFact():
 
 if __name__ == "__main__":
 
-    import logging as log
+    # import logging as log
 
 
-    log.basicConfig(level=log.DEBUG)
-    log.info('Enable log to level: DEBUG')
+    # log.basicConfig(level=log.DEBUG)
+    # log.info('Enable log to level: DEBUG')
 
     # model
     model = ZFact()

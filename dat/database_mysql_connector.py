@@ -43,10 +43,10 @@ class ZDataBase_MySQL(object):
 
     TABLES['category'] = (
         "CREATE TABLE `category` ("
-        "  `id` VARCHAR(127) NOT NULL,"
+        "  `id` VARCHAR(256) NOT NULL,"
         "  `label` VARCHAR(255),"
         "  `n_product` MEDIUMINT UNSIGNED NOT NULL DEFAULT 0,"
-        "  `category_url` VARCHAR(255),"
+        "  `category_url` VARCHAR(1023),"
         "  `same_as` VARCHAR(255),"
         "  PRIMARY KEY (`id`)"
         ") ENGINE=InnoDB")
@@ -143,98 +143,109 @@ class ZDataBase_MySQL(object):
 
         is_success = True
 
-        db_conn = self.__connect()
+        db_conn = self.__connect(True)
 
         if db_conn:
 
-            cursor = db_conn.cursor()
+            cursor = db_conn.cursor(buffered=True)
 
-            # Use database
-            try:
-                self.__lg.debug("\t> Use database '{}'".format(self.DB_NAME))
-                cursor.execute("USE {}".format(self.DB_NAME))
-                self.__lg.debug("\t  - Database {} used".format(self.DB_NAME))
+            # # Use database
+            # try:
+            #     self.__lg.debug("\t> Use database '{}'".format(self.DB_NAME))
+            #     cursor.execute("USE {}".format(self.DB_NAME))
+            #     self.__lg.debug("\t  - Database {} used".format(self.DB_NAME))
 
-            except mysql.connector.Error as err:
-                self.__lg.error("\t  - {}".format(err))
-                is_success = False
-                exit(1)
+            # except mysql.connector.Error as err:
+            #     self.__lg.error("\t  - {}".format(err))
+            #     is_success = False
+            #     exit(1)
 
             if is_success:
-                add_category = ("INSERT INTO category "
-                            "(id, label, n_product, category_url, same_as) "
-                            "VALUES (%(id)s, %(label)s, %(n_product)s, %(category_url)s, %(same_as)s)")
+
+                remote_data_dict = json
+                # categories_dict = self.__data[self.KEY_CATEGORY]
+                n_categories_detected = 0
+                n_redundancy = 0
+
+                
+                for idx, tag_dict in enumerate(remote_data_dict['tags']):
+
+                    #        print('#', idx, '.\t\t:', tag_dict['id'])
+                    category_id = tag_dict['id']
+
+                    # check category id.
+                    is_valid = False
+                    category = category_id.split(':')
+
+                    if len(category) == 2:
+                        is_valid = True
+                    else:
+                        self.__lg.warning('\t  - Maybe category id. has an unknown format {}'.format(category))
+
+                    if is_valid:
+
+                        language_code = category[0]
+                        label = category[-1]
+
+                        # Insert new category
+                        try:
+                            
+                            cmd = "INSERT INTO category (id, label, n_product, category_url"
+                            value = "VALUES (%(id)s, %(label)s, %(n_product)s, %(category_url)s"
                             # "VALUES (%s, %s, %s, %s, %s)")
 
-                # data_category = ('totot', 'azerty', 123, 'M', 'aedaef')
-                data_category = {'id': 'totot', 'label': 'azerty', 'n_product': 123, 'category_url': 'M', 'same_as': 'aedaef'}
+                            data = {'id': category_id, 'label': tag_dict['name'], 'n_product':  tag_dict['products'], 'category_url':  tag_dict['url']}
+                            # data_category = ('totot', 'azerty', 123, 'M', 'aedaef')
+                            
+                            if 'sameAs' in tag_dict:
+                                
+                                cmd = cmd + ", same_as"
+                                value = value + ", %(same_as)s" 
 
+                                data['same_as'] = tag_dict['sameAs'][0]
+                                
 
-                # Insert new category
-                try:
-                    self.__lg.debug("\t> Insert new category '{}'".format('toto'))
-                    cursor.execute(add_category, data_category)
-                except mysql.connector.Error as err:
-                    self.__lg.error("\t  - {}".format(err))
-                # emp_no = cursor.lastrowid
+                            cmd = cmd + ") "
+                            value = value + ")"
+
+                            # self.__lg.debug("\t> {}. Insert new category '{}'".format(n_categories_detected, category_id))
+                            
+                            command = (cmd + value)           
+                            # print(command)                 
+                            # print(data)
+
+                            cursor.execute(command, data)
+
+                            # # Make sure data is committed to the database
+                            # db_conn.commit()
+
+                            n_categories_detected = n_categories_detected + 1
+
+                            # query = ("SELECT id, label, n_product, category_url, same_as FROM category ")
+
+                            # cursor.execute(query)
+
+                            # for (id, label, n_product, category_url, same_as) in cursor:
+                            #     self.__lg.debug("\t  - Inserted category data: {}, {}, {}, {}, {}".format(id, label, n_product, category_url, same_as))
+
+                        except mysql.connector.Error as err:
+                            
+                            self.__lg.error("\t  - {}".format(err))
+                            # emp_no = cursor.lastrowid
+
+                            # print('/!\\ Warning /!\\ id. key:{} already exist'.format(n_categories_detected, category_id))
+                            n_redundancy = n_redundancy + 1
+                            # exit(1)
 
                 # Make sure data is committed to the database
                 db_conn.commit()
 
-                # cursor.execute("DESCRIBE category ")
-
-
-                query = ("SELECT id, label, n_product, category_url, same_as FROM category ")
-
-                cursor.execute(query)
-
-                for (id, label, n_product, category_url, same_as) in cursor:
-                    print("{}, {}, {}, {}, {}".format(id, label, n_product, category_url, same_as))
-
-
-
-
+                self.__lg.debug("N categories detected: {}/{} - N categories redundancy: {}".format(n_categories_detected, remote_data_dict['count'], n_redundancy))
+        #        print("Openfoodfacts categories:", categories_dict.keys())
+        #        print("Openfoodfacts World Categories values:", categories_dict.values())
 
             self.__close_connection(db_conn)
 
-
-        #         remote_data_dict = json
-        #         categories_dict = self.__data[self.KEY_CATEGORY]
-        #         n_categories_detected = 0
-        #         n_redundancy = 0
-
-        #         for idx, tag_dict in enumerate(remote_data_dict['tags']):
-
-        #             #        print('#', idx, '.\t\t:', tag_dict['id'])
-        #             category_id = tag_dict.pop("id")
-
-        #             # check category id.
-        #             is_valid = False
-        #             category = category_id.split(':')
-
-        #             if len(category) == 2:
-        #                 is_valid = True
-        #             else:
-        #                 print('/!\\ Warning /!\\ Maybe category id. has an unknown format', category)
-
-        #             if is_valid:
-
-        #                 language_code = category[0]
-        #                 label = category[-1]
-
-        #                 if category_id not in categories_dict:
-        #                     categories_dict[category_id] = tag_dict
-        #                     n_categories_detected = n_categories_detected + 1
-        #                 else:
-        #                     print('/!\\ Warning /!\\ id. key:{} already exist'.format(n_categories_detected, category_id))
-        #                     n_redundancy = n_redundancy + 1
-
-
-        #         print("N World categories detected: {}/{}".format(n_categories_detected, remote_data_dict['count']))
-        # #        print("Openfoodfacts categories:", categories_dict.keys())
-        # #        print("Openfoodfacts World Categories values:", categories_dict.values())
-        #         print("N redundancy:", n_redundancy)
-        # #        self.__save_db(True)
 
 
 #     def get_categories(self):
@@ -411,7 +422,7 @@ class ZDataBase_MySQL(object):
 
 #         return path_to_file
 
-    def __connect(self):
+    def __connect(self, use_database=False):
         """ Connect to MySQL database """
     
         db_config = self.__read_db_config()
@@ -420,9 +431,11 @@ class ZDataBase_MySQL(object):
             'user': 'app',
             'password': 'No@pp23',
             'host': 'localhost',
-            # 'database': 'openfacts',
             'raise_on_warnings': True
             }
+
+        if use_database:
+            db_config['database'] = 'openfacts'
     
         cnx = None
 

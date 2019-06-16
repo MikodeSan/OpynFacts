@@ -46,7 +46,7 @@ class ZDataBase_JSON(object):
         for idx, tag_dict in enumerate(remote_data_dict['tags']):
 
             #        print('#', idx, '.\t\t:', tag_dict['id'])
-            category_id = tag_dict.pop("id")
+            category_id = tag_dict['id']
 
             # check category id.
             is_valid = False
@@ -66,7 +66,7 @@ class ZDataBase_JSON(object):
                     categories_dict[category_id] = tag_dict
                     n_categories_detected = n_categories_detected + 1
                 else:
-                    print('/!\\ Warning /!\\ id. key:{} already exist'.format(n_categories_detected, category_id))
+                    print('/!\\ Warning /!\\ id. key:{} already exist'.format(category_id))
                     n_redundancy = n_redundancy + 1
 
 

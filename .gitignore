@@ -155,3 +155,4 @@ _ReSharper*/
 
 #Nuget packages folder
 packages/
+/dat/im/
