@@ -108,21 +108,19 @@ class ZFact():
 
         return response.json()
 
-    def __init_database_product(self, n_category_max=10, n_product_max=10):
+    def __init_database_product(self, n_category_max=50, n_product_max=50):
 
         if n_category_max > 0:
 
             category_idx = 0
-            categories_lst = self.__db.get_categories()
+            categories_lst = self.__db_sql.get_category_data()          # self.__db.get_categories()
 
             # Get categories
             while category_idx < n_category_max:
 
                 # Get category url
-                category_id = categories_lst[category_idx]
-                category_url = self.__db.get_category_url(category_id)
-                # print(category_idx+1, category_id)
-
+                category_id = categories_lst[category_idx][0]           # categories_lst[category_idx]
+                category_url = categories_lst[category_idx][3]          # self.__db.get_category_url(category_id)
 
                 # Get category pages
                 is_first_page = True
@@ -148,6 +146,7 @@ class ZFact():
 
                     # add product lst to db
                     self.__db.add_product(category_id, products_lst)
+                    self.__db_sql.add_product(category_id, products_lst)
 
                     page_idx = page_idx + 1
 
@@ -164,7 +163,6 @@ class ZFact():
     def __download_product_from_category(self, category_page_path, is_first_page=True):
 
         response = requests.get(category_page_path)
-        #                    print(response)
 
         category_page_dict = response.json()
 
@@ -345,11 +343,11 @@ class ZFact():
 
 if __name__ == "__main__":
 
-    # import logging as log
+    import logging as log
 
 
-    # log.basicConfig(level=log.DEBUG)
-    # log.info('Enable log to level: DEBUG')
+    log.basicConfig(level=log.DEBUG)
+    log.info('Enable log to level: DEBUG')
 
     # model
     model = ZFact()

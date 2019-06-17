@@ -53,13 +53,14 @@ class ZDataBase_MySQL(object):
 
     TABLES['product'] = (
         "CREATE TABLE `product` ("
-        "  `code` MEDIUMINT UNSIGNED NOT NULL,"
-        "  `label` VARCHAR(255),"
+        "  `code` CHAR(13) NOT NULL,"
         "  `brand` VARCHAR(255),"
+        "  `label` VARCHAR(255),"
+        "  `store` VARCHAR(255),"
         "  `product_url` VARCHAR(255),"
         "  `same_as` VARCHAR(255),"
-        "  `nova_group` TINYINT UNSIGNED,"
-        "  `nutrition_grades` CHAR(1),"
+        "  `nova_group` TINYINT,"
+        "  `nutrition_grade` CHAR(1),"
         "  `image_url` VARCHAR(255),"
         "  PRIMARY KEY (`code`)"
         # "categories_hierarchy": [
@@ -79,7 +80,6 @@ class ZDataBase_MySQL(object):
         #         },
         #         "nutrition_score": -1,
         #         "nutrition_score_beverage": 0,
-        #         "stores": "Bordeaux,Brive,Limoges,Saint-Yrieix",
         #         "unique_scans_n": -1,
         ") ENGINE=InnoDB")
 
@@ -87,6 +87,7 @@ class ZDataBase_MySQL(object):
         "CREATE TABLE `relation_category_product` ("
         "  `category_id` VARCHAR(127) NOT NULL,"
         "  `product_code` MEDIUMINT UNSIGNED NOT NULL,"
+        "  `category_hierarchy_index` TINYINT UNSIGNED NOT NULL,"
         "  PRIMARY KEY (`category_id`, `product_code`)"
         ") ENGINE=InnoDB")
 
@@ -149,21 +150,9 @@ class ZDataBase_MySQL(object):
 
             cursor = db_conn.cursor(buffered=True)
 
-            # # Use database
-            # try:
-            #     self.__lg.debug("\t> Use database '{}'".format(self.DB_NAME))
-            #     cursor.execute("USE {}".format(self.DB_NAME))
-            #     self.__lg.debug("\t  - Database {} used".format(self.DB_NAME))
-
-            # except mysql.connector.Error as err:
-            #     self.__lg.error("\t  - {}".format(err))
-            #     is_success = False
-            #     exit(1)
-
             if is_success:
 
                 remote_data_dict = json
-                # categories_dict = self.__data[self.KEY_CATEGORY]
                 n_categories_detected = 0
                 n_redundancy = 0
 
@@ -211,22 +200,10 @@ class ZDataBase_MySQL(object):
                             # self.__lg.debug("\t> {}. Insert new category '{}'".format(n_categories_detected, category_id))
                             
                             command = (cmd + value)           
-                            # print(command)                 
-                            # print(data)
 
                             cursor.execute(command, data)
 
-                            # # Make sure data is committed to the database
-                            # db_conn.commit()
-
                             n_categories_detected = n_categories_detected + 1
-
-                            # query = ("SELECT id, label, n_product, category_url, same_as FROM category ")
-
-                            # cursor.execute(query)
-
-                            # for (id, label, n_product, category_url, same_as) in cursor:
-                            #     self.__lg.debug("\t  - Inserted category data: {}, {}, {}, {}, {}".format(id, label, n_product, category_url, same_as))
 
                         except mysql.connector.Error as err:
                             
@@ -241,16 +218,33 @@ class ZDataBase_MySQL(object):
                 db_conn.commit()
 
                 self.__lg.debug("N categories detected: {}/{} - N categories redundancy: {}".format(n_categories_detected, remote_data_dict['count'], n_redundancy))
-        #        print("Openfoodfacts categories:", categories_dict.keys())
-        #        print("Openfoodfacts World Categories values:", categories_dict.values())
+            #        print("Openfoodfacts categories:", categories_dict.keys())
+            #        print("Openfoodfacts World Categories values:", categories_dict.values())
 
             self.__close_connection(db_conn)
 
+    def get_category_data(self):
 
+        db_conn = self.__connect(True)
 
-#     def get_categories(self):
+        if db_conn:
 
-#         return list(self.__data[self.KEY_CATEGORY].keys())
+            cursor = db_conn.cursor(buffered=True)
+
+            query = ("SELECT id, label, n_product, category_url FROM category ")
+            cursor.execute(query)
+            rows = cursor.fetchall()
+
+            category_data_lst = []
+            print('Total Row(s):', cursor.rowcount)
+
+            for row in rows:
+                category_data_lst.append(list(row))
+                #     self.__lg.debug("\t  - Inserted category data: {}".format(category_data_lst[-1])
+
+        self.__close_connection(db_conn)
+
+        return category_data_lst
 
 #     def get_categories_from_relation(self):
 #         """Get valid categories from the category/product relation table
@@ -302,33 +296,61 @@ class ZDataBase_MySQL(object):
 #         return self.__data[self.KEY_CATEGORY][category_id]['url']
 
 
-#     def add_product(self, category_id, products_lst):
+    def add_product(self, category_id, products_lst):
 
-#         existing_product_lst = []
-#         relation_lst = self.__data[self.KEY_RELATION_CATEGORY_2_PRODUCT]
+        n_redundancy = 0
 
-#         for product_idx, product_dict in enumerate(products_lst):
+        db_conn = self.__connect(True)
 
-#             code = product_dict.pop('code')
- 
-#             relation = {self.KEY_CATEGORY_ID:category_id, self.KEY_PRODUCT_CODE:code}
-#             if relation not in relation_lst:
-#                 relation_lst.append(relation)
+        if db_conn:
 
-#             db_products_dict = self.__data[self.KEY_PRODUCT]
-#             if code not in db_products_dict:
-#                 db_products_dict[code] = product_dict
-#                 # print(db_products_dict[code])
+            cursor = db_conn.cursor(buffered=True)
 
-#             else:
-#                 # TODO: Update product data
-#                 existing_product_lst.append({'code': code, 'name':product_dict['name']})
 
-#         print('N existing product into db', len(existing_product_lst))
+            existing_product_lst = []
 
-# #        self.__save_db(True)
+            for product_idx, product_dict in enumerate(products_lst):
 
-#         return existing_product_lst
+                try:
+                    # Insert new product
+                    sql_command = "INSERT INTO product (code, brand, label, store, product_url, nova_group, nutrition_grade, image_url) " \
+                                    "VALUES (%(code)s, %(brand)s, %(label)s, %(store)s, %(product_url)s, %(nova_group)s, %(nutrition_grade)s, %(image_url)s)"
+                    data = {'code': product_dict['code'], 'brand': product_dict['brands'], 'label':  product_dict['name'],
+                            'store': product_dict['stores'],
+                            'product_url':  product_dict['url'],
+                            'nova_group': product_dict['nova_group'], 'nutrition_grade': product_dict['nutrition_grades'], 'image_url': product_dict['image']}
+
+                    # self.__lg.debug("\t> {}. Insert new product: #{}-{}'".format(product_idx, product_dict['code'], product_dict['name']))
+                    cursor.execute(sql_command, data)
+
+
+                    # # Insert new category/product relation 
+                    # sql_command = "INSERT INTO category (category_id, product_code, category_hierarchy_index) " \
+                    #                 "VALUES (%s, %s, %s)"
+                    # data = {'category_id': product_dict['category_id'], 'product_code': product_dict['code'], 'category_hierarchy_index': product_dict['category_hierarchy_index']}
+
+                    # cursor.execute(sql_command, data)
+
+                except mysql.connector.Error as err:
+                    
+                    if err.errno == errorcode.ER_DUP_ENTRY :
+                        # TODO: Update product data
+                        existing_product_lst.append({'code': product_dict['code'], 'label':product_dict['name']})
+                        n_redundancy = n_redundancy + 1
+                        self.__lg.warning("\t  - {}".format(err))
+                    else:
+                        self.__lg.error("\t  - {}".format(err))
+                   
+                        exit(1)
+
+            # Make sure data is committed to the database
+            db_conn.commit()
+
+            # print('N existing product into db', len(existing_product_lst))      # n_redundancy
+
+            self.__close_connection(db_conn)
+
+        return existing_product_lst
 
 #     def products(self, categories_lst):
 
