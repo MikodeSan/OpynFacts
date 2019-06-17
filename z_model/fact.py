@@ -108,7 +108,7 @@ class ZFact():
 
         return response.json()
 
-    def __init_database_product(self, n_category_max=50, n_product_max=50):
+    def __init_database_product(self, n_category_max=230, n_product_max=120):
 
         if n_category_max > 0:
 

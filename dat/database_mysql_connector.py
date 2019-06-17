@@ -86,8 +86,8 @@ class ZDataBase_MySQL(object):
     TABLES['relation_category_product'] = (
         "CREATE TABLE `relation_category_product` ("
         "  `category_id` VARCHAR(127) NOT NULL,"
-        "  `product_code` MEDIUMINT UNSIGNED NOT NULL,"
-        "  `category_hierarchy_index` TINYINT UNSIGNED NOT NULL,"
+        "  `product_code` CHAR(13) NOT NULL,"
+        "  `category_hierarchy_index` TINYINT UNSIGNED,"
         "  PRIMARY KEY (`category_id`, `product_code`)"
         ") ENGINE=InnoDB")
 
@@ -315,7 +315,7 @@ class ZDataBase_MySQL(object):
                     # Insert new product
                     sql_command = "INSERT INTO product (code, brand, label, store, product_url, nova_group, nutrition_grade, image_url) " \
                                     "VALUES (%(code)s, %(brand)s, %(label)s, %(store)s, %(product_url)s, %(nova_group)s, %(nutrition_grade)s, %(image_url)s)"
-                    data = {'code': product_dict['code'], 'brand': product_dict['brands'], 'label':  product_dict['name'],
+                    data = {'code': product_dict['code'], 'brand': product_dict['brands'], 'label': product_dict['name'],
                             'store': product_dict['stores'],
                             'product_url':  product_dict['url'],
                             'nova_group': product_dict['nova_group'], 'nutrition_grade': product_dict['nutrition_grades'], 'image_url': product_dict['image']}
@@ -323,13 +323,27 @@ class ZDataBase_MySQL(object):
                     # self.__lg.debug("\t> {}. Insert new product: #{}-{}'".format(product_idx, product_dict['code'], product_dict['name']))
                     cursor.execute(sql_command, data)
 
+                    # Insert new category/product relation
+                    cmd = "INSERT INTO relation_category_product (category_id, product_code"
+                    value = "VALUES (%(category_id)s, %(product_code)s"
+                    data = {'category_id': category_id, 'product_code': product_dict['code']}
+                    self.__lg.debug("\t> Insert new relation: {}-#{}-{}".format(category_id, product_dict['code'], product_dict['name']))
 
-                    # # Insert new category/product relation 
-                    # sql_command = "INSERT INTO category (category_id, product_code, category_hierarchy_index) " \
-                    #                 "VALUES (%s, %s, %s)"
-                    # data = {'category_id': product_dict['category_id'], 'product_code': product_dict['code'], 'category_hierarchy_index': product_dict['category_hierarchy_index']}
+                    if category_id in product_dict['categories_hierarchy']:
+                        category_idx = product_dict['categories_hierarchy'].index(category_id)
 
-                    # cursor.execute(sql_command, data)
+                        cmd = cmd + ", category_hierarchy_index"
+                        value = value + ", %(category_hierarchy_index)s"
+
+                        data['category_hierarchy_index'] = category_idx
+                    else:
+                        self.__lg.warning("\t  - {} not in hierarchy {}".format(category_id, product_dict['categories_hierarchy']))
+
+                    cmd = cmd + ") "
+                    value = value + ")"
+                    sql_command = cmd + value                    
+
+                    cursor.execute(sql_command, data)
 
                 except mysql.connector.Error as err:
                     
