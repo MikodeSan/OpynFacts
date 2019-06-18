@@ -104,6 +104,8 @@ class ZFact():
         # path = "https://world.openfoodfacts.org/categories.json"
 
         response = requests.get(path)
+        if response.status_code != 200:
+            exit(1)
         # print(response)
 
         return response.json()
@@ -114,10 +116,9 @@ class ZFact():
 
             category_idx = 0
             categories_lst = self.__db_sql.get_category_data()          # self.__db.get_categories()
-            print(categories_lst)
 
             # Get categories
-            while category_idx < n_category_max:
+            while category_idx < len(categories_lst):                    # n_category_max:
 
                 # Get category url
                 category_id = categories_lst[category_idx][0]           # categories_lst[category_idx]
@@ -132,6 +133,17 @@ class ZFact():
 
 
                 while (n_scan < n_product_total) and (n_product < n_product_max):
+                    
+                    if is_first_page:
+                        
+                        response = requests.get(category_url)
+                        if response.status_code == 200:
+                            if response.url != category_url:
+                                category_url = response.url
+                                # print(category_url, response.url)
+                                # exit(1)
+                        else:
+                            exit(1)
 
                     category_page_path = category_url + '/{}.json'.format(page_idx+1)
                     print(category_page_path)
@@ -155,7 +167,7 @@ class ZFact():
                     page_idx = page_idx + 1
 
                 category_idx = category_idx + 1
-                print('category id {}'.format(category_idx))
+                print('category #{}. {}'.format(category_idx, category_id))
 
         else:
 
@@ -196,7 +208,7 @@ class ZFact():
         # -- Get products basic data from dict --
 
         # code
-        extracted_data_dict['code'] = product_dict['code']
+        extracted_data_dict['code'] = int(product_dict['code'])
 
         # name
         name = ''
@@ -305,7 +317,7 @@ class ZFact():
         extracted_data_dict['image'] = ""
 
         # if product data are valid
-        if extracted_data_dict['name']:
+        if extracted_data_dict['code'] < (2**64) and extracted_data_dict['name']:
 
             # image
             image_url = ""
@@ -314,17 +326,20 @@ class ZFact():
             elif 'image_front_url' in product_dict:
                 image_url = product_dict['image_front_url']
             
-            if image_url:
-                r = requests.get(image_url, stream=True)
-                if r.status_code == 200:
-                    image_path = self.IMAGE_PATH + "/{}".format(extracted_data_dict['code']) + "." + image_url.split(".")[-1]
-                    # print(image_path)
-                    with open(image_path, 'wb') as out_file:
-                        r.raw.decode_content = True
-                        shutil.copyfileobj(r.raw, out_file)
-                        extracted_data_dict['image'] = image_path
+            if 0:
+                if image_url:
+                    r = requests.get(image_url, stream=True)
+                    if r.status_code == 200:
+                        image_path = self.IMAGE_PATH + "/{}".format(extracted_data_dict['code']) + "." + image_url.split(".")[-1]
+                        # print(image_path)
+                        with open(image_path, 'wb') as out_file:
+                            r.raw.decode_content = True
+                            shutil.copyfileobj(r.raw, out_file)
+                            extracted_data_dict['image'] = image_path
+                    else:
+                        exit(1)
 
-                del r
+                    del r
         
         else:
             extracted_data_dict = {}

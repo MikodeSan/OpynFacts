@@ -53,11 +53,11 @@ class ZDataBase_MySQL(object):
 
     TABLES['product'] = (
         "CREATE TABLE `product` ("
-        "  `code` CHAR(13) NOT NULL,"
+        "  `code` BIGINT UNSIGNED NOT NULL,"
         "  `brand` VARCHAR(255),"
-        "  `label` VARCHAR(255),"
-        "  `store` VARCHAR(255),"
-        "  `product_url` VARCHAR(255),"
+        "  `label` VARCHAR(512),"
+        "  `store` TEXT,"
+        "  `product_url` VARCHAR(512),"
         "  `same_as` VARCHAR(255),"
         "  `nova_group` TINYINT,"
         "  `nutrition_grade` CHAR(1),"
@@ -85,8 +85,8 @@ class ZDataBase_MySQL(object):
 
     TABLES['relation_category_product'] = (
         "CREATE TABLE `relation_category_product` ("
-        "  `category_id` VARCHAR(127) NOT NULL,"
-        "  `product_code` CHAR(13) NOT NULL,"
+        "  `category_id` VARCHAR(256) NOT NULL,"
+        "  `product_code` BIGINT UNSIGNED NOT NULL,"
         "  `category_hierarchy_index` TINYINT UNSIGNED,"
         "  PRIMARY KEY (`category_id`, `product_code`)"
         ") ENGINE=InnoDB")
@@ -320,7 +320,7 @@ class ZDataBase_MySQL(object):
                             'product_url':  product_dict['url'],
                             'nova_group': product_dict['nova_group'], 'nutrition_grade': product_dict['nutrition_grades'], 'image_url': product_dict['image']}
 
-                    # self.__lg.debug("\t> {}. Insert new product: #{}-{}'".format(product_idx, product_dict['code'], product_dict['name']))
+                    self.__lg.debug("\t> {}. Insert new product: #{}-{}".format(product_idx, product_dict['code'], product_dict['name']))
                     cursor.execute(sql_command, data)
 
                     # Insert new category/product relation
