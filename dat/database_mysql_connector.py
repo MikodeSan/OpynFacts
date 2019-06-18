@@ -240,9 +240,9 @@ class ZDataBase_MySQL(object):
 
             for row in rows:
                 category_data_lst.append(list(row))
-                #     self.__lg.debug("\t  - Inserted category data: {}".format(category_data_lst[-1])
+                # self.__lg.debug("\t  - Category data: {}".format(category_data_lst[-1]))
 
-        self.__close_connection(db_conn)
+            self.__close_connection(db_conn)
 
         return category_data_lst
 
@@ -351,7 +351,7 @@ class ZDataBase_MySQL(object):
                         # TODO: Update product data
                         existing_product_lst.append({'code': product_dict['code'], 'label':product_dict['name']})
                         n_redundancy = n_redundancy + 1
-                        self.__lg.warning("\t  - {}".format(err))
+                        self.__lg.warning("\t  - {}; {}".format(err, existing_product_lst[-1]))
                     else:
                         self.__lg.error("\t  - {}".format(err))
                    

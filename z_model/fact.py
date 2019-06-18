@@ -114,6 +114,7 @@ class ZFact():
 
             category_idx = 0
             categories_lst = self.__db_sql.get_category_data()          # self.__db.get_categories()
+            print(categories_lst)
 
             # Get categories
             while category_idx < n_category_max:
@@ -133,9 +134,12 @@ class ZFact():
                 while (n_scan < n_product_total) and (n_product < n_product_max):
 
                     category_page_path = category_url + '/{}.json'.format(page_idx+1)
+                    print(category_page_path)
 
                     [products_lst, n_scanned, n_total] = self.__download_product_from_category(category_page_path,
                                                                                             is_first_page=is_first_page)
+                    # print(products_lst)
+
                     if is_first_page:
                         n_product_total = n_total
                         # print(n_product_total)
@@ -151,7 +155,7 @@ class ZFact():
                     page_idx = page_idx + 1
 
                 category_idx = category_idx + 1
-
+                print('category id {}'.format(category_idx))
 
         else:
 
