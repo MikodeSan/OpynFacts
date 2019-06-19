@@ -35,10 +35,11 @@ class ZDataBase_MySQL(object):
 #     KEY_PRODUCT_CODE = 'product_code'
 
     TABLES = {}
-    TABLES['version'] = (
-        "CREATE TABLE `version` ("
-        "  `id` CHAR(5) NOT NULL DEFAULT '1.0.0',"
-        "  PRIMARY KEY (`id`)"
+    TABLES['manifest'] = (
+        "CREATE TABLE `manifest` ("
+        "  `version` CHAR(5) NOT NULL DEFAULT '1.0',"
+        "  `is_completed` CHAR(1) NOT NULL DEFAULT 'F',"
+        "  PRIMARY KEY (`version`)"
         ") ENGINE=InnoDB")
 
     TABLES['category'] = (
@@ -53,7 +54,7 @@ class ZDataBase_MySQL(object):
 
     TABLES['product'] = (
         "CREATE TABLE `product` ("
-        "  `code` BIGINT UNSIGNED NOT NULL,"
+        "  `code` VARCHAR(255) NOT NULL,"
         "  `brand` VARCHAR(255),"
         "  `label` VARCHAR(512),"
         "  `store` TEXT,"
@@ -86,7 +87,7 @@ class ZDataBase_MySQL(object):
     TABLES['relation_category_product'] = (
         "CREATE TABLE `relation_category_product` ("
         "  `category_id` VARCHAR(256) NOT NULL,"
-        "  `product_code` BIGINT UNSIGNED NOT NULL,"
+        "  `product_code` VARCHAR(255) NOT NULL,"
         "  `category_hierarchy_index` TINYINT UNSIGNED,"
         "  PRIMARY KEY (`category_id`, `product_code`)"
         ") ENGINE=InnoDB")
@@ -105,9 +106,6 @@ class ZDataBase_MySQL(object):
             # Check database
             cursor = db_conn.cursor()
 
-            # drop database
-            self.__drop_database(cursor)
-
             # Use database
             try:
                 self.__lg.info("\t> Use database '{}'".format(self.DB_NAME))
@@ -115,16 +113,15 @@ class ZDataBase_MySQL(object):
                 self.__lg.info("\t  - Database {} used".format(self.DB_NAME))
 
             except mysql.connector.Error as err:
-                # if database not exists, create database
 
                 self.__lg.warning("\t  - Database '{}' does not exists.".format(self.DB_NAME))
                 if err.errno == errorcode.ER_BAD_DB_ERROR:
-                    self.__create_database(cursor)
+                    # if database does not exist, then create database
+                    self.__create_database(db_conn)
                     db_conn.database = self.DB_NAME
                 else:
                     self.__lg.error(err)
                     exit(1)
-
 
         #         # Get Matchs list
         #         path_to_file = self.__db_path()
@@ -138,6 +135,48 @@ class ZDataBase_MySQL(object):
         
         else:
             print("db connection failed")
+
+    def is_completed(self):
+        
+        version = ''
+        is_completed = False
+
+        db_conn = self.__connect(True)
+
+        if db_conn:
+
+            # try:
+            cursor = db_conn.cursor(buffered=True)
+            cursor.execute("SELECT * FROM manifest")
+            row = cursor.fetchone()
+
+            version = row[0]
+            self.__lg.info("\t  - Database version used: {}".format(version))
+            if row[1] == 'T':
+                is_completed = True
+
+            # except mysql.connector.Error as err:
+            #     self.__lg.error(err)
+            #     exit(1)            
+            self.__close_connection(db_conn)
+
+        return is_completed
+
+    def commit(self):
+
+        is_completed = False
+
+        db_conn = self.__connect(True)
+
+        if db_conn:
+                    
+            cursor = db_conn.cursor(buffered=True)
+
+            cursor.execute("UPDATE {} SET {} = 'T' WHERE version = {}".format('manifest', 'is_completed', '1.0'))
+            db_conn.commit()
+            self.__close_connection(db_conn)
+
+        return is_completed
 
 
     def add_category(self, json=None, observer=None):
@@ -490,6 +529,8 @@ class ZDataBase_MySQL(object):
             else:
                 self.__lg.warning(err)
 
+            exit(1)
+
         return cnx
 
     def __read_db_config(self, filename='config.ini', section='sql_db'):
@@ -521,9 +562,11 @@ class ZDataBase_MySQL(object):
     
         return db
         
-    def __create_database(self, cursor):
+    def __create_database(self, database_connection):
 
         is_success = True
+
+        cursor = database_connection.cursor()
 
         self.__drop_database(cursor)
 
@@ -531,31 +574,41 @@ class ZDataBase_MySQL(object):
             self.__lg.debug("\t> Create database '{}'".format(self.DB_NAME))
             cursor.execute("CREATE DATABASE {} DEFAULT CHARACTER SET 'UTF8MB4'".format(self.DB_NAME))
             self.__lg.debug("\t  - Database created successfully.")
+
             self.__lg.debug("\t> Use database '{}'".format(self.DB_NAME))
             cursor.execute("USE {}".format(self.DB_NAME))
             self.__lg.debug("\t  - Database '{}' used".format(self.DB_NAME))
 
         except mysql.connector.Error as err:
             is_success = False
-
             self.__lg.error("\t  - Failed creating database: {}".format(err))
+            exit(1)
 
         if is_success:
 
             for table_name, table_description in self.TABLES.items():
                     
-                    try:
-                        self.__lg.debug("\t> Create table '{}' ".format(table_name))
-                        cursor.execute(table_description)
+                try:
+                    self.__lg.debug("\t> Create table '{}' ".format(table_name))
+                    cursor.execute(table_description)
 
-                    except mysql.connector.Error as err:
+                except mysql.connector.Error as err:
 
-                        is_success = False
+                    is_success = False
 
-                        if err.errno == errorcode.ER_TABLE_EXISTS_ERROR:
-                            self.__lg.error("\t  - Table '{}' already exists".format(table_name))
-                        else:
-                            self.__lg.error("\t  - {} ".format(err))
+                    if err.errno == errorcode.ER_TABLE_EXISTS_ERROR:
+                        self.__lg.error("\t  - Table '{}' already exists".format(table_name))
+                    else:
+                        self.__lg.error("\t  - {} ".format(err))
+
+            try:
+                self.__lg.debug("\t> Set table '{}'".format('manifest'))
+                cursor.execute("INSERT INTO {} VALUES ('1.0', 'F')".format('manifest'))
+                database_connection.commit()
+                self.__lg.debug("\t  - Version and status set into manifest table")
+
+            except mysql.connector.Error as err:
+                exit(1)                
 
     def __drop_database(self, cursor):
 

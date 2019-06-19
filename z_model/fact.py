@@ -34,11 +34,12 @@ class ZFact():
         Constructor
         '''
 
+        #
         self.__db = database()
         self.__db_sql = database_mysql()
 
 
-        if not self.__db.get_categories():
+        if not self.__db_sql.is_completed(): # not self.__db.get_categories():
             category_dict = self.__download_categories()
 
             self.__db.init_categories(category_dict)
@@ -118,11 +119,13 @@ class ZFact():
             categories_lst = self.__db_sql.get_category_data()          # self.__db.get_categories()
 
             # Get categories
-            while category_idx < len(categories_lst):                    # n_category_max:
+            while category_idx < len(categories_lst)/10:                    # n_category_max:
 
                 # Get category url
                 category_id = categories_lst[category_idx][0]           # categories_lst[category_idx]
                 category_url = categories_lst[category_idx][3]          # self.__db.get_category_url(category_id)
+
+                print('\t> Process category #{}. {}'.format(category_idx, category_id))
 
                 # Get category pages
                 is_first_page = True
@@ -167,7 +170,9 @@ class ZFact():
                     page_idx = page_idx + 1
 
                 category_idx = category_idx + 1
-                print('category #{}. {}'.format(category_idx, category_id))
+
+            self.__db_sql.commit()
+            print('\t> Database is completed: {}'. format(self.__db_sql.is_completed()))
 
         else:
 
@@ -208,7 +213,7 @@ class ZFact():
         # -- Get products basic data from dict --
 
         # code
-        extracted_data_dict['code'] = int(product_dict['code'])
+        extracted_data_dict['code'] = product_dict['code']
 
         # name
         name = ''
@@ -317,7 +322,7 @@ class ZFact():
         extracted_data_dict['image'] = ""
 
         # if product data are valid
-        if extracted_data_dict['code'] < (2**64) and extracted_data_dict['name']:
+        if extracted_data_dict['name']:         # (extracted_data_dict['code'] < (2**64) and )
 
             # image
             image_url = ""

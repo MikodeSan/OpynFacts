@@ -39,7 +39,11 @@ class ZDataBase_JSON(object):
     def init_categories(self, json, observer=None):
 
         remote_data_dict = json
+        
+        # reset categories
         categories_dict = self.__data[self.KEY_CATEGORY]
+        categories_dict = {}
+
         n_categories_detected = 0
         n_redundancy = 0
 
