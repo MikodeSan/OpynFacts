@@ -31,6 +31,8 @@ def new_db(filename):
 
 def open_db(db_path):
 
+    is_db_loaded = False
+
     # get path
     temp_path = temp_db_path(db_path)
 
@@ -39,16 +41,27 @@ def open_db(db_path):
         # backup old db: TODO
         # switch files
         shutil.copyfile(temp_path, db_path)
+        print("Info: %s file found" % temp_path)
+        is_db_loaded = True
         try:
             os.remove(temp_path)
         except OSError as e:  ## if failed, report it back to the user ##
             print("Error: %s - %s." % (e.filename, e.strerror))
     else:    # Show an error #
-        print("Error: %s file not found" % temp_path)
+        print("Warning: %s temp. file not found" % temp_path)
+        if os.path.isfile(db_path):
+            print("Info: %s file found" % db_path)
+            is_db_loaded = True
+        else:
+            print("Error: %s file not found" % db_path)
 
-
+    if is_db_loaded:
+        db = db_format.load_db(db_path)
+    else:
+        db = {}
+        
     # get data from cur_file
-    return db_format.load_db(db_path)
+    return db
 
 
 def save_db(filename):
