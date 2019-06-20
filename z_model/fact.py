@@ -33,13 +33,12 @@ class ZFact():
         '''
         Constructor
         '''
-
-        #
+        # Get database back
         self.__db = database()
         self.__db_sql = database_mysql()
 
-
-        if not self.__db_sql.is_completed(): # not self.__db.get_categories():
+        # Init. database if necessary
+        if not self.__db_sql.is_completed():                    # not self.__db.get_categories():
             category_dict = self.__download_categories()
 
             self.__db.init_categories(category_dict)
@@ -99,7 +98,7 @@ class ZFact():
 
     def __download_categories(self):
 
-        # --- Get List of category ---
+        # - Get List of category ---
         path = "https://fr-fr.openfoodfacts.org/categories.json"
         # path = "https://fr-en.openfoodfacts.org/categories.json"
         # path = "https://world.openfoodfacts.org/categories.json"
@@ -210,7 +209,7 @@ class ZFact():
 
         extracted_data_dict = {}
 
-        # -- Get products basic data from dict --
+        # Get products basic data from dict --
 
         # code
         extracted_data_dict['code'] = product_dict['code']

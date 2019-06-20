@@ -41,8 +41,8 @@ class ZDataBase_JSON(object):
         remote_data_dict = json
         
         # reset categories
+        self.__data[self.KEY_CATEGORY] = {}
         categories_dict = self.__data[self.KEY_CATEGORY]
-        categories_dict = {}
 
         n_categories_detected = 0
         n_redundancy = 0
@@ -68,6 +68,8 @@ class ZDataBase_JSON(object):
 
                 if category_id not in categories_dict:
                     categories_dict[category_id] = tag_dict
+                    # print('\t  - id. key:{} added to json db: {}'.format(category_id, self.__data[self.KEY_CATEGORY][category_id]))
+
                     n_categories_detected = n_categories_detected + 1
                 else:
                     print('/!\\ Warning /!\\ id. key:{} already exist'.format(category_id))

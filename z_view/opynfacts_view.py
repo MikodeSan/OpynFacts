@@ -73,8 +73,7 @@ class ZOpynFacts_View(QWidget):
 
         altern_category_cbox = self.ui.altern_category_cbox
         altern_category_cbox.currentIndexChanged[int].connect(self.__update_data_alternative_product)
-
-
+        
     def __create_widgets(self):
 
         self.ui = Ui_Form()
@@ -178,7 +177,6 @@ class ZOpynFacts_View(QWidget):
                 # model.setItem(row_idx, item)
                 row_idx = row_idx + 1
 
-
     def __update_data_selected_categories(self, selected_item, deselected_item):
         """ Get the list of selected category items, then get item data back and update the list of selected category id. """
 
@@ -238,19 +236,17 @@ class ZOpynFacts_View(QWidget):
 
 
     def print_test(self, check):
-##        print(newAct.iconText(), newAct.text())
-#        print(self.ui_project_command._action_new.text())
-#
-#        text = QInputDialog.getText(self, "QInputDialog::getText()",
-#                                         "User name:")
-##                                         QLineEdit::Normal,
-##                                         QDir::home().dirName(), &ok);
-##        if (ok && !text.isEmpty())
-##            textLabel->setText(text);
-#        print(text)
+        ##        print(newAct.iconText(), newAct.text())
+        #        print(self.ui_project_command._action_new.text())
+        #
+        #        text = QInputDialog.getText(self, "QInputDialog::getText()",
+        #                                         "User name:")
+        ##                                         QLineEdit::Normal,
+        ##                                         QDir::home().dirName(), &ok);
+        ##        if (ok && !text.isEmpty())
+        ##            textLabel->setText(text);
+        #        print(text)
         pass
-
-        
 
 #        self.ui.project_list_combo.addItem("None")
 #

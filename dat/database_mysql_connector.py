@@ -106,6 +106,10 @@ class ZDataBase_MySQL(object):
             # Check database
             cursor = db_conn.cursor()
 
+            if 0:   # TODO: TO DELETE (reset db)
+                # drop database
+                self.__drop_database(cursor)
+
             # Use database
             try:
                 self.__lg.info("\t> Use database '{}'".format(self.DB_NAME))
@@ -178,10 +182,7 @@ class ZDataBase_MySQL(object):
 
         return is_completed
 
-
     def add_category(self, json=None, observer=None):
-
-        is_success = True
 
         db_conn = self.__connect(True)
 
@@ -189,80 +190,74 @@ class ZDataBase_MySQL(object):
 
             cursor = db_conn.cursor(buffered=True)
 
-            if is_success:
+            remote_data_dict = json
+            n_categories_detected = 0
+            n_redundancy = 0
 
-                remote_data_dict = json
-                n_categories_detected = 0
-                n_redundancy = 0
+            
+            for idx, tag_dict in enumerate(remote_data_dict['tags']):
 
-                
-                for idx, tag_dict in enumerate(remote_data_dict['tags']):
+                #        print('#', idx, '.\t\t:', tag_dict['id'])
+                category_id = tag_dict['id']
 
-                    #        print('#', idx, '.\t\t:', tag_dict['id'])
-                    category_id = tag_dict['id']
+                # check category id.
+                is_valid = False
+                category = category_id.split(':')
 
-                    # check category id.
-                    is_valid = False
-                    category = category_id.split(':')
+                if len(category) == 2:
+                    is_valid = True
+                else:
+                    self.__lg.warning('\t  - Maybe category id. has an unknown format {}'.format(category))
 
-                    if len(category) == 2:
-                        is_valid = True
-                    else:
-                        self.__lg.warning('\t  - Maybe category id. has an unknown format {}'.format(category))
+                if is_valid:
 
-                    if is_valid:
+                    language_code = category[0]
+                    label = category[-1]
 
-                        language_code = category[0]
-                        label = category[-1]
+                    # Insert new category
+                    try:
+                        
+                        cmd = "INSERT INTO category (id, label, n_product, category_url"
+                        value = "VALUES (%(id)s, %(label)s, %(n_product)s, %(category_url)s"
+                        # "VALUES (%s, %s, %s, %s, %s)")
 
-                        # Insert new category
-                        try:
+                        data = {'id': category_id, 'label': tag_dict['name'], 'n_product':  tag_dict['products'], 'category_url':  tag_dict['url']}
+                        # data_category = ('totot', 'azerty', 123, 'M', 'aedaef')
+                        
+                        if 'sameAs' in tag_dict:
                             
-                            cmd = "INSERT INTO category (id, label, n_product, category_url"
-                            value = "VALUES (%(id)s, %(label)s, %(n_product)s, %(category_url)s"
-                            # "VALUES (%s, %s, %s, %s, %s)")
+                            cmd = cmd + ", same_as"
+                            value = value + ", %(same_as)s" 
 
-                            data = {'id': category_id, 'label': tag_dict['name'], 'n_product':  tag_dict['products'], 'category_url':  tag_dict['url']}
-                            # data_category = ('totot', 'azerty', 123, 'M', 'aedaef')
+                            data['same_as'] = tag_dict['sameAs'][0]
                             
-                            if 'sameAs' in tag_dict:
-                                
-                                cmd = cmd + ", same_as"
-                                value = value + ", %(same_as)s" 
+                        cmd = cmd + ") "
+                        value = value + ")"
 
-                                data['same_as'] = tag_dict['sameAs'][0]
-                                
+                        # self.__lg.debug("\t> {}. Insert new category '{}'".format(n_categories_detected, category_id))
+                        command = (cmd + value)           
+                        cursor.execute(command, data)
 
-                            cmd = cmd + ") "
-                            value = value + ")"
+                        n_categories_detected = n_categories_detected + 1
 
-                            # self.__lg.debug("\t> {}. Insert new category '{}'".format(n_categories_detected, category_id))
-                            
-                            command = (cmd + value)           
-
-                            cursor.execute(command, data)
-
-                            n_categories_detected = n_categories_detected + 1
-
-                        except mysql.connector.Error as err:
-                            
+                    except mysql.connector.Error as err:
+                        
+                        if err.errno == errorcode.ER_DUP_ENTRY :
+                            n_redundancy = n_redundancy + 1
+                            self.__lg.warning("\t  - {}".format(err))
+                        else:
                             self.__lg.error("\t  - {}".format(err))
+                            exit(1)
                             # emp_no = cursor.lastrowid
 
-                            # print('/!\\ Warning /!\\ id. key:{} already exist'.format(n_categories_detected, category_id))
-                            n_redundancy = n_redundancy + 1
-                            # exit(1)
+            # Make sure data is committed to the database
+            db_conn.commit()
 
-                # Make sure data is committed to the database
-                db_conn.commit()
-
-                self.__lg.debug("N categories detected: {}/{} - N categories redundancy: {}".format(n_categories_detected, remote_data_dict['count'], n_redundancy))
-            #        print("Openfoodfacts categories:", categories_dict.keys())
-            #        print("Openfoodfacts World Categories values:", categories_dict.values())
+            self.__lg.debug("N categories detected: {}/{} - N categories redundancy: {}".format(n_categories_detected, remote_data_dict['count'], n_redundancy))
 
             self.__close_connection(db_conn)
 
-    def get_category_data(self):
+    def get_category_data(self, category_id_lst=None):
 
         db_conn = self.__connect(True)
 
@@ -284,6 +279,24 @@ class ZDataBase_MySQL(object):
             self.__close_connection(db_conn)
 
         return category_data_lst
+
+#     def get_categories_data(self, category_id_lst):
+
+#         categories_dct = {}
+#         db_categories_dct = self.__data[self.KEY_CATEGORY]
+
+#         if category_id_lst:
+
+#             for category_id in category_id_lst:
+
+#                 if category_id in db_categories_dct:
+#                     categories_dct[category_id] = db_categories_dct[category_id]
+
+#         else:
+#             categories_dct = dict(db_categories_dct)
+
+#         return categories_dct
+
 
 #     def get_categories_from_relation(self):
 #         """Get valid categories from the category/product relation table
@@ -310,25 +323,6 @@ class ZDataBase_MySQL(object):
 #                 categories_lst.append(data_dct)
 
 #         return categories_lst
-
-
-#     def get_categories_data(self, category_id_lst):
-
-#         categories_dct = {}
-#         db_categories_dct = self.__data[self.KEY_CATEGORY]
-
-#         if category_id_lst:
-
-#             for category_id in category_id_lst:
-
-#                 if category_id in db_categories_dct:
-#                     categories_dct[category_id] = db_categories_dct[category_id]
-
-#         else:
-#             categories_dct = dict(db_categories_dct)
-
-#         return categories_dct
-
 
 #     def get_category_url(self, category_id):
 
@@ -622,13 +616,11 @@ class ZDataBase_MySQL(object):
             # else:
             self.__lg.warning('\t  - {}'.format(err))
 
-
     @staticmethod
     def __close_connection(connection):
 
         connection.cursor().close()
         connection.close()
-
 
 if __name__ == '__main__':
 
