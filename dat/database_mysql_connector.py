@@ -267,14 +267,15 @@ class ZDataBase_MySQL(object):
 
             query = ("SELECT id, label, n_product, category_url FROM category ")
             cursor.execute(query)
-            rows = cursor.fetchall()
+            row = cursor.fetchone()
 
             category_data_lst = []
             print('Total Row(s):', cursor.rowcount)
 
-            for row in rows:
+            while row is not None:
                 category_data_lst.append(list(row))
                 # self.__lg.debug("\t  - Category data: {}".format(category_data_lst[-1]))
+                row = cursor.fetchone()
 
             self.__close_connection(db_conn)
 
@@ -444,14 +445,6 @@ class ZDataBase_MySQL(object):
 #                 products_dct[product_code] = dict(db_products_dct[product_code])
 
 #         return products_dct
-
-#     def save_db(self, is_temp=True):
-
-#         if is_temp:
-
-#             bkp.modif_db(self.__db_path(), self.__data)
-#         else:
-#             pass
 
 #     @classmethod
 #     def __init_db(cls):

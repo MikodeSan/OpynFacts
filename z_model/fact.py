@@ -51,6 +51,7 @@ class ZFact():
     def categories(self):
         
         categories_lst = self.__db.get_categories_from_relation()
+        # categories_lst = self.__db_sql.get_category_from_relation()
         categories_lst.sort(key=operator.itemgetter('name'))
 
         return categories_lst
@@ -118,7 +119,7 @@ class ZFact():
             categories_lst = self.__db_sql.get_category_data()          # self.__db.get_categories()
 
             # Get categories
-            while category_idx < len(categories_lst)/10:                    # n_category_max:
+            while category_idx < len(categories_lst)/10:                # n_category_max:
 
                 # Get category url
                 category_id = categories_lst[category_idx][0]           # categories_lst[category_idx]
