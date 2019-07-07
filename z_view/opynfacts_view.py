@@ -196,7 +196,7 @@ class ZOpynFacts_View(QWidget):
             if category_id not in self.__selected_category_lst:
                 self.__selected_category_lst.append(category_id)
         
-        self.__lg.debug('{} Selected categories: {}'.format(len(self.__selected_category_lst), self.__selected_category_lst))
+        self.__lg.debug('\t  - {} Selected categories: {}'.format(len(self.__selected_category_lst), self.__selected_category_lst))
 
         product_data_lst = self.__model.products_from_categories(self.__selected_category_lst)
         self.__update_view_product('product', product_data_lst)
@@ -208,16 +208,17 @@ class ZOpynFacts_View(QWidget):
 
         product_data_dct = self.__model.products([product_code])
         
-        categories_dct = self.__model.category_data(product_data_dct[product_code]['categories_hierarchy'])
+        category_lst = self.__model.category_data(product_data_dct[product_code]['categories_hierarchy'])
 
         altern_category_cbox = self.ui.altern_category_cbox
 
         altern_category_cbox.blockSignals(True)
         altern_category_cbox.clear()
 
-        for category_id, category_data in categories_dct.items():
+        for category_dct in category_lst:
+
             # altern_category_cbox.insertItem(-1, category_data['name'], category_id)
-            altern_category_cbox.addItem(category_data['name'], category_id)
+            altern_category_cbox.addItem(category_dct['name'], category_dct['id'])
 
         altern_category_cbox.blockSignals(False)
         cnt = altern_category_cbox.count()

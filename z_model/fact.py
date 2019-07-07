@@ -37,6 +37,8 @@ class ZFact():
         self.__db = database()
         self.__db_sql = database_mysql()
 
+        self.__db_sql.commit()
+
         # Init. database if necessary
         if not self.__db_sql.is_completed():                    # not self.__db.get_categories():
             category_dict = self.__download_categories()
@@ -50,14 +52,14 @@ class ZFact():
 
     def categories(self):
         
-        categories_lst = self.__db.get_categories_from_relation()
-        # categories_lst = self.__db_sql.get_category_from_relation()
+        # categories_lst = self.__db.get_categories_from_relation()
+        categories_lst = self.__db_sql.get_category_data(is_filled=True)
         categories_lst.sort(key=operator.itemgetter('name'))
 
         return categories_lst
 
     def category_data(self, category_id_lst):
-        return self.__db.get_categories_data(category_id_lst)
+        return self.__db_sql.get_category_data(is_filled=False, category_id_lst=category_id_lst)          # __db.get_categories_data(category_id_lst)
 
     def products_from_categories(self, categories_lst):
 
@@ -375,6 +377,7 @@ if __name__ == "__main__":
 
     # model
     model = ZFact()
+
 
 #    log.info(model._db)
 #    log.info(model.get_project_list())

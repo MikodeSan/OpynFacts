@@ -257,7 +257,9 @@ class ZDataBase_MySQL(object):
 
             self.__close_connection(db_conn)
 
-    def get_category_data(self, category_id_lst=None):
+    def get_category_data(self, is_filled=False, category_id_lst=None):
+
+        category_data_lst = []
 
         db_conn = self.__connect(True)
 
@@ -265,70 +267,59 @@ class ZDataBase_MySQL(object):
 
             cursor = db_conn.cursor(buffered=True)
 
-            query = ("SELECT id, label, n_product, category_url FROM category ")
-            cursor.execute(query)
-            row = cursor.fetchone()
+            if is_filled:
+                # Get distinct filled categories from the category/product relation table
 
-            category_data_lst = []
-            print('Total Row(s):', cursor.rowcount)
+                category_id_lst = []
+
+                query = ("SELECT DISTINCT category_id FROM relation_category_product ")
+                cursor.execute(query)
+                row = cursor.fetchone()
+
+                while row is not None:
+
+                    category_id = row[0]                  
+                    # store collected category id 
+                    category_id_lst.append(category_id)
+                    # self.__lg.debug("\t  - Category id: {}".format(category_id_lst[-1]))
+                        
+                    row = cursor.fetchone()
+
+            if category_id_lst:
+                # Get specified category data from category table
+            
+                cursor.execute("SELECT COUNT(*) FROM category")
+                (n_row, ) = cursor.fetchone()
+
+
+                query = ("SELECT * FROM category WHERE id IN {}".format( tuple(category_id_lst) ) )
+                cursor.execute(query)
+                self.__lg.debug("\t  - Total categories selected from id. list: {}/{} ({:.1%})".format(cursor.rowcount, n_row, cursor.rowcount/n_row ))
+
+                row = cursor.fetchone()
+
+            else:                    
+                query = ("SELECT * FROM category ")
+                cursor.execute(query)
+                row = cursor.fetchone()
+
+                print('Total Row(s):', cursor.rowcount)
 
             while row is not None:
-                category_data_lst.append(list(row))
+
+                category_dct = {}
+                category_dct['id'] = row[0]
+                category_dct['name'] = row[1]
+                category_dct['products'] = row[2]
+                category_dct['url'] = row[3]
+                
+                category_data_lst.append(category_dct)
                 # self.__lg.debug("\t  - Category data: {}".format(category_data_lst[-1]))
                 row = cursor.fetchone()
 
             self.__close_connection(db_conn)
 
         return category_data_lst
-
-#     def get_categories_data(self, category_id_lst):
-
-#         categories_dct = {}
-#         db_categories_dct = self.__data[self.KEY_CATEGORY]
-
-#         if category_id_lst:
-
-#             for category_id in category_id_lst:
-
-#                 if category_id in db_categories_dct:
-#                     categories_dct[category_id] = db_categories_dct[category_id]
-
-#         else:
-#             categories_dct = dict(db_categories_dct)
-
-#         return categories_dct
-
-
-#     def get_categories_from_relation(self):
-#         """Get valid categories from the category/product relation table
-#         Then return the category data"""
-
-#         category_id_lst = []
-#         categories_lst = []
-#         db_category_dct = self.__data[self.KEY_CATEGORY]
-
-#         for element_dct in self.__data[self.KEY_RELATION_CATEGORY_2_PRODUCT]:
-
-#             category_id = element_dct[self.KEY_CATEGORY_ID]
-
-#             if category_id not in category_id_lst:
-
-#                 # store collected category id 
-#                 category_id_lst.append(category_id)
-                
-#                 data_dct = dict(db_category_dct[category_id])
-#                 data_dct['id'] = category_id
-#                 del data_dct['url']
-#                 if 'sameAs' in data_dct:
-#                     del data_dct['sameAs']
-#                 categories_lst.append(data_dct)
-
-#         return categories_lst
-
-#     def get_category_url(self, category_id):
-
-#         return self.__data[self.KEY_CATEGORY][category_id]['url']
-
 
     def add_product(self, category_id, products_lst):
 
