@@ -155,23 +155,23 @@ class ZOpynFacts_View(QWidget):
                 item.setTextAlignment(Qt.AlignLeft | Qt.AlignVCenter)
                 item_lst.append(item)
 
-                nutrition_score = data_dct['nutrition_score']
-                if nutrition_score >= 0:
-                    s = str(nutrition_score)
-                else:
-                    s = ""
-                item = QStandardItem( s )
-                item.setTextAlignment(Qt.AlignLeft | Qt.AlignVCenter)
-                item_lst.append(item)
+                # nutrition_score = data_dct['nutrition_score']
+                # if nutrition_score >= 0:
+                #     s = str(nutrition_score)
+                # else:
+                #     s = ""
+                # item = QStandardItem( s )
+                # item.setTextAlignment(Qt.AlignLeft | Qt.AlignVCenter)
+                # item_lst.append(item)
 
-                time = data_dct['last_modified_t']
-                if time >= 0:
-                    s = str(QDateTime().setTime_t(time))
-                else:
-                    s = ""
-                item = QStandardItem( s )
-                item.setTextAlignment(Qt.AlignLeft | Qt.AlignVCenter)
-                item_lst.append(item)
+                # time = data_dct['last_modified_t']
+                # if time >= 0:
+                #     s = str(QDateTime().setTime_t(time))
+                # else:
+                #     s = ""
+                # item = QStandardItem( s )
+                # item.setTextAlignment(Qt.AlignLeft | Qt.AlignVCenter)
+                # item_lst.append(item)
 
                 model.appendRow(item_lst)
                 # model.setItem(row_idx, item)

@@ -63,7 +63,7 @@ class ZFact():
 
     def products_from_categories(self, categories_lst):
 
-        selected_product_lst = self.__db.products(categories_lst)
+        selected_product_lst = self.__db_sql.products(categories_lst)       # __db.products(categories_lst)
 
         selected_product_lst.sort(key=operator.itemgetter('brands', 'name', 'nutrition_grades', 'nova_group'))
         
@@ -80,7 +80,7 @@ class ZFact():
         selected_product_data_dct[database.KEY_PRODUCT_CODE] = product_code
         print(selected_product_data_dct)
 
-        selected_product_data_lst = self.__db.products([category_id])
+        selected_product_data_lst = self.__db_sql.products([category_id])       # __db.products([category_id])
         alternative_product_lst = []
 
         for product_data_dct in selected_product_data_lst:
