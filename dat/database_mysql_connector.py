@@ -404,10 +404,13 @@ class ZDataBase_MySQL(object):
             if category_id_lst:
 
                 # Get product codes from filled categories
-                print(category_id_lst)
-                query = ("SELECT DISTINCT product_code FROM relation_category_product ")    # WHERE category_id IN {}".format(tuple(category_id_lst)))
+                # print(category_id_lst)
+                if len(category_id_lst) > 1:
+                    query = ("SELECT DISTINCT product_code FROM relation_category_product WHERE category_id IN {}".format(tuple(category_id_lst)))
+                else:
+                    query = ("SELECT DISTINCT product_code FROM relation_category_product WHERE category_id = '{}'".format(category_id_lst[0]))
                 cursor.execute(query)
-                self.__lg.debug("\t  - Total products selected from specified categories: {}".format(cursor.rowcount))
+                self.__lg.debug("\t  - {} products selected from specified categories: {}".format(cursor.rowcount, category_id_lst))
 
                 row = cursor.fetchone()
                 product_id_lst = []
@@ -421,45 +424,16 @@ class ZDataBase_MySQL(object):
                 # Get product data from product table
                 if len(product_id_lst) > 1:
                     query = ("SELECT * FROM product WHERE code IN {}".format( tuple(product_id_lst) ) )
-                else:
+                    cursor.execute(query)
+                elif len(product_id_lst) == 1:
                     query = ("SELECT * FROM product WHERE code = {}".format(product_id_lst[0]))
+                    cursor.execute(query)
 
-                cursor.execute(query)
                 self.__lg.debug("\t  - Total products selected from filled categories: {}".format(cursor.rowcount))
 
                 row = cursor.fetchone()
 
-
-                #     category_dct = {}
-                #     category_dct['id'] = row[0]
-                #     category_dct['name'] = row[1]
-                #     category_dct['products'] = row[2]
-                #     category_dct['url'] = row[3]
-                    
-                #     category_data_lst.append(category_dct)
-                #     # self.__lg.debug("\t  - Category data: {}".format(category_data_lst[-1]))
-                #     row = cursor.fetchone()
-
-                # Get list of product code
-
-                # product_code_lst = []
-
-                # for category_id in category_id_lst:
-
-                #     for relation_dct in self.__data[self.KEY_RELATION_CATEGORY_2_PRODUCT]:
-
-                #         if category_id == relation_dct[self.KEY_CATEGORY_ID]:
-                #             product_code = relation_dct[self.KEY_PRODUCT_CODE]
-
-                #             if product_code not in product_code_lst:
-                #                 product_code_lst.append(product_code)
-                #                 products_dct = dict(self.__data[self.KEY_PRODUCT][product_code])
-                #                 products_dct[self.KEY_PRODUCT_CODE] = product_code
-                #                 products_lst.append(products_dct)
-                #                 # print('product code', product_code)
-
             else:
-
                 query = ("SELECT * FROM product")
                 cursor.execute(query)
                 self.__lg.debug("\t  - Total products selected from specified categories: {}".format(cursor.rowcount))
@@ -497,17 +471,58 @@ class ZDataBase_MySQL(object):
         
         return product_lst
 
-#     def product_data(self, product_code_lst):
+    def product_data(self, product_code_lst):
 
-#         products_dct = {}
-#         db_products_dct = self.__data[self.KEY_PRODUCT]
-        
-#         for product_code in product_code_lst:
+        product_dct = {}
 
-#             if product_code in db_products_dct:
-#                 products_dct[product_code] = dict(db_products_dct[product_code])
+        db_conn = self.__connect(True)
 
-#         return products_dct
+        if db_conn:
+
+            cursor = db_conn.cursor(buffered=True)
+
+            # Get product data from product table
+            if product_code_lst:
+
+                if len(product_code_lst) > 1:
+                    query = ("SELECT * FROM product WHERE code IN {}".format( tuple(product_code_lst) ) )
+                else:
+                    query = ("SELECT * FROM product WHERE code = {}".format(product_code_lst[0]))
+
+                cursor.execute(query)
+                self.__lg.debug("\t  - Total products selected from table: {}".format(cursor.rowcount))
+
+                row = cursor.fetchone()
+
+                while row is not None:
+
+                    idx = 0
+
+                    data_dct = {}
+                    product_dct[row[0]] = data_dct
+
+                    idx = idx + 1
+                    data_dct['brands'] = row[idx]
+                    idx = idx + 1
+                    product_dct['name'] = row[idx]
+                    idx = idx + 1
+                    product_dct['stores'] = row[idx]
+                    idx = idx + 1
+                    product_dct['product_url'] = row[idx]
+                    idx = idx + 1
+                    product_dct['same_as'] = row[idx]
+                    idx = idx + 1
+                    product_dct['nova_group'] = row[idx]
+                    idx = idx + 1
+                    product_dct['nutrition_grades'] = row[idx]
+                    idx = idx + 1
+                    product_dct['image_url'] = row[idx]
+                    
+                    row = cursor.fetchone()
+
+            self.__close_connection(db_conn)
+
+        return product_dct
 
 
     def __connect(self, use_database=False):
