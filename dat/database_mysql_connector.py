@@ -10,6 +10,8 @@ import sys
 import os
 import logging as lg
 
+import operator
+
 import mysql.connector
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
@@ -88,7 +90,7 @@ class ZDataBase_MySQL(object):
         "CREATE TABLE `relation_category_product` ("
         "  `category_id` VARCHAR(256) NOT NULL,"
         "  `product_code` VARCHAR(255) NOT NULL,"
-        "  `category_hierarchy_index` TINYINT UNSIGNED,"
+        "  `category_hierarchy_index` TINYINT UNSIGNED DEFAULT 0,"
         "  PRIMARY KEY (`category_id`, `product_code`)"
         ") ENGINE=InnoDB")
 
@@ -181,6 +183,7 @@ class ZDataBase_MySQL(object):
             self.__close_connection(db_conn)
 
         return is_completed
+
 
     def add_category(self, json=None, observer=None):
 
@@ -291,8 +294,11 @@ class ZDataBase_MySQL(object):
                 cursor.execute("SELECT COUNT(*) FROM category")
                 (n_row, ) = cursor.fetchone()
 
+                if len(category_id_lst) > 1:
+                    query = ("SELECT * FROM category WHERE id IN {}".format( tuple(category_id_lst) ) )
+                elif len(category_id_lst) == 1:
+                    query = ("SELECT * FROM category WHERE id = '{}'".format( category_id_lst[0] ) )
 
-                query = ("SELECT * FROM category WHERE id IN {}".format( tuple(category_id_lst) ) )
                 cursor.execute(query)
                 self.__lg.debug("\t  - Total categories selected from id. list: {}/{} ({:.1%})".format(cursor.rowcount, n_row, cursor.rowcount/n_row ))
 
@@ -321,6 +327,7 @@ class ZDataBase_MySQL(object):
 
         return category_data_lst
 
+
     def add_product(self, category_id, products_lst):
 
         n_redundancy = 0
@@ -337,26 +344,18 @@ class ZDataBase_MySQL(object):
             for product_idx, product_dict in enumerate(products_lst):
 
                 try:
-                    # Insert new product
-                    sql_command = "INSERT INTO product (code, brand, label, store, product_url, nova_group, nutrition_grade, image_url) " \
-                                    "VALUES (%(code)s, %(brand)s, %(label)s, %(store)s, %(product_url)s, %(nova_group)s, %(nutrition_grade)s, %(image_url)s)"
-                    data = {'code': product_dict['code'], 'brand': product_dict['brands'], 'label': product_dict['name'],
-                            'store': product_dict['stores'],
-                            'product_url':  product_dict['url'],
-                            'nova_group': product_dict['nova_group'], 'nutrition_grade': product_dict['nutrition_grades'], 'image_url': product_dict['image']}
-
-                    self.__lg.debug("\t> {}. Insert new product: #{}-{}".format(product_idx, product_dict['code'], product_dict['name']))
-                    cursor.execute(sql_command, data)
-
                     # Insert new category/product relation
                     cmd = "INSERT INTO relation_category_product (category_id, product_code"
                     value = "VALUES (%(category_id)s, %(product_code)s"
                     data = {'category_id': category_id, 'product_code': product_dict['code']}
-                    self.__lg.debug("\t> Insert new relation: {}-#{}-{}".format(category_id, product_dict['code'], product_dict['name']))
+                    category_idx = -1
 
                     if category_id in product_dict['categories_hierarchy']:
                         category_idx = product_dict['categories_hierarchy'].index(category_id)
+                    elif category_id in product_dict['categories_tags']:
+                        category_idx = product_dict['categories_tags'].index(category_id)                        
 
+                    if category_idx > -1:
                         cmd = cmd + ", category_hierarchy_index"
                         value = value + ", %(category_hierarchy_index)s"
 
@@ -369,6 +368,18 @@ class ZDataBase_MySQL(object):
                     sql_command = cmd + value                    
 
                     cursor.execute(sql_command, data)
+                    self.__lg.debug("\t> Insert new relation: {}-#{}-{}-{}".format(category_id, product_dict['code'], product_dict['name'], category_idx))
+
+                    # Insert new product
+                    sql_command = "INSERT INTO product (code, brand, label, store, product_url, nova_group, nutrition_grade, image_url) " \
+                                    "VALUES (%(code)s, %(brand)s, %(label)s, %(store)s, %(product_url)s, %(nova_group)s, %(nutrition_grade)s, %(image_url)s)"
+                    data = {'code': product_dict['code'], 'brand': product_dict['brands'], 'label': product_dict['name'],
+                            'store': product_dict['stores'],
+                            'product_url':  product_dict['url'],
+                            'nova_group': product_dict['nova_group'], 'nutrition_grade': product_dict['nutrition_grades'], 'image_url': product_dict['image']}
+
+                    self.__lg.debug("\t> {}. Insert new product: #{}-{}".format(product_idx, product_dict['code'], product_dict['name']))
+                    cursor.execute(sql_command, data)
 
                 except mysql.connector.Error as err:
                     
@@ -376,7 +387,7 @@ class ZDataBase_MySQL(object):
                         # TODO: Update product data
                         existing_product_lst.append({'code': product_dict['code'], 'label':product_dict['name']})
                         n_redundancy = n_redundancy + 1
-                        self.__lg.warning("\t  - {}; {}".format(err, existing_product_lst[-1]))
+                        self.__lg.warning("\t  - {}; {}; {}".format(err, category_id, existing_product_lst[-1]))
                     else:
                         self.__lg.error("\t  - {}".format(err))
                    
@@ -389,7 +400,7 @@ class ZDataBase_MySQL(object):
 
             self.__close_connection(db_conn)
 
-        return existing_product_lst
+        return
 
     def products(self, category_id_lst):
 
@@ -404,7 +415,6 @@ class ZDataBase_MySQL(object):
             if category_id_lst:
 
                 # Get product codes from filled categories
-                # print(category_id_lst)
                 if len(category_id_lst) > 1:
                     query = ("SELECT DISTINCT product_code FROM relation_category_product WHERE category_id IN {}".format(tuple(category_id_lst)))
                 else:
@@ -429,7 +439,7 @@ class ZDataBase_MySQL(object):
                     query = ("SELECT * FROM product WHERE code = {}".format(product_id_lst[0]))
                     cursor.execute(query)
 
-                self.__lg.debug("\t  - Total products selected from filled categories: {}".format(cursor.rowcount))
+                # self.__lg.debug("\t  - Total products selected from filled categories: {}".format(cursor.rowcount))
 
                 row = cursor.fetchone()
 
@@ -486,7 +496,7 @@ class ZDataBase_MySQL(object):
 
                 if len(product_code_lst) > 1:
                     query = ("SELECT * FROM product WHERE code IN {}".format( tuple(product_code_lst) ) )
-                else:
+                elif len(product_code_lst) == 1:
                     query = ("SELECT * FROM product WHERE code = {}".format(product_code_lst[0]))
 
                 cursor.execute(query)
@@ -504,21 +514,49 @@ class ZDataBase_MySQL(object):
                     idx = idx + 1
                     data_dct['brands'] = row[idx]
                     idx = idx + 1
-                    product_dct['name'] = row[idx]
+                    data_dct['name'] = row[idx]
                     idx = idx + 1
-                    product_dct['stores'] = row[idx]
+                    data_dct['stores'] = row[idx]
                     idx = idx + 1
-                    product_dct['product_url'] = row[idx]
+                    data_dct['product_url'] = row[idx]
                     idx = idx + 1
-                    product_dct['same_as'] = row[idx]
+                    data_dct['same_as'] = row[idx]
                     idx = idx + 1
-                    product_dct['nova_group'] = row[idx]
+                    data_dct['nova_group'] = row[idx]
                     idx = idx + 1
-                    product_dct['nutrition_grades'] = row[idx]
+                    data_dct['nutrition_grades'] = row[idx]
                     idx = idx + 1
-                    product_dct['image_url'] = row[idx]
+                    data_dct['image_url'] = row[idx]
                     
                     row = cursor.fetchone()
+
+                # print(product_dct)
+
+                # Get back filled category hierarchy of the product
+                for product_code, product_data_dct in product_dct.items():
+
+                    print(product_code, product_data_dct)
+                    query = ("SELECT category_id, category_hierarchy_index FROM relation_category_product WHERE product_code = '{}'".format(product_code))
+
+                    cursor.execute(query)
+                    self.__lg.debug("\t  - Total category(ies) selected from product: {}".format(cursor.rowcount))
+
+                    row = cursor.fetchone()
+
+                    category_hierarchy_lst = [] 
+                    while row is not None:
+
+                        category_hierarchy_lst.append((row[0], row[1]))
+                        print(category_hierarchy_lst)
+                        row = cursor.fetchone()
+                    
+                    if category_hierarchy_lst:
+                        category_hierarchy_lst.sort(key = operator.itemgetter(1), reverse=True)
+
+                    for x in category_hierarchy_lst:
+                        print(x[0])
+
+                        product_data_dct['categories_hierarchy'] = [x[0] for x in category_hierarchy_lst]
 
             self.__close_connection(db_conn)
 
@@ -545,8 +583,8 @@ class ZDataBase_MySQL(object):
         try:
             cnx = mysql.connector.connect(**db_config)
 
-            if cnx.is_connected():
-                self.__lg.info('\t  - Connected to MySQL database')
+            if not cnx.is_connected():
+                self.__lg.info('\t  - Not Connected to MySQL database')
 
         except mysql.connector.Error as err:
         

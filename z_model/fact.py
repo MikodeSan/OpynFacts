@@ -37,7 +37,8 @@ class ZFact():
         self.__db = database()
         self.__db_sql = database_mysql()
 
-        self.__db_sql.commit()
+        if 0:                                       # forcing db validation
+            self.__db_sql.commit()
 
         # Init. database if necessary
         if not self.__db_sql.is_completed():                    # not self.__db.get_categories():
@@ -71,11 +72,12 @@ class ZFact():
 
     def products(self, product_code_lst):
 
-        return self.__db.product_data(product_code_lst)
+        # return self.__db.product_data(product_code_lst)
+        return self.__db_sql.product_data(product_code_lst)
 
     def alternative_products(self, product_code, category_id):
 
-        product_data_dct = self.__db.product_data([product_code])
+        product_data_dct = self.__db_sql.product_data([product_code])              # __db.product_data([product_code])
         selected_product_data_dct = product_data_dct[product_code]
         selected_product_data_dct[database.KEY_PRODUCT_CODE] = product_code
         print(selected_product_data_dct)
@@ -113,7 +115,7 @@ class ZFact():
 
         return response.json()
 
-    def __init_database_product(self, n_category_max=230, n_product_max=120):
+    def __init_database_product(self, n_category_max=720, n_product_max=50):
 
         if n_category_max > 0:
 
@@ -121,11 +123,12 @@ class ZFact():
             categories_lst = self.__db_sql.get_category_data()          # self.__db.get_categories()
 
             # Get categories
-            while category_idx < len(categories_lst)/10:                # n_category_max:
+            # n_category_max = len(categories_lst)/10     # to debug
+            while category_idx < n_category_max:
 
                 # Get category url
-                category_id = categories_lst[category_idx][0]           # categories_lst[category_idx]
-                category_url = categories_lst[category_idx][3]          # self.__db.get_category_url(category_id)
+                category_id = categories_lst[category_idx]['id']           # categories_lst[category_idx]
+                category_url = categories_lst[category_idx]['url']          # self.__db.get_category_url(category_id)
 
                 print('\t> Process category #{}. {}'.format(category_idx, category_id))
 
@@ -151,7 +154,7 @@ class ZFact():
                             exit(1)
 
                     category_page_path = category_url + '/{}.json'.format(page_idx+1)
-                    print(category_page_path)
+                    # print(category_page_path)
 
                     [products_lst, n_scanned, n_total] = self.__download_product_from_category(category_page_path,
                                                                                             is_first_page=is_first_page)
@@ -166,7 +169,7 @@ class ZFact():
                     n_scan = n_scan + n_scanned
 
                     # add product lst to db
-                    self.__db.add_product(category_id, products_lst)
+                    # self.__db.add_product(category_id, products_lst)
                     self.__db_sql.add_product(category_id, products_lst)
 
                     page_idx = page_idx + 1
@@ -267,6 +270,11 @@ class ZFact():
             extracted_data_dict['categories_hierarchy'] = product_dict['categories_hierarchy']
         else:
             extracted_data_dict['categories_hierarchy'] = []
+
+        if 'categories_tags' in product_dict:
+            extracted_data_dict['categories_tags'] = product_dict['categories_tags']
+        else:
+            extracted_data_dict['categories_tags'] = []
 
         # nova group
         extracted_data_dict['nova_group'] = -1
