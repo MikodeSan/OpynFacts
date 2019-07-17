@@ -1,10 +1,18 @@
-# OpyFoodFacts App
+# OpynFacts Application
 
 This the documentation of the project __Open Food Facts manager__
 
 Open Food Facts is the exclusive source of the data, any additions will be shared and back to the community under the OdBL licence.
 
-## Features
+## Architecture
+
+* db phisical model
+  * JSON
+* Model-View-Control
+  * View
+    * Qt 5.8: PyQt5
+
+## Features (Release / Story)
 
 * As a user, at first I want to get the categories list from Open Food Facts and secondly get the products list from the selected category.
   * Model
@@ -22,10 +30,21 @@ Open Food Facts is the exclusive source of the data, any additions will be share
 * As a user, I want to use a GUI to interact with db
 
 ### tasks
-  * sub-task
 
-## Architecture
+* sub-task
 
 ## Algorithm
 
 ## Workflow
+
+* Activity diagram
+* Processus
+
+## Difficulty
+
+* Solution
+
+## Misc.
+
+Trello: https://trello.com/b/LZOSEDow/opynfacts
+Github: https://github.com/MikodeSan/OpyFoodFacts

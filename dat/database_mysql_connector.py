@@ -275,7 +275,7 @@ class ZDataBase_MySQL(object):
 
                 category_id_lst = []
 
-                query = ("SELECT DISTINCT category_id FROM relation_category_product ")
+                query = ("SELECT DISTINCT category_id FROM relation_category_product")
                 cursor.execute(query)
                 row = cursor.fetchone()
 
@@ -295,7 +295,7 @@ class ZDataBase_MySQL(object):
                 (n_row, ) = cursor.fetchone()
 
                 if len(category_id_lst) > 1:
-                    query = ("SELECT * FROM category WHERE id IN {}".format( tuple(category_id_lst) ) )
+                    query = ("SELECT * FROM category WHERE id IN {} ORDER BY label ASC".format( tuple(category_id_lst) ) )
                 elif len(category_id_lst) == 1:
                     query = ("SELECT * FROM category WHERE id = '{}'".format( category_id_lst[0] ) )
 
@@ -304,12 +304,14 @@ class ZDataBase_MySQL(object):
 
                 row = cursor.fetchone()
 
-            else:                    
-                query = ("SELECT * FROM category ")
+            else:
+                # Get specified category data from category table
+                    
+                query = ("SELECT * FROM category ORDER BY label ASC")
                 cursor.execute(query)
                 row = cursor.fetchone()
 
-                print('Total Row(s):', cursor.rowcount)
+                self.__lg.debug("\t  - Total categories: {}".format(cursor.rowcount))
 
             while row is not None:
 

@@ -55,7 +55,7 @@ class ZFact():
         
         # categories_lst = self.__db.get_categories_from_relation()
         categories_lst = self.__db_sql.get_category_data(is_filled=True)
-        categories_lst.sort(key=operator.itemgetter('name'))
+        # categories_lst.sort(key=operator.itemgetter('name'))
 
         return categories_lst
 
@@ -71,9 +71,8 @@ class ZFact():
         return selected_product_lst
 
     def products(self, product_code_lst):
-
-        # return self.__db.product_data(product_code_lst)
-        return self.__db_sql.product_data(product_code_lst)
+        
+        return self.__db_sql.product_data(product_code_lst)                 # __db.product_data(product_code_lst)
 
     def alternative_products(self, product_code, category_id):
 
