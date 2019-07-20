@@ -10,6 +10,8 @@ import sys
 import os
 import logging as lg
 
+import operator
+
 import mysql.connector
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
@@ -32,7 +34,7 @@ class ZDataBase_MySQL(object):
 #     KEY_PRODUCT = 'product'
 #     KEY_RELATION_CATEGORY_2_PRODUCT = 'category2product'
 #     KEY_CATEGORY_ID = 'category_id'
-#     KEY_PRODUCT_CODE = 'product_code'
+    KEY_PRODUCT_CODE = 'product_code'
 
     TABLES = {}
     TABLES['manifest'] = (
@@ -63,6 +65,7 @@ class ZDataBase_MySQL(object):
         "  `nova_group` TINYINT,"
         "  `nutrition_grade` CHAR(1),"
         "  `image_url` VARCHAR(255),"
+        "  `is_favorite` CHAR(1) NOT NULL DEFAULT 'F',"
         "  PRIMARY KEY (`code`)"
         # "categories_hierarchy": [
         #             "en:biscuits-and-cakes",
@@ -88,7 +91,7 @@ class ZDataBase_MySQL(object):
         "CREATE TABLE `relation_category_product` ("
         "  `category_id` VARCHAR(256) NOT NULL,"
         "  `product_code` VARCHAR(255) NOT NULL,"
-        "  `category_hierarchy_index` TINYINT UNSIGNED,"
+        "  `category_hierarchy_index` TINYINT UNSIGNED DEFAULT 0,"
         "  PRIMARY KEY (`category_id`, `product_code`)"
         ") ENGINE=InnoDB")
 
@@ -168,8 +171,6 @@ class ZDataBase_MySQL(object):
 
     def commit(self):
 
-        is_completed = False
-
         db_conn = self.__connect(True)
 
         if db_conn:
@@ -180,7 +181,6 @@ class ZDataBase_MySQL(object):
             db_conn.commit()
             self.__close_connection(db_conn)
 
-        return is_completed
 
     def add_category(self, json=None, observer=None):
 
@@ -257,7 +257,9 @@ class ZDataBase_MySQL(object):
 
             self.__close_connection(db_conn)
 
-    def get_category_data(self, category_id_lst=None):
+    def get_category_data(self, is_filled=False, category_id_lst=None):
+
+        category_data_lst = []
 
         db_conn = self.__connect(True)
 
@@ -265,68 +267,66 @@ class ZDataBase_MySQL(object):
 
             cursor = db_conn.cursor(buffered=True)
 
-            query = ("SELECT id, label, n_product, category_url FROM category ")
-            cursor.execute(query)
-            rows = cursor.fetchall()
+            if is_filled:
+                # Get distinct filled categories from the category/product relation table
 
-            category_data_lst = []
-            print('Total Row(s):', cursor.rowcount)
+                category_id_lst = []
 
-            for row in rows:
-                category_data_lst.append(list(row))
+                query = ("SELECT DISTINCT category_id FROM relation_category_product")
+                cursor.execute(query)
+                row = cursor.fetchone()
+
+                self.__lg.debug("\t  - Total categories selected from category/product relation table: {}".format(cursor.rowcount))
+
+                while row is not None:
+
+                    category_id = row[0]                  
+                    # store collected category id 
+                    category_id_lst.append(category_id)
+                    # self.__lg.debug("\t  - Category id: {}".format(category_id_lst[-1]))
+                        
+                    row = cursor.fetchone()
+
+            if category_id_lst:
+                # Get specified category data from category table
+            
+                cursor.execute("SELECT COUNT(*) FROM category")
+                (n_row, ) = cursor.fetchone()
+
+                if len(category_id_lst) > 1:
+                    query = ("SELECT * FROM category WHERE id IN {} ORDER BY label ASC".format( tuple(category_id_lst) ) )
+                elif len(category_id_lst) == 1:
+                    query = ("SELECT * FROM category WHERE id = '{}'".format( category_id_lst[0] ) )
+
+                cursor.execute(query)
+                self.__lg.debug("\t  - Total categories selected from id. list: {}/{} ({:.1%})".format(cursor.rowcount, n_row, cursor.rowcount/n_row ))
+
+                row = cursor.fetchone()
+
+            else:
+                # Get specified category data from category table
+                    
+                query = ("SELECT * FROM category ORDER BY label ASC")
+                cursor.execute(query)
+                row = cursor.fetchone()
+
+                self.__lg.debug("\t  - Total categories: {}".format(cursor.rowcount))
+
+            while row is not None:
+
+                category_dct = {}
+                category_dct['id'] = row[0]
+                category_dct['name'] = row[1]
+                category_dct['products'] = row[2]
+                category_dct['url'] = row[3]
+                
+                category_data_lst.append(category_dct)
                 # self.__lg.debug("\t  - Category data: {}".format(category_data_lst[-1]))
+                row = cursor.fetchone()
 
             self.__close_connection(db_conn)
 
         return category_data_lst
-
-#     def get_categories_data(self, category_id_lst):
-
-#         categories_dct = {}
-#         db_categories_dct = self.__data[self.KEY_CATEGORY]
-
-#         if category_id_lst:
-
-#             for category_id in category_id_lst:
-
-#                 if category_id in db_categories_dct:
-#                     categories_dct[category_id] = db_categories_dct[category_id]
-
-#         else:
-#             categories_dct = dict(db_categories_dct)
-
-#         return categories_dct
-
-
-#     def get_categories_from_relation(self):
-#         """Get valid categories from the category/product relation table
-#         Then return the category data"""
-
-#         category_id_lst = []
-#         categories_lst = []
-#         db_category_dct = self.__data[self.KEY_CATEGORY]
-
-#         for element_dct in self.__data[self.KEY_RELATION_CATEGORY_2_PRODUCT]:
-
-#             category_id = element_dct[self.KEY_CATEGORY_ID]
-
-#             if category_id not in category_id_lst:
-
-#                 # store collected category id 
-#                 category_id_lst.append(category_id)
-                
-#                 data_dct = dict(db_category_dct[category_id])
-#                 data_dct['id'] = category_id
-#                 del data_dct['url']
-#                 if 'sameAs' in data_dct:
-#                     del data_dct['sameAs']
-#                 categories_lst.append(data_dct)
-
-#         return categories_lst
-
-#     def get_category_url(self, category_id):
-
-#         return self.__data[self.KEY_CATEGORY][category_id]['url']
 
 
     def add_product(self, category_id, products_lst):
@@ -345,6 +345,32 @@ class ZDataBase_MySQL(object):
             for product_idx, product_dict in enumerate(products_lst):
 
                 try:
+                    # Insert new category/product relation
+                    cmd = "INSERT INTO relation_category_product (category_id, product_code"
+                    value = "VALUES (%(category_id)s, %(product_code)s"
+                    data = {'category_id': category_id, 'product_code': product_dict['code']}
+                    category_idx = -1
+
+                    if category_id in product_dict['categories_hierarchy']:
+                        category_idx = product_dict['categories_hierarchy'].index(category_id)
+                    elif category_id in product_dict['categories_tags']:
+                        category_idx = product_dict['categories_tags'].index(category_id)                        
+
+                    if category_idx > -1:
+                        cmd = cmd + ", category_hierarchy_index"
+                        value = value + ", %(category_hierarchy_index)s"
+
+                        data['category_hierarchy_index'] = category_idx
+                    else:
+                        self.__lg.warning("\t  - {} not in hierarchy {}_{}".format(category_id, product_dict['categories_hierarchy'], product_dict['categories_tags']))
+
+                    cmd = cmd + ") "
+                    value = value + ")"
+                    sql_command = cmd + value                    
+
+                    cursor.execute(sql_command, data)
+                    self.__lg.debug("\t> Insert new relation: {}-#{}-{}-{}".format(category_id, product_dict['code'], product_dict['name'], category_idx))
+
                     # Insert new product
                     sql_command = "INSERT INTO product (code, brand, label, store, product_url, nova_group, nutrition_grade, image_url) " \
                                     "VALUES (%(code)s, %(brand)s, %(label)s, %(store)s, %(product_url)s, %(nova_group)s, %(nutrition_grade)s, %(image_url)s)"
@@ -356,35 +382,13 @@ class ZDataBase_MySQL(object):
                     self.__lg.debug("\t> {}. Insert new product: #{}-{}".format(product_idx, product_dict['code'], product_dict['name']))
                     cursor.execute(sql_command, data)
 
-                    # Insert new category/product relation
-                    cmd = "INSERT INTO relation_category_product (category_id, product_code"
-                    value = "VALUES (%(category_id)s, %(product_code)s"
-                    data = {'category_id': category_id, 'product_code': product_dict['code']}
-                    self.__lg.debug("\t> Insert new relation: {}-#{}-{}".format(category_id, product_dict['code'], product_dict['name']))
-
-                    if category_id in product_dict['categories_hierarchy']:
-                        category_idx = product_dict['categories_hierarchy'].index(category_id)
-
-                        cmd = cmd + ", category_hierarchy_index"
-                        value = value + ", %(category_hierarchy_index)s"
-
-                        data['category_hierarchy_index'] = category_idx
-                    else:
-                        self.__lg.warning("\t  - {} not in hierarchy {}".format(category_id, product_dict['categories_hierarchy']))
-
-                    cmd = cmd + ") "
-                    value = value + ")"
-                    sql_command = cmd + value                    
-
-                    cursor.execute(sql_command, data)
-
                 except mysql.connector.Error as err:
                     
                     if err.errno == errorcode.ER_DUP_ENTRY :
                         # TODO: Update product data
                         existing_product_lst.append({'code': product_dict['code'], 'label':product_dict['name']})
                         n_redundancy = n_redundancy + 1
-                        self.__lg.warning("\t  - {}; {}".format(err, existing_product_lst[-1]))
+                        self.__lg.warning("\t  - {}; {}; {}".format(err, category_id, existing_product_lst[-1]))
                     else:
                         self.__lg.error("\t  - {}".format(err))
                    
@@ -397,99 +401,207 @@ class ZDataBase_MySQL(object):
 
             self.__close_connection(db_conn)
 
-        return existing_product_lst
+        return
 
-#     def products(self, categories_lst):
+    def products(self, category_id_lst, is_favorite=False):
 
-#         products_lst = []
-#         db_products_dct = {}
+        product_lst = []
 
-#         # Get list of product code
-#         if not categories_lst:
+        db_conn = self.__connect(True)
 
-#             db_products_dct = dict(self.__data[self.KEY_PRODUCT])
+        if db_conn:
 
-#             for product_code, product_data_dct in db_products_dct.items():
+            cursor = db_conn.cursor(buffered=True)
 
-#                 products_dct = product_data_dct
-#                 products_dct[self.KEY_PRODUCT_CODE] = product_code
-#                 products_lst.append(products_dct)
+            try:
+                if category_id_lst:
 
-#         else:
-#             product_code_lst = []
-#             for category_id in categories_lst:
+                    # Get product codes from filled categories
+                    if len(category_id_lst) > 1:
+                        query = ("SELECT DISTINCT product_code FROM relation_category_product WHERE category_id IN {}".format(tuple(category_id_lst)))
+                    else:
+                        query = ("SELECT DISTINCT product_code FROM relation_category_product WHERE category_id = '{}'".format(category_id_lst[0]))
+                    cursor.execute(query)
+                    self.__lg.debug("\t  - {} products selected from specified categories: {}".format(cursor.rowcount, category_id_lst))
 
-#                 for relation_dct in self.__data[self.KEY_RELATION_CATEGORY_2_PRODUCT]:
+                    row = cursor.fetchone()
+                    product_id_lst = []
 
-#                     if category_id == relation_dct[self.KEY_CATEGORY_ID]:
-#                         product_code = relation_dct[self.KEY_PRODUCT_CODE]
+                    while row is not None:
 
-#                         if product_code not in product_code_lst:
-#                             product_code_lst.append(product_code)
-#                             products_dct = dict(self.__data[self.KEY_PRODUCT][product_code])
-#                             products_dct[self.KEY_PRODUCT_CODE] = product_code
-#                             products_lst.append(products_dct)
-#                             # print('product code', product_code)
+                        # self.__lg.debug("\t  - Product code: {}".format(row))
+                        product_id_lst.append(row[0])
+                        row = cursor.fetchone()
 
-#         return products_lst
+                    # Get product data from product table
+                    if len(product_id_lst) > 1:
+                        query = ("SELECT * FROM product WHERE code IN {}".format( tuple(product_id_lst) ) )
+                        cursor.execute(query)
+                    elif len(product_id_lst) == 1:
+                        query = ("SELECT * FROM product WHERE code = {}".format(product_id_lst[0]))
+                        cursor.execute(query)
 
-#     def product_data(self, product_code_lst):
+                    # self.__lg.debug("\t  - Total products selected from filled categories: {}".format(cursor.rowcount))
 
-#         products_dct = {}
-#         db_products_dct = self.__data[self.KEY_PRODUCT]
+                    row = cursor.fetchone()
+
+                else:
+                    query = "SELECT * FROM product"
+
+                    if is_favorite:
+                        query = query + " WHERE is_favorite = 'T'"
+
+                    cursor.execute(query)
+                    self.__lg.debug("\t  - Total products selected from specified categories: {}".format(cursor.rowcount))
+
+                    row = cursor.fetchone()
+
+            except mysql.connector.Error as err:
+
+                exit(1)
+
+
+            while row is not None:
+                products_dct = {}
+                idx = 0
+
+                products_dct[self.KEY_PRODUCT_CODE] = row[idx]
+                idx = idx + 1
+                products_dct['brands'] = row[idx]
+                idx = idx + 1
+                products_dct['name'] = row[idx]
+                idx = idx + 1
+                products_dct['stores'] = row[idx]
+                idx = idx + 1
+                products_dct['product_url'] = row[idx]
+                idx = idx + 1
+                products_dct['same_as'] = row[idx]
+                idx = idx + 1
+                products_dct['nova_group'] = row[idx]
+                idx = idx + 1
+                products_dct['nutrition_grades'] = row[idx]
+                idx = idx + 1
+                products_dct['image_url'] = row[idx]
+                idx = idx + 1
+                products_dct['is_favorite'] = True if row[idx] == 'T' else False                
+
+                product_lst.append(products_dct)
+                
+                row = cursor.fetchone()
+
+            self.__close_connection(db_conn)
+
         
-#         for product_code in product_code_lst:
+        return product_lst
 
-#             if product_code in db_products_dct:
-#                 products_dct[product_code] = dict(db_products_dct[product_code])
+    def product_data(self, product_code_lst):
 
-#         return products_dct
+        product_dct = {}
 
-#     def save_db(self, is_temp=True):
+        db_conn = self.__connect(True)
 
-#         if is_temp:
+        if db_conn:
 
-#             bkp.modif_db(self.__db_path(), self.__data)
-#         else:
-#             pass
+            cursor = db_conn.cursor(buffered=True)
 
-#     @classmethod
-#     def __init_db(cls):
+            # Get product data from product table
+            if product_code_lst:
 
-#         db = {}
+                if len(product_code_lst) > 1:
+                    query = ("SELECT * FROM product WHERE code IN {}".format( tuple(product_code_lst) ) )
+                elif len(product_code_lst) == 1:
+                    query = ("SELECT * FROM product WHERE code = {}".format(product_code_lst[0]))
 
-#         # db version
-#         db['version'] = '1.00.00'
+                cursor.execute(query)
+                self.__lg.debug("\t  - Total products selected from table: {}".format(cursor.rowcount))
 
-#         # db categories
-#         categories_dict = {}
-# #        categories_dict['label'] = 'default'
+                row = cursor.fetchone()
 
-#         db[cls.KEY_CATEGORY] = categories_dict
+                while row is not None:
 
-#         # db products
-#         products_dict = {}
-# #        categories_dict['label'] = 'default'
+                    idx = 0
 
-#         db[cls.KEY_PRODUCT] = products_dict
+                    data_dct = {}
+                    product_dct[row[0]] = data_dct
 
-#         # db relation
-#         relation_lst = []
-#         db[cls.KEY_RELATION_CATEGORY_2_PRODUCT] = relation_lst
+                    idx = idx + 1
+                    data_dct['brands'] = row[idx]
+                    idx = idx + 1
+                    data_dct['name'] = row[idx]
+                    idx = idx + 1
+                    data_dct['stores'] = row[idx]
+                    idx = idx + 1
+                    data_dct['product_url'] = row[idx]
+                    idx = idx + 1
+                    data_dct['same_as'] = row[idx]
+                    idx = idx + 1
+                    data_dct['nova_group'] = row[idx]
+                    idx = idx + 1
+                    data_dct['nutrition_grades'] = row[idx]
+                    idx = idx + 1
+                    data_dct['image_url'] = row[idx]
+                    
+                    row = cursor.fetchone()
 
-# #        print(db)
+                # print(product_dct)
 
-#         return db
+                # Get back filled category hierarchy of the product
+                for product_code, product_data_dct in product_dct.items():
 
-#     @staticmethod
-#     def __db_path():
+                    print(product_code, product_data_dct)
+                    query = ("SELECT category_id, category_hierarchy_index FROM relation_category_product WHERE product_code = '{}'".format(product_code))
 
-#         directory_path = os.path.dirname(__file__)
-#         # with this path, we go inside the folder `data` and get the file.
-#         path_to_file = os.path.join(directory_path, "food_facts_db.json")
-# #        print('db path_to_file', path_to_file)
+                    cursor.execute(query)
+                    self.__lg.debug("\t  - Total category(ies) selected from product: {}".format(cursor.rowcount))
 
-#         return path_to_file
+                    row = cursor.fetchone()
+
+                    category_hierarchy_lst = [] 
+                    while row is not None:
+
+                        category_hierarchy_lst.append((row[0], row[1]))
+                        row = cursor.fetchone()
+
+                    print(category_hierarchy_lst)
+                    
+                    if category_hierarchy_lst:
+                        category_hierarchy_lst.sort(key = operator.itemgetter(1), reverse=True)
+
+                    for x in category_hierarchy_lst:
+                        print(x[0])
+
+                    product_data_dct['categories_hierarchy'] = [x[0] for x in category_hierarchy_lst]
+
+            self.__close_connection(db_conn)
+
+        return product_dct
+
+    def set_favorite(self, product_code, is_added):
+
+        db_conn = self.__connect(True)
+
+        if db_conn:
+                    
+            try:
+                cursor = db_conn.cursor(buffered=True)
+
+                if is_added:
+                    self.__lg.debug("\t  > Add #{} to favorite".format(product_code))
+                    c = 'T'
+                else:
+                    self.__lg.debug("\t  > Remove #{} from favorite".format(product_code))
+                    c = 'F'
+
+                cursor.execute("UPDATE {} SET {} = '{}' WHERE code = {}".format('product', 'is_favorite', c, product_code))
+                self.__lg.debug("\t  - Product #{} set to favorite".format(product_code))
+
+            except mysql.connector.Error as err:
+                self.__lg.error("\t  - Failed to add favorite")
+                exit(1)
+
+            db_conn.commit()
+            self.__close_connection(db_conn)
+
 
     def __connect(self, use_database=False):
         """ Connect to MySQL database """
@@ -511,8 +623,8 @@ class ZDataBase_MySQL(object):
         try:
             cnx = mysql.connector.connect(**db_config)
 
-            if cnx.is_connected():
-                self.__lg.info('\t  - Connected to MySQL database')
+            if not cnx.is_connected():
+                self.__lg.info('\t  - Not Connected to MySQL database')
 
         except mysql.connector.Error as err:
         

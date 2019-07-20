@@ -82,7 +82,6 @@ class ZDataBase_JSON(object):
         print("N redundancy:", n_redundancy)
         #        self.__save_db(True)
 
-
     def get_categories(self):
 
         return list(self.__data[self.KEY_CATEGORY].keys())
@@ -113,7 +112,6 @@ class ZDataBase_JSON(object):
 
         return categories_lst
 
-
     def get_categories_data(self, category_id_lst):
 
         categories_dct = {}
@@ -131,11 +129,9 @@ class ZDataBase_JSON(object):
 
         return categories_dct
 
-
     def get_category_url(self, category_id):
 
         return self.__data[self.KEY_CATEGORY][category_id]['url']
-
 
     def add_product(self, category_id, products_lst):
 
