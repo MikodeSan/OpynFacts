@@ -66,6 +66,8 @@ class ZOpynFacts_View(QWidget):
         product_selection_model = self.ui.product_view.selectionModel()
         product_selection_model.selectionChanged[QItemSelection, QItemSelection].connect(self.__update_data_selected_product)
 
+        self.ui.product_select_pbtn.clicked[bool].connect(self.__add_product_2_favorite)
+
         # set model for alternative product view
         self.__alternative_mdl = QStandardItemModel()
         self.ui.alternative_view.setModel(self.__alternative_mdl)
@@ -74,6 +76,19 @@ class ZOpynFacts_View(QWidget):
         altern_category_cbox = self.ui.altern_category_cbox
         altern_category_cbox.currentIndexChanged[int].connect(self.__update_data_alternative_product)
         
+        self.ui.alternative_select_pbtn.clicked[bool].connect(self.__add_alternative_2_favorite)
+
+        # set model for alternative product view
+        self.__favorite_stdmdl = QStandardItemModel()
+        self.ui.favorite_view.setModel(self.__favorite_stdmdl)
+        self.ui.favorite_view.setSelectionMode(QAbstractItemView.SingleSelection)
+
+        # populate favorite view model
+        product_data_lst = self.__model.products_from_categories([], is_favorite=True)        
+        self.__update_view_product('favorite', product_data_lst)
+
+        self.ui.favorite_remove_pbtn.clicked[bool].connect(self.__remove_favorite)
+
     def __create_widgets(self):
 
         self.ui = Ui_Form()
@@ -108,6 +123,8 @@ class ZOpynFacts_View(QWidget):
             model = self.__product_mdl
         elif model_type == 'alternative':
             model = self.__alternative_mdl
+        elif model_type == 'favorite':
+            model = self.__favorite_stdmdl
         else:
             is_checked = False
 
@@ -208,6 +225,7 @@ class ZOpynFacts_View(QWidget):
         print(' >   Enter into __update_data_selected_product function')
 
         product_code = selected_item.indexes()[1].data(Qt.UserRole+1)
+
         print('selected product:', selected_item.indexes()[1].data(), product_code )
 
         product_data_dct = self.__model.products([product_code])
@@ -245,6 +263,39 @@ class ZOpynFacts_View(QWidget):
 
         product_data_lst = self.__model.alternative_products(product_code, category_id)
         self.__update_view_product('alternative', product_data_lst)
+
+    def __add_product_2_favorite(self, is_checked=False):
+        
+        indexes = self.ui.product_view.selectionModel().selectedIndexes()
+        
+        self.__set_favorite(indexes, True)
+
+    def __add_alternative_2_favorite(self, is_checked=False):
+
+        indexes = self.ui.alternative_view.selectionModel().selectedIndexes()
+        
+        self.__set_favorite(indexes, True)
+
+    def __remove_favorite(self, is_checked=False):
+
+        indexes = self.ui.favorite_view.selectionModel().selectedIndexes()
+        
+        self.__set_favorite(indexes, False)
+
+    def __set_favorite(self, indexes, is_added):
+
+        if indexes:
+            
+            product_code = indexes[1].data(Qt.UserRole+1)
+            print(" -  push_button select product #{}-{}".format(product_code, indexes[1].data()))
+
+            self.__model.set_favorite(product_code, is_added)
+
+            product_data_lst = self.__model.products_from_categories([], is_favorite=True)        
+            self.__update_view_product('favorite', product_data_lst)
+
+        else:
+            print(" -  No selected product ")
 
 
 if __name__ == "__main__":

@@ -171,8 +171,6 @@ class ZDataBase_MySQL(object):
 
     def commit(self):
 
-        is_completed = False
-
         db_conn = self.__connect(True)
 
         if db_conn:
@@ -182,8 +180,6 @@ class ZDataBase_MySQL(object):
             cursor.execute("UPDATE {} SET {} = 'T' WHERE version = {}".format('manifest', 'is_completed', '1.0'))
             db_conn.commit()
             self.__close_connection(db_conn)
-
-        return is_completed
 
 
     def add_category(self, json=None, observer=None):
@@ -407,7 +403,7 @@ class ZDataBase_MySQL(object):
 
         return
 
-    def products(self, category_id_lst):
+    def products(self, category_id_lst, is_favorite=False):
 
         product_lst = []
 
@@ -450,7 +446,11 @@ class ZDataBase_MySQL(object):
                     row = cursor.fetchone()
 
                 else:
-                    query = ("SELECT * FROM product")
+                    query = "SELECT * FROM product"
+
+                    if is_favorite:
+                        query = query + " WHERE is_favorite = 'T'"
+
                     cursor.execute(query)
                     self.__lg.debug("\t  - Total products selected from specified categories: {}".format(cursor.rowcount))
 
@@ -482,6 +482,8 @@ class ZDataBase_MySQL(object):
                 products_dct['nutrition_grades'] = row[idx]
                 idx = idx + 1
                 products_dct['image_url'] = row[idx]
+                idx = idx + 1
+                products_dct['is_favorite'] = True if row[idx] == 'T' else False                
 
                 product_lst.append(products_dct)
                 
@@ -573,6 +575,32 @@ class ZDataBase_MySQL(object):
             self.__close_connection(db_conn)
 
         return product_dct
+
+    def set_favorite(self, product_code, is_added):
+
+        db_conn = self.__connect(True)
+
+        if db_conn:
+                    
+            try:
+                cursor = db_conn.cursor(buffered=True)
+
+                if is_added:
+                    self.__lg.debug("\t  > Add #{} to favorite".format(product_code))
+                    c = 'T'
+                else:
+                    self.__lg.debug("\t  > Remove #{} from favorite".format(product_code))
+                    c = 'F'
+
+                cursor.execute("UPDATE {} SET {} = '{}' WHERE code = {}".format('product', 'is_favorite', c, product_code))
+                self.__lg.debug("\t  - Product #{} set to favorite".format(product_code))
+
+            except mysql.connector.Error as err:
+                self.__lg.error("\t  - Failed to add favorite")
+                exit(1)
+
+            db_conn.commit()
+            self.__close_connection(db_conn)
 
 
     def __connect(self, use_database=False):

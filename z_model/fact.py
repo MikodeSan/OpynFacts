@@ -62,9 +62,9 @@ class ZFact():
     def category_data(self, category_id_lst):
         return self.__db_sql.get_category_data(is_filled=False, category_id_lst=category_id_lst)          # __db.get_categories_data(category_id_lst)
 
-    def products_from_categories(self, categories_lst):
+    def products_from_categories(self, categories_lst, is_favorite=False):
 
-        selected_product_lst = self.__db_sql.products(categories_lst)       # __db.products(categories_lst)
+        selected_product_lst = self.__db_sql.products(categories_lst, is_favorite)       # __db.products(categories_lst)
 
         selected_product_lst.sort(key=operator.itemgetter('brands', 'name', 'nutrition_grades', 'nova_group'))
         
@@ -100,6 +100,10 @@ class ZFact():
         alternative_product_lst.sort(key=operator.itemgetter('nutrition_grades', 'nova_group', 'brands', 'name'))
 
         return alternative_product_lst
+
+    def set_favorite(self, product_code, is_added):
+
+        self.__db_sql.set_favorite(product_code, is_added)
 
     def __download_categories(self):
 
