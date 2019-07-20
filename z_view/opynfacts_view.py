@@ -67,8 +67,8 @@ class ZOpynFacts_View(QWidget):
         product_selection_model.selectionChanged[QItemSelection, QItemSelection].connect(self.__update_data_selected_product)
 
         # set model for alternative product view
-        self.alternative_mdl = QStandardItemModel()
-        self.ui.alternative_view.setModel(self.alternative_mdl)
+        self.__alternative_mdl = QStandardItemModel()
+        self.ui.alternative_view.setModel(self.__alternative_mdl)
         self.ui.alternative_view.setSelectionMode(QAbstractItemView.SingleSelection)
 
         altern_category_cbox = self.ui.altern_category_cbox
@@ -107,7 +107,7 @@ class ZOpynFacts_View(QWidget):
         if model_type == 'product':
             model = self.__product_mdl
         elif model_type == 'alternative':
-            model = self.alternative_mdl
+            model = self.__alternative_mdl
         else:
             is_checked = False
 
@@ -141,16 +141,19 @@ class ZOpynFacts_View(QWidget):
                 item.setTextAlignment(Qt.AlignLeft | Qt.AlignVCenter)
                 item_lst.append(item)
 
-                item = QStandardItem( data_dct['nutrition_grades'] )
+                grade = data_dct['nutrition_grades']
+                if grade == 'z':
+                    grade = ''
+                item = QStandardItem( grade )
                 item.setTextAlignment(Qt.AlignLeft | Qt.AlignVCenter)
                 item_lst.append(item)
 
                 nova = data_dct['nova_group']
                 # print(nova)
-                if int(nova) > 0:
+                if int(nova) < 127:
                     s = str(nova)
                 else:
-                    s = ""
+                    s = ''
                 item = QStandardItem( s )
                 item.setTextAlignment(Qt.AlignLeft | Qt.AlignVCenter)
                 item_lst.append(item)
@@ -202,6 +205,7 @@ class ZOpynFacts_View(QWidget):
         self.__update_view_product('product', product_data_lst)
 
     def __update_data_selected_product(self, selected_item, deselected_item):
+        print(' >   Enter into __update_data_selected_product function')
 
         product_code = selected_item.indexes()[1].data(Qt.UserRole+1)
         print('selected product:', selected_item.indexes()[1].data(), product_code )
@@ -220,35 +224,27 @@ class ZOpynFacts_View(QWidget):
             # altern_category_cbox.insertItem(-1, category_data['name'], category_id)
             altern_category_cbox.addItem(category_dct['name'], category_dct['id'])
 
-        altern_category_cbox.blockSignals(False)
         cnt = altern_category_cbox.count()
         if cnt > 0:
             altern_category_cbox.setCurrentIndex(cnt-1)
 
+        altern_category_cbox.blockSignals(False)
+
+        self.__update_data_alternative_product(altern_category_cbox.currentIndex())
+
+
     def __update_data_alternative_product(self, category_index):
 
+        print(' >   Enter into __update_data_alternative_product function')
         product_code = self.ui.product_view.selectionModel().selectedIndexes()[1].data(Qt.UserRole+1)
         
         category_id = self.ui.altern_category_cbox.itemData(category_index)
         # category_id = self.ui.altern_category_cbox.currentData()
+        print('From category: {}; Compare alternative product with #{}'.format(category_id, product_code))
+        
 
         product_data_lst = self.__model.alternative_products(product_code, category_id)
         self.__update_view_product('alternative', product_data_lst)
-
-
-    def print_test(self, check):
-        ##        print(newAct.iconText(), newAct.text())
-        #        print(self.ui_project_command._action_new.text())
-        #
-        #        text = QInputDialog.getText(self, "QInputDialog::getText()",
-        #                                         "User name:")
-        ##                                         QLineEdit::Normal,
-        ##                                         QDir::home().dirName(), &ok);
-        ##        if (ok && !text.isEmpty())
-        ##            textLabel->setText(text);
-        #        print(text)
-        pass
-
 
 
 if __name__ == "__main__":

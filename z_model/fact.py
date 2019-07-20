@@ -78,7 +78,7 @@ class ZFact():
 
         product_data_dct = self.__db_sql.product_data([product_code])              # __db.product_data([product_code])
         selected_product_data_dct = product_data_dct[product_code]
-        selected_product_data_dct[database.KEY_PRODUCT_CODE] = product_code
+        # selected_product_data_dct[database.KEY_PRODUCT_CODE] = product_code
         print(selected_product_data_dct)
 
         selected_product_data_lst = self.__db_sql.products([category_id])       # __db.products([category_id])
@@ -86,10 +86,11 @@ class ZFact():
 
         for product_data_dct in selected_product_data_lst:
 
-            if product_data_dct[database.KEY_PRODUCT_CODE] != selected_product_data_dct[database.KEY_PRODUCT_CODE] \
+            # selected_product_data_dct[database.KEY_PRODUCT_CODE] \
+            if product_data_dct[database.KEY_PRODUCT_CODE] != product_code \
                 and (product_data_dct['nutrition_grades'] < selected_product_data_dct['nutrition_grades'] \
-                or (product_data_dct['nutrition_grades'] == selected_product_data_dct['nutrition_grades'] \
-                    and product_data_dct['nova_group'] < selected_product_data_dct['nova_group'])) :
+                    or (product_data_dct['nutrition_grades'] == selected_product_data_dct['nutrition_grades'] \
+                        and product_data_dct['nova_group'] < selected_product_data_dct['nova_group'])) :
 
                 # print(product_data_dct)
                 # selected_product_data_lst.remove(product_data_dct)
@@ -221,25 +222,27 @@ class ZFact():
 
         # name
         name = ''
-        lg_lst = ['fr', 'en', 'es', '']
+        lg_lst = ['_fr', '_en', '_es', '']
         key_generic_base = 'generic_name'
         key_product_base = 'product_name'
         lg_idx = 0
         is_found = False
-        while lg_idx < len(lg_lst) and not is_found:
+        while lg_idx < len(lg_lst) and is_found == False:
 
             key_generic = key_generic_base + lg_lst[lg_idx]
             key_product = key_product_base + lg_lst[lg_idx]
 
             if key_generic in product_dict:
                 if product_dict[key_generic] != '':
+                    print(product_dict[key_generic])
                     name = product_dict[key_generic]
                     is_found = True
-
-                elif key_product in product_dict:
-                    if product_dict[key_product] != '':
-                        name = product_dict[key_product]
-                        is_found = True
+            
+            if is_found == False and key_product in product_dict:
+                if product_dict[key_product] != '':
+                    print(product_dict[key_product])
+                    name = product_dict[key_product]
+                    is_found = True
 
             lg_idx = lg_idx + 1
 
@@ -276,12 +279,12 @@ class ZFact():
             extracted_data_dict['categories_tags'] = []
 
         # nova group
-        extracted_data_dict['nova_group'] = -1
+        extracted_data_dict['nova_group'] = 127
         if 'nova_group' in product_dict:
             extracted_data_dict['nova_group'] = int(product_dict['nova_group'])
                 
         # nutrition grade
-        extracted_data_dict['nutrition_grades'] = ""
+        extracted_data_dict['nutrition_grades'] = 'z'
         if 'nutrition_grades' in product_dict:
             extracted_data_dict['nutrition_grades'] = product_dict['nutrition_grades']
 
