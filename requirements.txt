@@ -1,0 +1,4 @@
+requests
+pyqt5
+mysql-connector-python		# do not use mysql-connector
+configparser
