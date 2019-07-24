@@ -37,9 +37,6 @@ class ZFact():
         self.__db = database()
         self.__db_sql = database_mysql()
 
-        if 0:                                       # forcing db validation
-            self.__db_sql.commit()
-
         # Init. database if necessary
         if not self.__db_sql.is_completed():                    # not self.__db.get_categories():
             category_dict = self.__download_categories()

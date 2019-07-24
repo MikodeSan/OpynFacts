@@ -109,10 +109,6 @@ class ZDataBase_MySQL(object):
             # Check database
             cursor = db_conn.cursor()
 
-            if 0:   # TODO: TO DELETE (reset db)
-                # drop database
-                self.__drop_database(cursor)
-
             # Use database
             try:
                 self.__lg.info("\t> Use database '{}'".format(self.DB_NAME))
