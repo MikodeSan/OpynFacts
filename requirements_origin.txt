@@ -1,0 +1,21 @@
+pycodestyle
+pylint
+
+pyqt5
+
+requests
+
+psycopg2
+mysql-connector-python		# do not use mysql-connector
+configparser
+
+# Flask
+# flask_sqlalchemy
+gunicorn
+
+pytest
+pytest-cov
+coverage
+
+
+

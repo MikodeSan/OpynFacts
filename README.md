@@ -59,7 +59,7 @@ Web site for "_Pur Beurre_" Company in order to:
 * As a user, I want to store and restore my favorite alternative food/product
   * Set selected product as favorite by click on button '_>>_'
   * Populate/Display favorite list
-    * Get all product set as favorite 
+    * Get all product set as favorite
   * Remove selected product from favorite list by click on button '_<<_'
 
 <!--
@@ -207,7 +207,7 @@ execute : python '_opynfacts.py_'
 
 ## Resources
 
-- [Web application](https://z-pur-beurre.herokuapp.com)
+* [Web application](https://z-pur-beurre.herokuapp.com)
 * [Planning P05](https://trello.com/b/LZOSEDow/opynfacts)
 * [Planning P08](https://www.pivotaltracker.com/n/projects/2436156)
 * [Source Code](https://github.com/MikodeSan/OpynFacts)
