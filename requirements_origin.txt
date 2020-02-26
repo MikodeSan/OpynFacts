@@ -11,6 +11,7 @@ configparser
 
 # Flask
 # flask_sqlalchemy
+django
 gunicorn
 
 pytest
