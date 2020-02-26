@@ -12,6 +12,7 @@ configparser
 # Flask
 # flask_sqlalchemy
 django
+django-debug-toolbar
 gunicorn
 
 pytest
