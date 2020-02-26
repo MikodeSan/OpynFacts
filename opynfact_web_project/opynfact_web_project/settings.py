@@ -85,11 +85,14 @@ WSGI_APPLICATION = 'opynfact_web_project.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': 'django.db.backends.postgresql', # on utilise l'adaptateur postgresql
+        'NAME': 'opynfacts', # le nom de notre base de donnees creee precedemment
+        'USER': 'opynfacts_adm', # attention : remplacez par votre nom d'utilisateur
+        'PASSWORD': '',
+        'HOST': '',
+        'PORT': '5432',
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/3.0/ref/settings/#auth-password-validators
