@@ -24,6 +24,7 @@ from store import views
 
 urlpatterns = [
     url(r'^$', views.index), # call the method "index" in "views.py"
+    url(r'^food/', include('food.urls')),
     url(r'^store/', include('store.urls')),
     url(r'^admin/', admin.site.urls)
 ]
