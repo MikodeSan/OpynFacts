@@ -39,7 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'debug_toolbar',
     'store.apps.StoreConfig',
-    'food.apps.FoodConfig',
+    'product.apps.ProductConfig',
 
 ]
 

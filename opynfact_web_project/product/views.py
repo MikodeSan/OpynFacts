@@ -1,6 +1,6 @@
 from django.http import HttpResponse
 
-from .models import ALBUMS
+# from .models import ALBUMS
 
 def index(request):
     message = "This is the home page"
@@ -18,9 +18,9 @@ def account(request):
     message = "This is the account page"
     return HttpResponse(message)
 
-def food(request, _food_id):
-    food_id = int(_food_id) # make sure we have an integer.
-    message = "This is the food #{} description page".format(food_id)
+def product(request, _product_id):
+    product_id = int(_product_id) # make sure we have an integer.
+    message = "This is the product #{} description page".format(product_id)
     return HttpResponse(message)
 
 #     id = int(album_id) # make sure we have an integer.
