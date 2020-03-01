@@ -1,7 +1,7 @@
 from django.db import models
 
 
-class Contact(models.Model):
+class ZContact(models.Model):
     name = models.CharField(max_length=200)
     email = models.EmailField(max_length=100)
 
@@ -9,10 +9,23 @@ class Contact(models.Model):
         return self.name
 
 
-class Product(models.Model):
+class ZAddress(models.Model):
+    name = models.CharField(max_length=200)
+
+    def __str__(self):
+        return self.name
+
+class ZRole(models.Model):
+    name = models.CharField(max_length=200)
+
+    def __str__(self):
+        return self.name
+
+
+class ZProduct(models.Model):
     reference = models.IntegerField(null=True)
-    brand = models.IntegerField(null=True)
-    name = models.IntegerField(null=True)
+    brand = models.CharField(max_length=200)
+    name = models.CharField(max_length=200)
     store = models.IntegerField(null=True)
     category_hierarchy = models.IntegerField(null=True)
     nutrition_grade = models.IntegerField(null=True)
@@ -28,16 +41,16 @@ class Product(models.Model):
     
     isfavorite = models.BooleanField(default=False)
 
-    contact = models.ManyToManyField(Contact, related_name='product', blank=True)
+    contact = models.ManyToManyField(ZContact, related_name='product', blank=True)
     # alternative = models.ManyToManyField(Product, related_name='product_b', blank=True)
 
     def __str__(self):
-        return self.name
+        return str(self.name)
 
 
-class Category(models.Model):
+class ZCategory(models.Model):
     name = models.CharField(max_length=200, unique=True)
-    product = models.ManyToManyField(Product, related_name='category', blank=True)
+    product = models.ManyToManyField(ZProduct, related_name='category', blank=True)
 
     def __str__(self):
         return self.name

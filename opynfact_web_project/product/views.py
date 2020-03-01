@@ -1,13 +1,22 @@
 from django.http import HttpResponse
+from django.template import loader
 
-# from .models import ALBUMS
+from .models import ZContact, ZProduct, ZCategory
 
 def index(request):
-    message = "This is the home page"
-    return HttpResponse(message)
+    # print(ZContact.objects.all())
+    # print()
+    # ZContact.objects.filter(name="Mike")[-1])
+    message = "This is the home page, the user is {}".format(ZContact.objects.filter(name="mike")[0]) 
+    template = loader.get_template('product/index.html')
+    return HttpResponse(template.render(request=request))
 
 def result(request):
-    message = "This is the result page"
+    contact_lst = ZContact.objects.all().order_by('-name')[:12]
+    contacts_fromatted = ["<li>{}</li>".format(contact) for contact in contact_lst]
+    product_lst = ZProduct.objects.all().order_by('name')[:12]
+    product_formatted = ["<li>{}</li>".format(product) for product in product_lst]
+    message = "This is the result page:<br>The contacts:<ul>{}</ul><br>The products:<ul>{}</ul>".format("\n".join(contacts_fromatted), "\n".join(product_formatted))
     return HttpResponse(message)
 
 def favorite(request):
@@ -20,7 +29,12 @@ def account(request):
 
 def product(request, _product_id):
     product_id = int(_product_id) # make sure we have an integer.
-    message = "This is the product #{} description page".format(product_id)
+    try:
+        product = ZProduct.objects.get(pk=product_id)
+        s = ", ".join([contact.name for contact in product.contact.all()])
+        message = "This is the product #{} description page owned by: {}".format(product_id, s)
+    except:
+        message = "Unkown product id"
     return HttpResponse(message)
 
 #     id = int(album_id) # make sure we have an integer.
@@ -28,6 +42,7 @@ def product(request, _product_id):
 #     artists = " ".join([artist['name'] for artist in album['artists']]) # grab artists name and create a string out of it.
 #     message = "Le nom de l'album est {}. Il a été écrit par {}".format(album['name'], artists)
 #     return HttpResponse(message)
+
 
 # def search(request):
 #     query = request.GET.get('query')
