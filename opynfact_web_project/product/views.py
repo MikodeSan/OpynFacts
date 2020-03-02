@@ -5,19 +5,29 @@ from .models import ZContact, ZProduct, ZCategory
 
 def index(request):
     # print(ZContact.objects.all())
-    # print()
     # ZContact.objects.filter(name="Mike")[-1])
-    message = "This is the home page, the user is {}".format(ZContact.objects.filter(name="mike")[0]) 
+    # message = "This is the home page, the user is {}".format(ZContact.objects.filter(name="mike")[0])
+
     template = loader.get_template('product/index.html')
-    return HttpResponse(template.render(request=request))
+    contact_lst = ZContact.objects.all()
+    context = {'contact_lst': contact_lst}
+    return HttpResponse(template.render(context, request=request))
 
 def result(request):
     contact_lst = ZContact.objects.all().order_by('-name')[:12]
     contacts_fromatted = ["<li>{}</li>".format(contact) for contact in contact_lst]
+
     product_lst = ZProduct.objects.all().order_by('name')[:12]
     product_formatted = ["<li>{}</li>".format(product) for product in product_lst]
-    message = "This is the result page:<br>The contacts:<ul>{}</ul><br>The products:<ul>{}</ul>".format("\n".join(contacts_fromatted), "\n".join(product_formatted))
-    return HttpResponse(message)
+
+    # message = "This is the result page:<br>The contacts:<ul>{}</ul><br>The products:<ul>{}</ul>".format("\n".join(contacts_fromatted), "\n".join(product_formatted))
+
+    template = loader.get_template('product/list.html')
+    product_lst = ZProduct.objects.all()
+    print(ZProduct.objects.all())
+
+    context = {'product_lst': product_lst}
+    return HttpResponse(template.render(context, request=request))
 
 def favorite(request):
     message = "This is the favorite page"
