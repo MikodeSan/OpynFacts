@@ -1,17 +1,17 @@
-from django.http import HttpResponse
+from django.shortcuts import render
 from django.template import loader
+from django.http import HttpResponse
 
 from .models import ZContact, ZProduct, ZCategory
 
 def index(request):
-    # print(ZContact.objects.all())
+    print(ZContact.objects.all())
     # ZContact.objects.filter(name="Mike")[-1])
     # message = "This is the home page, the user is {}".format(ZContact.objects.filter(name="mike")[0])
 
-    template = loader.get_template('product/index.html')
     contact_lst = ZContact.objects.all()
     context = {'contact_lst': contact_lst}
-    return HttpResponse(template.render(context, request=request))
+    return render(request, 'product/index.html', context)
 
 def result(request):
     contact_lst = ZContact.objects.all().order_by('-name')[:12]
@@ -22,16 +22,18 @@ def result(request):
 
     # message = "This is the result page:<br>The contacts:<ul>{}</ul><br>The products:<ul>{}</ul>".format("\n".join(contacts_fromatted), "\n".join(product_formatted))
 
-    template = loader.get_template('product/list.html')
     product_lst = ZProduct.objects.all()
     print(ZProduct.objects.all())
 
-    context = {'product_lst': product_lst}
-    return HttpResponse(template.render(context, request=request))
+    context = {'page':'result', 'product_lst': product_lst}
+    return render(request, 'product/list.html', context)
 
 def favorite(request):
-    message = "This is the favorite page"
-    return HttpResponse(message)
+
+    product_lst = ZProduct.objects.all().order_by('name')[:12]
+    context = {'page':'favorite', 'product_lst': product_lst}
+
+    return render(request, 'product/list.html', context)
 
 def account(request):
     message = "This is the account page"

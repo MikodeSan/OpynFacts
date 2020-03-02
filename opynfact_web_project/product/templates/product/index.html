@@ -4,7 +4,9 @@
     Je me suis faufilé dans le gabarit parent. Salut !
     <ul>
         {% for contact in contact_lst %}
-        <li>{{ contact }}</li>
+        <li>
+            <a href="{% url 'info' _product_id=forloop.counter %}">{{ contact }}</a></li>
+        <!-- <img class="img-responsive" src="{{ album.picture }}" alt="{{ album.title }}"> -->
         {% endfor %}
     </ul>
 
