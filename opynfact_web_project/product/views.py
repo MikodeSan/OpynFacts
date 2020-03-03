@@ -3,15 +3,50 @@ from django.template import loader
 from django.http import HttpResponse
 
 from .models import ZContact, ZProduct, ZCategory
+from .forms import ContactForm
+
 
 def index(request):
     print(ZContact.objects.all())
     # ZContact.objects.filter(name="Mike")[-1])
     # message = "This is the home page, the user is {}".format(ZContact.objects.filter(name="mike")[0])
 
-    contact_lst = ZContact.objects.all()
-    context = {'contact_lst': contact_lst}
-    return render(request, 'product/index.html', context)
+    # album = get_object_or_404(Album, pk=album_id)
+    # artists = [artist.name for artist in album.artists.all()]
+    # artists_name = " ".join(artists)
+    
+    # context = {
+    #     'album_title': album.title,
+    #     'artists_name': artists_name,
+    #     'album_id': album.id,
+    #     'thumbnail': album.picture
+    # }
+    
+    if request.method == 'POST':
+        form = ContactForm(request.POST)
+        if form.is_valid():
+            # Form is correct.
+            # We can proceed to booking.
+            email = request.POST.get('email')
+            name = request.POST.get('name')
+            print(name, email)
+        else:
+            # Form data doesn't match the expected format.
+            # Add errors to the template.
+            context['errors'] = form.errors.items()
+
+        context = {'page': 'result'}
+        context['form'] = form
+
+        return render(request, 'product/list.html', context)
+    else:
+        # GET method. Create a new form to be used in the template.
+        form = ContactForm()
+        contact_lst = ZContact.objects.all()
+        context = { 'contact_lst': contact_lst,
+                    'form': form }
+        return render(request, 'product/index.html', context)
+
 
 def result(request):
     contact_lst = ZContact.objects.all().order_by('-name')[:12]
@@ -24,6 +59,13 @@ def result(request):
 
     product_lst = ZProduct.objects.all()
     print(ZProduct.objects.all())
+
+
+
+    # if form.is_valid():
+    #     email = form.cleaned_data['email']
+    #     name = form.cleaned_data['name']
+
 
     context = {'page':'result', 'product_lst': product_lst}
     return render(request, 'product/list.html', context)

@@ -9,6 +9,30 @@
     {% include 'product/result.html' with list_title='Unknown Content' %}
 {% endif %}
 
+
+<form>
+  <div class="form-group  {% if form.name.errors %}has-warning has-feedback{% endif %}">
+    <p>Salut l'artist</p>
+  </div>
+
+  <div class="form-group  {% if form.email.errors %}has-warning has-feedback{% endif %}">
+    <p>Salut l'artist</p>
+  </div>
+
+</form>
+
+{% if errors %}
+<div>
+  {% for key, error in errors %}
+  {% autoescape off %}
+    {{ error }}
+  {% endautoescape %}
+  {% endfor %}
+</div>
+{% endif %}
+
+
+
 {% if product_lst|length_is:"0" %}
     <div class="text-center">
         Palsambleu ! Nous n'avons trouvé aucun résultat à cette requête. Même pas de quoi se ronger la chique ! Partez de nouveau à l'abordage !
