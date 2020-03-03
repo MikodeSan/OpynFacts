@@ -1,0 +1,21 @@
+#zlogo {
+    /* padding-top: 0.3125rem;
+  padding-bottom: 0.3125rem;
+  margin-right: 1rem; */
+    height: 2.7rem;
+    /* line-height: inherit;
+  white-space: nowrap; */
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-family: "Open Sans", sans-serif;
+}
+
+p {
+    font-family: "Scope One", sans-serif;
+}

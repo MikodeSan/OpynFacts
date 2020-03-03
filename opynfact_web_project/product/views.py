@@ -3,7 +3,7 @@ from django.template import loader
 from django.http import HttpResponse
 
 from .models import ZContact, ZProduct, ZCategory
-from .forms import ContactForm
+from .forms import QueryForm
 
 
 def index(request):
@@ -22,26 +22,27 @@ def index(request):
     #     'thumbnail': album.picture
     # }
     
+    context = {}
+
     if request.method == 'POST':
-        form = ContactForm(request.POST)
+        form = QueryForm(request.POST)
         if form.is_valid():
             # Form is correct.
             # We can proceed to booking.
-            email = request.POST.get('email')
-            name = request.POST.get('name')
-            print(name, email)
+            query = request.POST.get('name')
+            print(query)
         else:
             # Form data doesn't match the expected format.
             # Add errors to the template.
             context['errors'] = form.errors.items()
 
-        context = {'page': 'result'}
+        context['page'] = 'result'
         context['form'] = form
 
         return render(request, 'product/list.html', context)
     else:
         # GET method. Create a new form to be used in the template.
-        form = ContactForm()
+        form = QueryForm()
         contact_lst = ZContact.objects.all()
         context = { 'contact_lst': contact_lst,
                     'form': form }

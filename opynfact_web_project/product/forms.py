@@ -20,3 +20,10 @@ class QueryForm(forms.Form):
         widget=forms.TextInput(attrs={'class': 'form-control'}),
         required=True
         )
+
+    query_2 = forms.CharField(
+        label='Query',
+        max_length=100,
+        widget=forms.TextInput(attrs={'class': 'form-control'}),
+        required=True
+        )
