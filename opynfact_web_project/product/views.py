@@ -23,21 +23,22 @@ def index(request):
     # }
     
     context = {}
+    user_query = ""
 
     if request.method == 'POST':
         form = QueryForm(request.POST)
         if form.is_valid():
             # Form is correct.
             # We can proceed to booking.
-            query = request.POST.get('query')
-            print(query)
+            user_query = request.POST.get('query')
+            print(user_query)
         else:
             # Form data doesn't match the expected format.
             # Add errors to the template.
             context['errors'] = form.errors.items()
 
         context['page'] = 'result'
-        context['form'] = form
+        context['query'] = user_query
 
         return render(request, 'product/list.html', context)
     else:
@@ -62,8 +63,6 @@ def result(request):
 
     product_lst = ZProduct.objects.all()
     print(ZProduct.objects.all())
-
-
 
     # if form.is_valid():
     #     email = form.cleaned_data['email']

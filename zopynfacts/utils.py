@@ -112,9 +112,14 @@ def fetch(path, json_file=True):
     located on the OFF API.
     """
     if json_file:
-        path = "%s.json" % (path)
+        path = "{}.json".format(path)
 
     response = requests.get(path)
+    if response.status_code != 200:
+        exit(1)
+    # print(response)
+    # print(response.json())
+
     return response.json()
 
 

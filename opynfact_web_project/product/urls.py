@@ -8,7 +8,7 @@ urlpatterns = [
     url(r'^index/$', views.index), 
     url(r'^home/$', views.index), 
     url(r'^result/$', views.result, name='list'), 
-    url(r'^favorite/$', views.favorite, name='favorite'), 
+    url(r'^favorite/$', views.favorite, name='list'), 
     url(r'^account/$', views.account, name='account'), 
     url(r'^(?P<_product_id>[0-9]+)/$', views.product, name='info'),
     # url(r'^search/$', views.search),
