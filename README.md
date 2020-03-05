@@ -16,6 +16,7 @@ Web site for "_Pur Beurre_" Company in order to:
   * Personal Space
 * __Product__
   * Search
+    * As a user I want to get a targeted product information
   * Recommendation
 * __Non volatile memory__
   * Database
@@ -35,7 +36,7 @@ Web site for "_Pur Beurre_" Company in order to:
   * Extract product data
   * Store only new product data
   * Set Category/Product Relation
-  * Store Category/Product relation for only new relation 
+  * Store Category/Product relation for only new relation
   * Set db as completed
 
 * As a user, I want to see all stored products by category

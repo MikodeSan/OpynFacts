@@ -29,7 +29,7 @@ def index(request):
         if form.is_valid():
             # Form is correct.
             # We can proceed to booking.
-            query = request.POST.get('name')
+            query = request.POST.get('query')
             print(query)
         else:
             # Form data doesn't match the expected format.
@@ -42,10 +42,12 @@ def index(request):
         return render(request, 'product/list.html', context)
     else:
         # GET method. Create a new form to be used in the template.
-        form = QueryForm()
+        form_nav = QueryForm()
+        form_home = QueryForm()
         contact_lst = ZContact.objects.all()
         context = { 'contact_lst': contact_lst,
-                    'form': form }
+                    'form_nav': form_nav,
+                    'form_home': form_home }
         return render(request, 'product/index.html', context)
 
 
