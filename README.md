@@ -2,10 +2,8 @@
 
 ## Context
 
-This is the documentation of the project __Open Food Facts manager__
-
-Web site for "_Pur Beurre_" Company in order to:
-* __Trouver en un clic un substitut sain à un aliment considéré comme "Trop gras, trop sucré, trop salé"__
+This is the documentation of the project __Open Food Facts Client__.  
+The site "___Pur Beurre___" is a web application where the main goal is to find by one click, a healthy substitute for a food concidered too fat, too sweet, too salt.
 
 ## Packages / Epic
 
@@ -16,7 +14,6 @@ Web site for "_Pur Beurre_" Company in order to:
   * Personal Space
 * __Product__
   * Search
-    * As a user I want to get a targeted product information
   * Recommendation
 * __Non volatile memory__
   * Database
@@ -36,7 +33,7 @@ Web site for "_Pur Beurre_" Company in order to:
   * Extract product data
   * Store only new product data
   * Set Category/Product Relation
-  * Store Category/Product relation for only new relation
+  * Store Category/Product relation for only new relation 
   * Set db as completed
 
 * As a user, I want to see all stored products by category
@@ -95,7 +92,6 @@ Web site for "_Pur Beurre_" Company in order to:
 * Solution
 
 -->
-
 
 ## Architecture
 
