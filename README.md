@@ -2,10 +2,8 @@
 
 ## Context
 
-This is the documentation of the project __Open Food Facts manager__
-
-Web site for "_Pur Beurre_" Company in order to:
-* __Trouver en un clic un substitut sain à un aliment considéré comme "Trop gras, trop sucré, trop salé"__
+This is the documentation of the project __Open Food Facts Client__.  
+The site "___Pur Beurre___" is a web application where the main goal is to find by one click, a healthy substitute for a food concidered too fat, too sweet, too salt.
 
 ## Packages / Epic
 
@@ -15,8 +13,10 @@ Web site for "_Pur Beurre_" Company in order to:
   * Authentification
   * Personal Space
 * __Product__
-  * Search
-  * Recommendation
+  * ___Search___: To get a targeted product by 1 click, the user's query is get from the search bar and received by a html post request.  
+  According to [Search request documentation](https://documenter.getpostman.com/view/8470508/SVtN3Wzy?version=latest#58efae40-73c3-4907-9a88-785faff6ffb1), a search is requested to the Openfoodfact service specifying the query into the get request ([example for "confiture"](https://world.openfoodfacts.org/cgi/search.pl?search_terms=confiture&search_simple=1&action=process&json=true&sort_by=unique_scans)).  
+  From the returned JSON formatted, the first product of the list sorted by popularity is used to find an alternative product with better nutrition score.
+  * ___Recommendation___:
 * __Non volatile memory__
   * Database
     * PostGreSQL
@@ -95,7 +95,6 @@ Web site for "_Pur Beurre_" Company in order to:
 
 -->
 
-
 ## Architecture
 
 ### Front-end
@@ -126,6 +125,9 @@ When the response is received asynchronously from the server, a callback functio
 #### Component
 
 #### Deployment
+
+#### Query analysis: identification of requested place
+
 
 #### Query analysis: identification of requested place
 
