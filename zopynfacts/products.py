@@ -3,33 +3,11 @@ from . import utils
 import requests
 
 
-def search(query, page=1, page_size=20,
-           sort_by='unique_scans', locale='world'):
-    """
-    Perform a search using Open Food Facts search engine.
-    """
-    parameters = {
-        'search_terms': query,
-        'action': 'process',
-        'page': page,
-        'page_size': page_size,
-        'sort_by': sort_by,
-        'json': 'true' }
-
-    url = utils.build_url(geography=locale,
-                          service='cgi',
-                          resource_type='search.pl',
-                          parameters=parameters)
-    # print(url)
-
-    return utils.fetch(url, json_file=False)
-
-
 def extract_data(product_dict):
-    """Extract main product data from openfoodfact"""
-
+    """
+    Extract main product data from openfoodfact
+    """
     extracted_data_dict = {}
-
 
     # code
     extracted_data_dict['code'] = product_dict['code']
@@ -91,6 +69,11 @@ def extract_data(product_dict):
         extracted_data_dict['categories_tags'] = product_dict['categories_tags']
     else:
         extracted_data_dict['categories_tags'] = []
+    
+    if 'compared_to_category' in product_dict:
+        extracted_data_dict['compared_to_category'] = product_dict['compared_to_category']
+    else:
+        extracted_data_dict['compared_to_category'] = ""
 
     # nova group
     extracted_data_dict['nova_group'] = 127
@@ -180,6 +163,33 @@ def extract_data(product_dict):
 
     return extracted_data_dict
 
+
+def category_hierarchy():
+    pass
+
+def nutrition():
+    pass    
+
+def search(query, page=1, page_size=20,
+           sort_by='unique_scans', locale='world'):
+    """
+    Perform a search using Open Food Facts search engine.
+    """
+    parameters = {
+        'search_terms': query,
+        'action': 'process',
+        'page': page,
+        'page_size': page_size,
+        'sort_by': sort_by,
+        'json': 'true' }
+
+    url = utils.build_url(geography=locale,
+                          service='cgi',
+                          resource_type='search.pl',
+                          parameters=parameters)
+    # print(url)
+
+    return utils.fetch(url, json_file=False)
 
 # # -*- coding: utf-8 -*-
 # from . import utils

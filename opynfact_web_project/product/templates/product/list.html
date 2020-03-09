@@ -23,6 +23,13 @@
         <li>{{ category }}</li>
         {% endfor %}
     </ul>
+    {% if product_data.compared_to_category %}
+      <h6>[{{ product_data.compared_to_category }}] </h3>
+    {% endif %}
+
+    
+
+
 
     {% include 'product/result.html' with list_title='Result Content' %} {% elif page == 'favorite'%} {% include 'product/favorite.html' with list_title='Favorite Content' %} {% else %} {% include 'product/result.html' with list_title='Unknown Content' %}
   {% endif %}
