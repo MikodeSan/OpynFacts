@@ -120,6 +120,8 @@ def fetch(path, json_file=True):
     # print(response)
     # print(response.json())
 
+    # TODO: insert into request header [app_name, version, system, ...]
+
     return response.json()
 
 

@@ -2,9 +2,29 @@
 
 <p>Je me suis faufilé dans le gabarit parent. Salut !</p>
 {% if page == 'result' %}
+    {% if query %}
+        <h2>[{{ query }}]</h2>
 
-<h2>[{{ query }}] </h2>
-{% include 'product/result.html' with list_title='Result Content' %} {% elif page == 'favorite'%} {% include 'product/favorite.html' with list_title='Favorite Content' %} {% else %} {% include 'product/result.html' with list_title='Unknown Content' %}
+        <h3>[{{ nutrition_grades }}]</h3>
+
+        {% if image_url %}
+            <p><img src={{ image_url }} alt=""></p>
+        {% endif %}
+        <h6>[{{ image_url }}] </h3>
+        
+        <ul>
+        {% for category in categories_hierarchy %}
+            <li>{{ category }}</li>
+        {% endfor %}
+        </ul>
+        <ul>
+        {% for category in categories_tags %}
+            <li>{{ category }}</li>
+        {% endfor %}
+        </ul>
+
+        {% include 'product/result.html' with list_title='Result Content' %} {% elif page == 'favorite'%} {% include 'product/favorite.html' with list_title='Favorite Content' %} {% else %} {% include 'product/result.html' with list_title='Unknown Content' %}
+    {% endif %}
 {% endif %}
 
 

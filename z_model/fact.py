@@ -34,19 +34,19 @@ class ZFact():
         Constructor
         '''
         # Get database back
-        self.__db = database()
-        self.__db_sql = database_mysql()
+        # self.__db = database()
+        # self.__db_sql = database_mysql()
 
-        # Init. database if necessary
-        if not self.__db_sql.is_completed():                    # not self.__db.get_categories():
-            category_dict = self.__download_categories()
+        # # Init. database if necessary
+        # if not self.__db_sql.is_completed():                    # not self.__db.get_categories():
+        #     category_dict = self.__download_categories()
 
-            self.__db.init_categories(category_dict)
-            self.__db_sql.add_category(category_dict)
+        #     self.__db.init_categories(category_dict)
+        #     self.__db_sql.add_category(category_dict)
 
-            self.__init_database_product()
+        #     self.__init_database_product()
 
-            self.__db.save_db()
+        #     self.__db.save_db()
 
     def categories(self):
         
@@ -212,7 +212,7 @@ class ZFact():
 
         return [products_lst, len(page_products_lst), n_product_total]
 
-    def __product_data_from_source(self, product_dict):
+    def product_data_from_source(self, product_dict):
 
         extracted_data_dict = {}
 
@@ -359,6 +359,9 @@ class ZFact():
 
                     del r
         
+            if image_url:
+                extracted_data_dict['image_url'] = image_url
+                
         else:
             extracted_data_dict = {}
 
