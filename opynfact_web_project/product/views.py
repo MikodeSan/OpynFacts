@@ -12,7 +12,6 @@ DIR_BASE = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__fil
 print(DIR_BASE)
 sys.path.append(DIR_BASE)
 from zopynfacts import products
-from z_model.fact import ZFact
 
 # sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
@@ -43,20 +42,15 @@ def index(request):
             # Form is correct.
             # We can proceed to booking.
             user_query = request.POST.get('query')
-            print(user_query)
+
+            # Get most product according to query
             r_json = products.search(user_query, locale='fr')
             product_dct = r_json['products'][0]
 
-            f = ZFact()
-            product_data_dct = f.product_data_from_source(product_dct)
+            # Get product data
+            product_data_dct = products.extract_data(product_dct)
 
-            context['image_url'] = ""
-            if product_data_dct['image_url']:
-                context['image_url'] = product_data_dct['image_url']
-
-            context['nutrition_grades'] = product_data_dct['nutrition_grades']
-            context['categories_hierarchy'] = product_data_dct['categories_hierarchy']
-            context['categories_tags'] = product_data_dct['categories_tags']
+            context['product_data'] = product_data_dct
         else:
             # Form data doesn't match the expected format.
             # Add errors to the template.
