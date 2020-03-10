@@ -2,6 +2,8 @@
 from . import utils
 import requests
 
+from operator import itemgetter
+
 
 def nutrition(product_dct, n_product_max):
     """
@@ -13,9 +15,9 @@ def nutrition(product_dct, n_product_max):
     n_top_product = 0
     category_idx = 0
     n_category_max = len(product_dct['categories_hierarchy'])
+    n_category_max = 1
 
     category_lst = product_dct['categories_hierarchy']
-            
 
 
     while (n_top_product < n_product_max) and (category_idx < n_category_max):
@@ -23,9 +25,25 @@ def nutrition(product_dct, n_product_max):
         # Get category repartition
         category = category_lst[category_idx]
         print(category)
-        criteria_dct = {'categories': category, 'nutrition_grades': 'e'}
-        nutrition_grade_dct = advanced_search(criteria_dct, locale='fr')
-        print(nutrition_grade_dct)
+        grades_dct = drilldown_search('category', category, 'nutrition-grades', locale='fr')
+
+        count = grades_dct['count']
+        nutrition_grade_lst = sorted(grades_dct['tags'], key=itemgetter('id')) 
+
+        print(count, nutrition_grade_lst)
+
+        idx = 0
+        while idx < count:
+            grade = nutrition_grade_lst[idx]['id']
+            print(grade)
+            # get product with specified nutrition from category 
+            # product_dct = drilldown_search('category', category, 'nutrition-grades', filter_value=grade, locale='fr')
+            # print(product_dct)
+            criteria_dct = {'categories': category, 'nutrition_grades': grade}
+            nutrition_grade_dct = advanced_search(criteria_dct, page_size=1000, locale='fr')
+            print(nutrition_grade_dct['count'])
+            
+            idx += 1
 
         category_idx += 1
 
@@ -262,8 +280,8 @@ def advanced_search(criteria_dct, ingredient_dct={}, nutriment_dct={},
         'json': 'true' }
 
     print(criteria_dct)
+    idx = 0
     for criteria, value in criteria_dct.items():
-        idx = 0
         parameters['tagtype_{}'.format(idx)] = criteria
         if value[0] != '-':
             parameters['tag_contains_{}'.format(idx)] = 'contains'
@@ -271,7 +289,7 @@ def advanced_search(criteria_dct, ingredient_dct={}, nutriment_dct={},
             parameters['tag_contains_{}'.format(idx)] = 'does_not_contain'
         parameters['tag_{}'.format(idx)] = value
         idx += 1 
-
+        print(parameters)
     geography_code = locale + '-' + utils.API_LANGUAGE_CODE
 
     url = utils.build_url(geography=geography_code,
@@ -281,6 +299,19 @@ def advanced_search(criteria_dct, ingredient_dct={}, nutriment_dct={},
     print(url)
 
     return utils.fetch(url, json_file=False)
+
+def drilldown_search(criteria, value, criteria_filter, filter_value=None, locale='world'):
+    """
+    Perform an drilldown search by getting secondary criteria for products from main criteria.
+    """
+
+    geography_code = locale + '-' + utils.API_LANGUAGE_CODE
+
+    url = utils.build_url(geography=geography_code,
+                          resource_type=[criteria, value, criteria_filter],
+                          parameters=filter_value)
+    print(url)
+    return utils.fetch(url, json_file=True)
 
 
 # # -*- coding: utf-8 -*-

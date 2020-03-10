@@ -11,7 +11,7 @@
     {% if product_data.image_url %}
       <p><img src={{ product_data.image_url }} alt=""></p>
     {% endif %}
-    <h6>[{{ product_data.image_url }}] </h3>
+    <h6>[{{ product_data.image_url }}] </h6>
 
     <ul>
         {% for category in product_data.categories_hierarchy %}
@@ -24,7 +24,7 @@
         {% endfor %}
     </ul>
     {% if product_data.compared_to_category %}
-      <h6>[{{ product_data.compared_to_category }}] </h3>
+      <h6>[{{ product_data.compared_to_category }}] </h6>
     {% endif %}
 
     

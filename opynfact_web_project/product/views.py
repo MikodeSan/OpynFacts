@@ -16,7 +16,6 @@ from zopynfacts import products
 # sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
 
-
 def index(request):
     print(ZContact.objects.all())
     # ZContact.objects.filter(name="Mike")[-1])
