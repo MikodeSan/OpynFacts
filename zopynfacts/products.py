@@ -60,20 +60,23 @@ def extract_data(product_dict):
         extracted_data_dict['stores'] = ""
 
     # category hierarchy
-    if 'categories_hierarchy' in product_dict:
-        extracted_data_dict['categories_hierarchy'] = product_dict['categories_hierarchy']
-    else:
-        extracted_data_dict['categories_hierarchy'] = []
+    extracted_data_dict['categories_hierarchy'] = extract_category_hierarchy(product_dict)
 
-    if 'categories_tags' in product_dict:
-        extracted_data_dict['categories_tags'] = product_dict['categories_tags']
-    else:
-        extracted_data_dict['categories_tags'] = []
+
+    # if 'categories_hierarchy' in product_dict:
+    #     extracted_data_dict['categories_hierarchy'] = product_dict['categories_hierarchy']
+    # else:
+    #     extracted_data_dict['categories_hierarchy'] = []
+
+    # if 'categories_tags' in product_dict:
+    #     extracted_data_dict['categories_tags'] = product_dict['categories_tags']
+    # else:
+    #     extracted_data_dict['categories_tags'] = []
     
-    if 'compared_to_category' in product_dict:
-        extracted_data_dict['compared_to_category'] = product_dict['compared_to_category']
-    else:
-        extracted_data_dict['compared_to_category'] = ""
+    # if 'compared_to_category' in product_dict:
+    #     extracted_data_dict['compared_to_category'] = product_dict['compared_to_category']
+    # else:
+    #     extracted_data_dict['compared_to_category'] = ""
 
     # nova group
     extracted_data_dict['nova_group'] = 127
@@ -164,8 +167,37 @@ def extract_data(product_dict):
     return extracted_data_dict
 
 
-def category_hierarchy():
-    pass
+def extract_category_hierarchy(product_dict):
+    """
+    Extract category hierarchy list from openfoodfact
+    """
+
+    # category hierarchy
+    category_lst = []
+    idx = 0
+
+    if 'compared_to_category' in product_dict:
+        category_lst.append(product_dict['compared_to_category'])
+        idx += 1
+        print('compared_to_category', category_lst)
+
+    if 'categories_hierarchy' in product_dict:
+        for category in reversed(product_dict['categories_hierarchy']):
+            if category not in category_lst:
+                category_lst.append(category)
+                print('categories_hierarchy', category_lst)
+
+    # if 'categories_tags' in product_dict:
+    #     for category in reversed(product_dict['categories_tags']):
+    #         if category not in category_lst:
+    #             category_lst.insert(idx, category)
+    #             idx += 1
+    #             print('categories_tags', category_lst)
+    #         else:
+    #             idx = category_lst.index(category)
+                
+    return category_lst
+
 
 def nutrition():
     pass    
