@@ -8,6 +8,8 @@ API_URL = "https://%s.openfoodfacts.org/"
 OBF_API_URL = "https://%s.openbeautyfacts.org/"
 OPFF_API_URL = "https://%s.openpetfoodfacts.org/"
 
+API_LANGUAGE_CODE = "en"
+
 FILE_TYPE_MAP = {
     "mongodb": "openfoodfacts-mongodbdump.tar.gz",
     "csv": "en.openfoodfacts.org.products.csv",

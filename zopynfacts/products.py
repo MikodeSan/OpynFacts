@@ -3,6 +3,34 @@ from . import utils
 import requests
 
 
+def nutrition(product_dct, n_product_max):
+    """
+    Find alternative product from openfoodfact database
+    """
+
+    alternative_product_lst = []
+    score_lst = ['a', 'b', 'c', 'd', 'e', 'u']
+    n_top_product = 0
+    category_idx = 0
+    n_category_max = len(product_dct['categories_hierarchy'])
+
+    category_lst = product_dct['categories_hierarchy']
+            
+
+
+    while (n_top_product < n_product_max) and (category_idx < n_category_max):
+
+        # Get category repartition
+        category = category_lst[category_idx]
+        print(category)
+        criteria_dct = {'categories': category, 'nutrition_grades': 'e'}
+        nutrition_grade_dct = advanced_search(criteria_dct, locale='fr')
+        print(nutrition_grade_dct)
+
+        category_idx += 1
+
+    return alternative_product_lst
+
 def extract_data(product_dict):
     """
     Extract main product data from openfoodfact
@@ -199,9 +227,6 @@ def extract_category_hierarchy(product_dict):
     return category_lst
 
 
-def nutrition():
-    pass    
-
 def search(query, page=1, page_size=20,
            sort_by='unique_scans', locale='world'):
     """
@@ -222,6 +247,41 @@ def search(query, page=1, page_size=20,
     # print(url)
 
     return utils.fetch(url, json_file=False)
+
+def advanced_search(criteria_dct, ingredient_dct={}, nutriment_dct={},
+                    page=1, page_size=20,
+                    sort_by='unique_scans', locale='world'):
+    """
+    Perform an advanced search using Open Food Facts search engine.
+    """
+    parameters = {
+        'action': 'process',
+        'page': page,
+        'page_size': page_size,
+        'sort_by': sort_by,
+        'json': 'true' }
+
+    print(criteria_dct)
+    for criteria, value in criteria_dct.items():
+        idx = 0
+        parameters['tagtype_{}'.format(idx)] = criteria
+        if value[0] != '-':
+            parameters['tag_contains_{}'.format(idx)] = 'contains'
+        else:
+            parameters['tag_contains_{}'.format(idx)] = 'does_not_contain'
+        parameters['tag_{}'.format(idx)] = value
+        idx += 1 
+
+    geography_code = locale + '-' + utils.API_LANGUAGE_CODE
+
+    url = utils.build_url(geography=geography_code,
+                          service='cgi',
+                          resource_type='search.pl',
+                          parameters=parameters)
+    print(url)
+
+    return utils.fetch(url, json_file=False)
+
 
 # # -*- coding: utf-8 -*-
 # from . import utils
@@ -295,13 +355,3 @@ def search(query, page=1, page_size=20,
 #                          files=image_payload,
 #                          headers=headers)
 
-
-# def advanced_search(post_query):
-#     """
-#     Perform advanced search using OFF search engine
-#     """
-#     post_query['json'] = '1'
-#     url = utils.build_url(service='cgi',
-#                           resource_type='search.pl',
-#                           parameters=post_query)
-#     return utils.fetch(url, json_file=False)

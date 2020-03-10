@@ -50,6 +50,8 @@ def index(request):
             # Get product data
             product_data_dct = products.extract_data(product_dct)
 
+            alternative_product_lst = products.nutrition(product_data_dct, 12)
+
             context['product_data'] = product_data_dct
         else:
             # Form data doesn't match the expected format.
