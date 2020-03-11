@@ -5,38 +5,31 @@ import requests
 from operator import itemgetter
 
 
-def nutrition(product_dct, n_product_max):
+def nutrition(reference_product_dct, n_product_max):
     """
     Find alternative product from openfoodfact database
     """
 
     alternative_product_lst = []
-    score_lst = ['a', 'b', 'c', 'd', 'e', 'u']
     n_top_product = 0
     category_idx = 0
-    n_category_max = len(product_dct['categories_hierarchy'])
-    # n_category_max = 1
+    n_category_max = len(reference_product_dct['categories_hierarchy'])
 
-    grade_max = 'e'
-    nova_max = '4'
-    popularity_min = 0
+    grade_max = utils.NutritionGrade.E.value
+    nova_max = utils.Nova.NOVA_4
+    popularity_min = -1
 
 
-    category_lst = product_dct['categories_hierarchy']
+    category_lst = reference_product_dct['categories_hierarchy']
 
 
     while (n_top_product < n_product_max) and (category_idx < n_category_max):
 
         # Get nutrition grades repartition from category
         category = category_lst[category_idx]
-        print(category)
-        grades_dct = drilldown_search('category', category, 'nutrition-grades', locale='fr')
+        print('Category', category)
 
-        # Sort nutrition gradesS
-        count = grades_dct['count']
-        nutrition_grade_lst = sorted(grades_dct['tags'], key=itemgetter('id')) 
-
-        grade_lst = [grade['id'] for grade in nutrition_grade_lst]
+        count, grade_lst = get_nutrition_grade_repartition(category)
         print(count, grade_lst)
 
         for grade in grade_lst:
@@ -48,16 +41,12 @@ def nutrition(product_dct, n_product_max):
                 if grade == 'a':
                     flag = True
 
-                
-                # get product with specified nutrition from category
-                # product_dct = drilldown_search('category', category, 'nutrition-grades', filter_value=grade, locale='fr')
-                # print(product_dct)
                 criteria_dct = {'categories': category, 'nutrition_grades': grade}
                 product_page_dct = advanced_search(criteria_dct, page_size=1000, locale='fr')
                 print('Count', product_page_dct['count'])
 
                 for idx, product_src_dct in enumerate(product_page_dct['products']):
-    
+
                     product_data_dct = extract_data(product_src_dct)
 
                     # Get product better than known alternatine one
@@ -69,44 +58,62 @@ def nutrition(product_dct, n_product_max):
                             is_unknown = False
 
                     if is_unknown:
-                        # if better : grade, nova , popularity
-                        alternative_product_lst.append(product_data_dct)
-
-                        # Sort list of alternatve product prior by nutrition grade, nova score, popularity
-                        alternative_product_lst.sort(key=itemgetter('unique_scans_n'), reverse=True)
-                        alternative_product_lst.sort(key=itemgetter('nova_group'))
-                        alternative_product_lst.sort(key=itemgetter('nutrition_grades'))
-
-                        n_alternative_product = len(alternative_product_lst)
-
-                        for altern in alternative_product_lst:
+                        if (product_data_dct['nutrition_grades'] < grade_max) \
+                            or (product_data_dct['nutrition_grades'] == grade_max and product_data_dct['nova_group'] < nova_max) \
+                                or (product_data_dct['nutrition_grades'] == grade_max and product_data_dct['nova_group'] == nova_max and product_data_dct['unique_scans_n'] < popularity_min): 
                             
-                            print('Alternative list:', idx, altern['code'], '\t',
-                                                            altern['name'], '\t',
-                                                            altern['categories_hierarchy'][0], '\t',
-                                                            altern['nutrition_grades'], '\t',
-                                                            altern['nova_group'], '\t',
-                                                            altern['unique_scans_n'] )
+                            alternative_product_lst.append(product_data_dct)
 
-                        # Keep the maximal number of alternative wished
-                        if n_alternative_product > n_product_max:
+                            # Sort list of alternatve product prior by nutrition grade, nova score, popularity
+                            alternative_product_lst.sort(key=itemgetter('unique_scans_n'), reverse=True)
+                            alternative_product_lst.sort(key=itemgetter('nova_group'))
+                            alternative_product_lst.sort(key=itemgetter('nutrition_grades'))
 
-                            # Update number of grade: 'a'
-                            if flag:
-                                n_top_product += 1
+                            n_alternative_product = len(alternative_product_lst)
 
-                            alternative_product_lst.pop()
+                            for altern in alternative_product_lst:
+                                
+                                print('Alternative list:', idx, altern['code'], '\t',
+                                                                altern['name'], '\t',
+                                                                altern['categories_hierarchy'][0], '\t',
+                                                                altern['nutrition_grades'], '\t',
+                                                                altern['nova_group'], '\t',
+                                                                altern['unique_scans_n'] )
 
-                            # Update critera Min
-                            print('Update values', grade_max, nova_max, popularity_min)
-                            grade_max = alternative_product_lst[-1]['nutrition_grades']
-                            nova_max = alternative_product_lst[-1]['nova_group']
-                            popularity_min = alternative_product_lst[-1]['unique_scans_n']
+                            # Keep the maximal number of alternative wished
+                            if n_alternative_product > n_product_max:
+
+                                # Update number of grade: 'a'
+                                if flag:
+                                    n_top_product += 1
+
+                                alternative_product_lst.pop()
+
+                                # Update critera Min
+                                print('Update values', grade_max, nova_max, popularity_min)
+                                grade_max = alternative_product_lst[-1]['nutrition_grades']
+                                nova_max = alternative_product_lst[-1]['nova_group']
+                                popularity_min = alternative_product_lst[-1]['unique_scans_n']
 
         category_idx += 1
 
-
     return alternative_product_lst
+
+
+def get_nutrition_grade_repartition(category):
+
+    # search grade repartition from category
+    grades_dct = drilldown_search('category', category, 'nutrition-grades', locale='fr')
+
+    # Sort nutrition grades
+    count = grades_dct['count']
+    nutrition_grade_lst = sorted(grades_dct['tags'], key=itemgetter('id')) 
+
+    grade_lst = [grade['id'] for grade in nutrition_grade_lst]
+
+    return count, grade_lst
+
+
 
 def extract_data(product_dict):
     """
@@ -166,22 +173,6 @@ def extract_data(product_dict):
 
     # category hierarchy
     extracted_data_dict['categories_hierarchy'] = extract_category_hierarchy(product_dict)
-
-
-    # if 'categories_hierarchy' in product_dict:
-    #     extracted_data_dict['categories_hierarchy'] = product_dict['categories_hierarchy']
-    # else:
-    #     extracted_data_dict['categories_hierarchy'] = []
-
-    # if 'categories_tags' in product_dict:
-    #     extracted_data_dict['categories_tags'] = product_dict['categories_tags']
-    # else:
-    #     extracted_data_dict['categories_tags'] = []
-    
-    # if 'compared_to_category' in product_dict:
-    #     extracted_data_dict['compared_to_category'] = product_dict['compared_to_category']
-    # else:
-    #     extracted_data_dict['compared_to_category'] = ""
 
     # nova group
     extracted_data_dict['nova_group'] = 127
@@ -271,7 +262,6 @@ def extract_data(product_dict):
 
     return extracted_data_dict
 
-
 def extract_category_hierarchy(product_dict):
     """
     Extract category hierarchy list from openfoodfact
@@ -302,7 +292,6 @@ def extract_category_hierarchy(product_dict):
     #             idx = category_lst.index(category)
                 
     return category_lst
-
 
 def search(query, page=1, page_size=20,
            sort_by='unique_scans', locale='world'):

@@ -2,6 +2,7 @@ import requests
 import getpass
 import sys
 import urllib
+from enum import Enum, IntEnum, auto
 
 
 API_URL = "https://%s.openfoodfacts.org/"
@@ -22,6 +23,20 @@ ENTITY_MAP = {
     "pet": OPFF_API_URL
 }
 
+
+class NutritionGrade(Enum):
+    A = 'a'
+    B = 'b'
+    C = 'c'
+    D = 'd'
+    E = 'e'
+    UNKNOWN = 'unkown'
+
+class Nova(IntEnum):
+    NOVA_1 = auto()
+    NOVA_2 = auto()
+    NOVA_3 = auto()
+    NOVA_4 = auto()
 
 def login_into_OFF():
     username = raw_input("Username:")
