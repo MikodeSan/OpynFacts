@@ -15,37 +15,96 @@ def nutrition(product_dct, n_product_max):
     n_top_product = 0
     category_idx = 0
     n_category_max = len(product_dct['categories_hierarchy'])
-    n_category_max = 1
+    # n_category_max = 1
+
+    grade_max = 'e'
+    nova_max = '4'
+    popularity_min = 0
+
 
     category_lst = product_dct['categories_hierarchy']
 
 
     while (n_top_product < n_product_max) and (category_idx < n_category_max):
 
-        # Get category repartition
+        # Get nutrition grades repartition from category
         category = category_lst[category_idx]
         print(category)
         grades_dct = drilldown_search('category', category, 'nutrition-grades', locale='fr')
 
+        # Sort nutrition gradesS
         count = grades_dct['count']
         nutrition_grade_lst = sorted(grades_dct['tags'], key=itemgetter('id')) 
 
-        print(count, nutrition_grade_lst)
+        grade_lst = [grade['id'] for grade in nutrition_grade_lst]
+        print(count, grade_lst)
 
-        idx = 0
-        while idx < count:
-            grade = nutrition_grade_lst[idx]['id']
-            print(grade)
-            # get product with specified nutrition from category 
-            # product_dct = drilldown_search('category', category, 'nutrition-grades', filter_value=grade, locale='fr')
-            # print(product_dct)
-            criteria_dct = {'categories': category, 'nutrition_grades': grade}
-            nutrition_grade_dct = advanced_search(criteria_dct, page_size=1000, locale='fr')
-            print(nutrition_grade_dct['count'])
-            
-            idx += 1
+        for grade in grade_lst:
+            # Get product from nutrition grade group
+            print('Grade', grade)
+            if grade <= grade_max:
+
+                flag = False
+                if grade == 'a':
+                    flag = True
+
+                
+                # get product with specified nutrition from category
+                # product_dct = drilldown_search('category', category, 'nutrition-grades', filter_value=grade, locale='fr')
+                # print(product_dct)
+                criteria_dct = {'categories': category, 'nutrition_grades': grade}
+                product_page_dct = advanced_search(criteria_dct, page_size=1000, locale='fr')
+                print('Count', product_page_dct['count'])
+
+                for idx, product_src_dct in enumerate(product_page_dct['products']):
+    
+                    product_data_dct = extract_data(product_src_dct)
+
+                    # Get product better than known alternatine one
+                    code = product_data_dct['code']
+                    is_unknown = True
+
+                    for alternative_product in alternative_product_lst:
+                        if code == alternative_product['code']:
+                            is_unknown = False
+
+                    if is_unknown:
+                        # if better : grade, nova , popularity
+                        alternative_product_lst.append(product_data_dct)
+
+                        # Sort list of alternatve product prior by nutrition grade, nova score, popularity
+                        alternative_product_lst.sort(key=itemgetter('unique_scans_n'), reverse=True)
+                        alternative_product_lst.sort(key=itemgetter('nova_group'))
+                        alternative_product_lst.sort(key=itemgetter('nutrition_grades'))
+
+                        n_alternative_product = len(alternative_product_lst)
+
+                        for altern in alternative_product_lst:
+                            
+                            print('Alternative list:', idx, altern['code'], '\t',
+                                                            altern['name'], '\t',
+                                                            altern['categories_hierarchy'][0], '\t',
+                                                            altern['nutrition_grades'], '\t',
+                                                            altern['nova_group'], '\t',
+                                                            altern['unique_scans_n'] )
+
+                        # Keep the maximal number of alternative wished
+                        if n_alternative_product > n_product_max:
+
+                            # Update number of grade: 'a'
+                            if flag:
+                                n_top_product += 1
+
+                            alternative_product_lst.pop()
+
+                            # Update critera Min
+                            print('Update values', grade_max, nova_max, popularity_min)
+                            grade_max = alternative_product_lst[-1]['nutrition_grades']
+                            nova_max = alternative_product_lst[-1]['nova_group']
+                            popularity_min = alternative_product_lst[-1]['unique_scans_n']
 
         category_idx += 1
+
 
     return alternative_product_lst
 
@@ -231,7 +290,7 @@ def extract_category_hierarchy(product_dict):
         for category in reversed(product_dict['categories_hierarchy']):
             if category not in category_lst:
                 category_lst.append(category)
-                print('categories_hierarchy', category_lst)
+                # print('categories_hierarchy', category_lst)
 
     # if 'categories_tags' in product_dict:
     #     for category in reversed(product_dict['categories_tags']):
