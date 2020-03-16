@@ -8,6 +8,10 @@ class ZContact(models.Model):
     def __str__(self):
         return self.name
 
+    class Meta:
+        verbose_name = "Utilisateur"
+        verbose_name_plural = "Utilisateurs"
+
 
 class ZAddress(models.Model):
     name = models.CharField(max_length=200)
@@ -24,8 +28,8 @@ class ZRole(models.Model):
 
 
 class ZProduct(models.Model):
-    reference = models.IntegerField(null=True)
-    brand = models.CharField(max_length=200)
+    reference = models.IntegerField('Code', null=True)
+    brand = models.CharField('Marque', max_length=200)
     name = models.CharField(max_length=200)
     store = models.IntegerField(null=True)
     category_hierarchy = models.IntegerField(null=True)
@@ -43,7 +47,11 @@ class ZProduct(models.Model):
     isfavorite = models.BooleanField(default=False)
 
     contact = models.ManyToManyField(ZContact, related_name='product', blank=True)
-    # alternative = models.ManyToManyField(Product, related_name='product_b', blank=True)
+    alternative = models.ManyToManyField('self', related_name='product_b', blank=True)
+
+    class Meta:
+        verbose_name = "Produit"
+        verbose_name_plural = "Produits"
 
     def __str__(self):
         return str(self.name)
