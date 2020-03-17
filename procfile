@@ -1,0 +1,1 @@
+web: gunicorn opynfact_web_project.wsgi
