@@ -1,0 +1,26 @@
+pycodestyle
+pylint
+
+# pyqt5
+
+requests
+
+psycopg2
+mysql-connector-python		# do not use mysql-connector
+configparser
+
+whitenoise
+
+# Flask
+# flask_sqlalchemy
+django
+django-debug-toolbar
+dj-database-url
+gunicorn
+
+pytest
+pytest-cov
+coverage
+
+
+
