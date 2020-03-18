@@ -1,27 +1,103 @@
-from django.http import HttpResponse
+import os, sys
+
+
+from django.shortcuts import render
 from django.template import loader
+from django.http import HttpResponse
 
 from .models import ZContact, ZProduct, ZCategory
+from .forms import QueryForm
+
+DIR_BASE = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+print(DIR_BASE)
+sys.path.append(DIR_BASE)
+from zopynfacts import products
+
+# sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+
 
 def index(request):
-    # print(ZContact.objects.all())
-    # print()
+    print(ZContact.objects.all())
     # ZContact.objects.filter(name="Mike")[-1])
-    message = "This is the home page, the user is {}".format(ZContact.objects.filter(name="mike")[0]) 
-    template = loader.get_template('product/index.html')
-    return HttpResponse(template.render(request=request))
+    # message = "This is the home page, the user is {}".format(ZContact.objects.filter(name="mike")[0])
+
+    # album = get_object_or_404(Album, pk=album_id)
+    # artists = [artist.name for artist in album.artists.all()]
+    # artists_name = " ".join(artists)
+    
+    # context = {
+    #     'album_title': album.title,
+    #     'artists_name': artists_name,
+    #     'album_id': album.id,
+    #     'thumbnail': album.picture
+    # }
+    
+    context = {}
+    user_query = ""
+
+    if request.method == 'POST':
+        form = QueryForm(request.POST)
+        if form.is_valid():
+            # Form is correct.
+            # We can proceed to booking.
+            user_query = request.POST.get('query')
+
+            # Get most product according to query
+            r_json = products.search(user_query, locale='fr')
+            product_dct = r_json['products'][0]
+
+            # Get product data
+            product_data_dct = products.extract_data(product_dct)
+
+            alternative_product_lst = products.nutrition(product_data_dct, 12)
+
+            context['product_data'] = product_data_dct
+        else:
+            # Form data doesn't match the expected format.
+            # Add errors to the template.
+            context['errors'] = form.errors.items()
+
+        context['page'] = 'result'
+        context['query'] = user_query
+        
+        return render(request, 'product/list.html', context)
+    else:
+        # GET method. Create a new form to be used in the template.
+        form_nav = QueryForm()
+        form_home = QueryForm()
+        contact_lst = ZContact.objects.all()
+        context = { 'contact_lst': contact_lst,
+                    'form_nav': form_nav,
+                    'form_home': form_home }
+        return render(request, 'product/index.html', context)
+
 
 def result(request):
     contact_lst = ZContact.objects.all().order_by('-name')[:12]
     contacts_fromatted = ["<li>{}</li>".format(contact) for contact in contact_lst]
+
     product_lst = ZProduct.objects.all().order_by('name')[:12]
     product_formatted = ["<li>{}</li>".format(product) for product in product_lst]
-    message = "This is the result page:<br>The contacts:<ul>{}</ul><br>The products:<ul>{}</ul>".format("\n".join(contacts_fromatted), "\n".join(product_formatted))
-    return HttpResponse(message)
+
+    # message = "This is the result page:<br>The contacts:<ul>{}</ul><br>The products:<ul>{}</ul>".format("\n".join(contacts_fromatted), "\n".join(product_formatted))
+
+    product_lst = ZProduct.objects.all()
+    print(ZProduct.objects.all())
+
+    # if form.is_valid():
+    #     email = form.cleaned_data['email']
+    #     name = form.cleaned_data['name']
+
+
+    context = {'page':'result', 'product_lst': product_lst}
+    return render(request, 'product/list.html', context)
 
 def favorite(request):
-    message = "This is the favorite page"
-    return HttpResponse(message)
+
+    product_lst = ZProduct.objects.all().order_by('name')[:12]
+    context = {'page':'favorite', 'product_lst': product_lst}
+
+    return render(request, 'product/list.html', context)
 
 def account(request):
     message = "This is the account page"

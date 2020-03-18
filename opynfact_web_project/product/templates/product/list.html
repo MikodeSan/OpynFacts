@@ -1,0 +1,66 @@
+{% extends 'product/base.html' %}
+{% block content %}
+
+<p>Je me suis faufilé dans le gabarit parent. Salut !</p>
+{% if page == 'result' %}
+  {% if query %}
+    <h2>[{{ query }}]</h2>
+
+    <h3>[{{ product_data.nutrition_grades }}]</h3>
+
+    {% if product_data.image_url %}
+      <p><img src={{ product_data.image_url }} alt=""></p>
+    {% endif %}
+    <h6>[{{ product_data.image_url }}] </h6>
+
+    <ul>
+        {% for category in product_data.categories_hierarchy %}
+        <li>{{ category }}</li>
+        {% endfor %}
+    </ul>
+    <ul>
+        {% for category in product_data.categories_tags %}
+        <li>{{ category }}</li>
+        {% endfor %}
+    </ul>
+    {% if product_data.compared_to_category %}
+      <h6>[{{ product_data.compared_to_category }}] </h6>
+    {% endif %}
+
+    
+
+
+
+    {% include 'product/result.html' with list_title='Result Content' %} {% elif page == 'favorite'%} {% include 'product/favorite.html' with list_title='Favorite Content' %} {% else %} {% include 'product/result.html' with list_title='Unknown Content' %}
+  {% endif %}
+{% endif %}
+
+
+    <form>
+        <div class="form-group  {% if form.name.errors %}has-warning has-feedback{% endif %}">
+            <p>Salut l'artist</p>
+        </div>
+
+        <div class="form-group  {% if form.email.errors %}has-warning has-feedback{% endif %}">
+            <p>Salut l'artist</p>
+        </div>
+
+    </form>
+
+    {% if errors %}
+    <div>
+        {% for key, error in errors %} {% autoescape off %} {{ error }} {% endautoescape %} {% endfor %}
+    </div>
+    {% endif %}
+    {% if product_lst|length_is:"0" %}
+    <div class="text-center">
+        Palsambleu ! Nous n'avons trouvé aucun résultat à cette requête. Même pas de quoi se ronger la chique ! Partez de nouveau à l'abordage !
+    </div>
+    {% else %}
+    <ul>
+        {% for product in product_lst %}
+        <li>{{ product }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+  {% endblock %}

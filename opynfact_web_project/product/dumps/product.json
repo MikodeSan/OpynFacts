@@ -1,0 +1,2 @@
+C:\Dev\py\opynfacts
+[{"model": "product.zcontact", "pk": 1, "fields": {"name": "Mike", "email": ""}}, {"model": "product.zcontact", "pk": 3, "fields": {"name": "DDoko", "email": ""}}]

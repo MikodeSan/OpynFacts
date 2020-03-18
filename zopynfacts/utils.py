@@ -2,11 +2,14 @@ import requests
 import getpass
 import sys
 import urllib
+from enum import Enum, IntEnum, auto
 
 
 API_URL = "https://%s.openfoodfacts.org/"
 OBF_API_URL = "https://%s.openbeautyfacts.org/"
 OPFF_API_URL = "https://%s.openpetfoodfacts.org/"
+
+API_LANGUAGE_CODE = "en"
 
 FILE_TYPE_MAP = {
     "mongodb": "openfoodfacts-mongodbdump.tar.gz",
@@ -20,6 +23,20 @@ ENTITY_MAP = {
     "pet": OPFF_API_URL
 }
 
+
+class NutritionGrade(Enum):
+    A = 'a'
+    B = 'b'
+    C = 'c'
+    D = 'd'
+    E = 'e'
+    UNKNOWN = 'unkown'
+
+class Nova(IntEnum):
+    NOVA_1 = auto()
+    NOVA_2 = auto()
+    NOVA_3 = auto()
+    NOVA_4 = auto()
 
 def login_into_OFF():
     username = raw_input("Username:")
@@ -112,9 +129,16 @@ def fetch(path, json_file=True):
     located on the OFF API.
     """
     if json_file:
-        path = "%s.json" % (path)
+        path = "{}.json".format(path)
 
     response = requests.get(path)
+    if response.status_code != 200:
+        exit(1)
+    # print(response)
+    # print(response.json())
+
+    # TODO: insert into request header [app_name, version, system, ...]
+
     return response.json()
 
 
