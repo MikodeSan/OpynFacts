@@ -13,20 +13,6 @@ class ZContact(models.Model):
         verbose_name_plural = "Utilisateurs"
 
 
-class ZAddress(models.Model):
-    name = models.CharField(max_length=200)
-
-    def __str__(self):
-        return self.name
-
-
-class ZRole(models.Model):
-    name = models.CharField(max_length=200)
-
-    def __str__(self):
-        return self.name
-
-
 class ZProduct(models.Model):
     reference = models.IntegerField('Code', null=True)
     brand = models.CharField('Marque', max_length=200)

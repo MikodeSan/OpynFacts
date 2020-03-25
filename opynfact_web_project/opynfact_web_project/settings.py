@@ -47,9 +47,7 @@ INSTALLED_APPS = [
     'store.apps.StoreConfig',
     'product.apps.ProductConfig',
     'account.apps.AccountConfig',
-
     'debug_toolbar',
-
 ]
 
 MIDDLEWARE = [
