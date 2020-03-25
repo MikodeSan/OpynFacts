@@ -26,10 +26,13 @@ SECRET_KEY = 'rrkt%ps7yqw*)o6gol*i(@c)ciu_7+f)p1h-!-d@xev!wd5yv+'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 if os.environ.get('ENV') == 'PRODUCTION':
+
     DEBUG = False
+    ALLOWED_HOSTS = ['zopynfacts.herokuapp.com']
 else:
+
     DEBUG = True
-ALLOWED_HOSTS = ['zopynfacts.herokuapp.com']
+    ALLOWED_HOSTS = []
 
 
 # Application definition
@@ -41,9 +44,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'debug_toolbar',
     'store.apps.StoreConfig',
     'product.apps.ProductConfig',
+    'debug_toolbar',
 
 ]
 
@@ -130,9 +133,9 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/3.0/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'fr-FR'
 
-TIME_ZONE = 'Europe/Paris'
+TIME_ZONE = 'UTC'       # 'Europe/Paris'
 
 USE_I18N = True
 

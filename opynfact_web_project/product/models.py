@@ -46,7 +46,7 @@ class ZProduct(models.Model):
     
     isfavorite = models.BooleanField(default=False)
 
-    contact = models.ManyToManyField(ZContact, related_name='product', blank=True)
+    contact = models.ManyToManyField(ZContact, related_name='favorite', blank=True)
     alternative = models.ManyToManyField('self', related_name='product_b', blank=True)
 
     class Meta:

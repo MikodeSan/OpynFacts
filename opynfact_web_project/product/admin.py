@@ -21,7 +21,7 @@ class ZProductInline(admin.TabularInline):
         ] # list columns
 
 class ZContactProductInline(admin.TabularInline):
-    model = ZContact.product.through # the query goes through an intermediate table.
+    model = ZContact.favorite.through # the query goes through an intermediate table.
 
     verbose_name = "Favori"
     verbose_name_plural = "Favoris"
