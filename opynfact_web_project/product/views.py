@@ -1,9 +1,8 @@
 import os, sys
 
-
-from django.shortcuts import render
-from django.template import loader
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect, HttpResponsePermanentRedirect
+from django.shortcuts import render, get_object_or_404
+from django.urls import reverse
 
 from .models import ZContact, ZProduct, ZCategory
 from .forms import QueryForm
@@ -36,7 +35,10 @@ def index(request):
     user_query = ""
 
     if request.method == 'POST':
+
         form = QueryForm(request.POST)
+        context['page'] = 'result'
+        context['query'] = user_query
         if form.is_valid():
             # Form is correct.
             # We can proceed to booking.
@@ -51,16 +53,18 @@ def index(request):
 
             alternative_product_lst = products.nutrition(product_data_dct, 12)
 
+            context['query'] = user_query
             context['product_data'] = product_data_dct
+            print('Form OK')
+            return render(request, 'product/list.html', context)
+            # return HttpResponseRedirect(reverse('product:result', args=(x,y,)))
+
         else:
             # Form data doesn't match the expected format.
             # Add errors to the template.
             context['errors'] = form.errors.items()
-
-        context['page'] = 'result'
-        context['query'] = user_query
-        
-        return render(request, 'product/list.html', context)
+            print('Form error')
+            return render(request, 'product/list.html', context)
     else:
         # GET method. Create a new form to be used in the template.
         form_nav = QueryForm()

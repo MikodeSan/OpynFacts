@@ -1,0 +1,26 @@
+{% extends 'product/base.html' %} {% block content %}
+
+<div class="col-md-6">
+
+    <ul>
+        <li>Go to <a href="{% url 'product:home' %}">Home</a></li>
+        <li>Go to <a href="{% url 'product:home' %}">Home</a></li>
+    </ul>
+
+    <h2 class="text-center artist_name">Artistes</h2>
+
+    <p style="margin-bottom: 20px;">Some text ! </p>
+
+    <form class="form-inline" action="{% url 'product:home' %}" method="post">
+        {% csrf_token %}
+
+        <div class="form-group">
+            <!-- {{ form_home.query }} -->
+            <button type="submit" class="btn btn-success">Recherche</button>
+        </div>
+        <!-- <input type="hidden" class="hidden" value="{{ album_id }}" name="album_id"> -->
+    </form>
+
+</div>
+
+{% endblock %}

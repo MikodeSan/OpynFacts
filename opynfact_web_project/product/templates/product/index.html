@@ -5,7 +5,7 @@
     <ul>
         {% for contact in contact_lst %}
         <li>
-            <a href="{% url 'info' _product_id=forloop.counter %}">{{ contact }}</a></li>
+            <a href="{% url 'product:info' _product_id=forloop.counter %}">{{ contact }}</a></li>
         <!-- <img class="img-responsive" src="{{ album.picture }}" alt="{{ album.title }}"> -->
         {% endfor %}
     </ul>
@@ -22,7 +22,7 @@
         <p style="margin-bottom: 20px;">Demandez-nous de mettre de côté {{ album_title }} et venez le chercher dès demain en magasin ! </p>
 
         <!-- album_id=album_id -->
-        <form class="form-inline" action="{% url 'home' %}" method="post">
+        <form class="form-inline" action="{% url 'product:home' %}" method="get">
             {% csrf_token %}
 
             <div class="form-group">
