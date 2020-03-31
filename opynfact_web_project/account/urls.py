@@ -7,9 +7,10 @@ from . import views
 app_name = 'account'
 urlpatterns = [
     path('<int:user_id>', views.profil, name='profile'),
+    path('sign-up/id', views.signup, name='signup'),     # register
+    path('sign-up/key', views.signup_password, name='signup-pwd'),
     path('sign-in', views.connect, name='signin'),
     path('logon', auth_views.LoginView.as_view()),
-    path('sign-up', views.connect, name='signup'),     # register
     path('sign-out', views.disconnect, name='signout'),
     # re_path(r'^connection$', views.connect, name='connection'),
 ]
