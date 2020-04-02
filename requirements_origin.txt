@@ -11,10 +11,14 @@ configparser
 
 whitenoise
 
+
+# SERVER
+
 # Flask
 # flask_sqlalchemy
 django
 django-debug-toolbar
+django-extensions
 dj-database-url
 gunicorn
 
@@ -23,7 +27,6 @@ pytest-cov
 coverage
 
 
+# TOOLS
 pillow
-
-
-
+pydotplus
