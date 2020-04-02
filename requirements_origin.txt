@@ -23,4 +23,7 @@ pytest-cov
 coverage
 
 
+pillow
+
+
 

@@ -25,6 +25,11 @@ The site "___Pur Beurre___" is a web application where the main goal is to find 
 
 ## Features (Release / Story)
 
+Two Apps:
+
+* Product: openfoodfact items
+* Account: Account Management
+
 ### Use case / User story
 
 #### Sequence
