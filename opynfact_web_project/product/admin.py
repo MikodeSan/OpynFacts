@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import ZContact, ZProduct 
+from .models import ZProduct 
 
 # Register your models here.
 # admin.site.register(ZProduct)
@@ -20,16 +20,16 @@ class ZProductInline(admin.TabularInline):
         (None, {'fields': ['reference', 'brand', 'name']})
         ] # list columns
 
-class ZContactProductInline(admin.TabularInline):
-    model = ZContact.favorite.through # the query goes through an intermediate table.
+# class ZContactProductInline(admin.TabularInline):
+#     model = ZContact.favorite.through # the query goes through an intermediate table.
 
-    verbose_name = "Favori"
-    verbose_name_plural = "Favoris"
+#     verbose_name = "Favori"
+#     verbose_name_plural = "Favoris"
     
-    extra = 1
+#     extra = 1
 
-@admin.register(ZContact)
-class ZContactAdmin(admin.ModelAdmin):
-    search_fields = ['name', 'email']
-    list_filter = ['name', 'email']
-    inlines = [ZContactProductInline,] # list of bookings made by a contact
+# @admin.register(ZContact)
+# class ZContactAdmin(admin.ModelAdmin):
+#     search_fields = ['name', 'email']
+#     list_filter = ['name', 'email']
+#     inlines = [ZContactProductInline,] # list of bookings made by a contact

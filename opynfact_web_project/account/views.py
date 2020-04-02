@@ -11,6 +11,7 @@ from .forms import ConnectionForm, SignUpForm, SignUpPasswordForm, ParagraphErro
 
 from enum import Enum, auto
 
+# from ..product.models import ZSearch
 
 class ZSign(Enum):
     UP = auto()
@@ -85,6 +86,7 @@ def signup(request):
 
     print(locals())
     return render(request, template, locals())
+
 
 def signup_password(request):
 

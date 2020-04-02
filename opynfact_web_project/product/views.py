@@ -4,7 +4,8 @@ from django.http import HttpResponse, HttpResponseRedirect, HttpResponsePermanen
 from django.shortcuts import render, get_object_or_404
 from django.urls import reverse
 
-from .models import ZContact, ZProduct, ZCategory
+from django.contrib.auth import get_user_model
+from .models import ZProduct, ZCategory, ZSearch
 from .forms import QueryForm
 
 DIR_BASE = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -16,7 +17,7 @@ from zopynfacts import products
 
 
 def index(request):
-    print(ZContact.objects.all())
+    # print(ZContact.objects.all())
     # ZContact.objects.filter(name="Mike")[-1])
     # message = "This is the home page, the user is {}".format(ZContact.objects.filter(name="mike")[0])
 
@@ -46,12 +47,28 @@ def index(request):
 
             # Get most product according to query
             r_json = products.search(user_query, locale='fr')
+            # TODO: if r_json['product']:
             product_dct = r_json['products'][0]
 
             # Get product data
             product_data_dct = products.extract_data(product_dct)
 
-            alternative_product_lst = products.nutrition(product_data_dct, 12)
+            if request.user.is_authenticated:
+                # Save searched product according to authenticated user
+                user_cur = get_user_model().objects.get(username=request.user.username)
+                product_searched, created = ZProduct.objects.get_or_create(reference=product_data_dct['code'])
+                print("Created:", created, "; ", product_searched)
+                if created: # or (save date < modified date):
+                # TODO: set data
+                    product_searched.brands = product_data_dct['brands']
+                    product_searched.name = product_data_dct['name']
+                    product_searched.save()
+                    user_cur.searches.add(product_searched)
+                print(user_cur.searches.all())
+
+
+
+            alternative_product_lst = products.nutrition(product_data_dct, 1)
 
             context['query'] = user_query
             context['product_data'] = product_data_dct
@@ -69,19 +86,21 @@ def index(request):
         # GET method. Create a new form to be used in the template.
         form_nav = QueryForm()
         form_home = QueryForm()
-        contact_lst = ZContact.objects.all()
-        context = { 'contact_lst': contact_lst,
-                    'form_nav': form_nav,
-                    'form_home': form_home }
+        # contact_lst = ZContact.objects.all()
+        context = {
+            # 'contact_lst': contact_lst,
+            'form_nav': form_nav,
+            'form_home': form_home
+            }
         return render(request, 'product/index.html', context)
 
 
 def result(request):
-    contact_lst = ZContact.objects.all().order_by('-name')[:12]
-    contacts_fromatted = ["<li>{}</li>".format(contact) for contact in contact_lst]
+    # contact_lst = ZContact.objects.all().order_by('-name')[:12]
+    # contacts_fromatted = ["<li>{}</li>".format(contact) for contact in contact_lst]
 
-    product_lst = ZProduct.objects.all().order_by('name')[:12]
-    product_formatted = ["<li>{}</li>".format(product) for product in product_lst]
+    # product_lst = ZProduct.objects.all().order_by('name')[:12]
+    # product_formatted = ["<li>{}</li>".format(product) for product in product_lst]
 
     # message = "This is the result page:<br>The contacts:<ul>{}</ul><br>The products:<ul>{}</ul>".format("\n".join(contacts_fromatted), "\n".join(product_formatted))
 
