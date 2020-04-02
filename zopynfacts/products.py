@@ -50,12 +50,16 @@ def nutrition(reference_product_dct, n_product_max):
                     product_data_dct = extract_data(product_src_dct)
 
                     # Get product better than known alternatine one
-                    code = product_data_dct['code']
                     is_unknown = True
+                    if product_data_dct:
 
-                    for alternative_product in alternative_product_lst:
-                        if code == alternative_product['code']:
-                            is_unknown = False
+                        code = product_data_dct['code']
+
+                        for alternative_product in alternative_product_lst:
+                            if code == alternative_product['code']:
+                                is_unknown = False
+                    else:
+                        is_unknown = False
 
                     if is_unknown:
                         if (product_data_dct['nutrition_grades'] < grade_max) \

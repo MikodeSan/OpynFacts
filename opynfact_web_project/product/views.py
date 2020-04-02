@@ -47,31 +47,33 @@ def index(request):
 
             # Get most product according to query
             r_json = products.search(user_query, locale='fr')
-            # TODO: if r_json['product']:
-            product_dct = r_json['products'][0]
+            if r_json['products']:
+                product_dct = r_json['products'][0]
 
-            # Get product data
-            product_data_dct = products.extract_data(product_dct)
+                # Get product data
+                product_data_dct = products.extract_data(product_dct)
 
-            if request.user.is_authenticated:
-                # Save searched product according to authenticated user
-                user_cur = get_user_model().objects.get(username=request.user.username)
-                product_searched, created = ZProduct.objects.get_or_create(reference=product_data_dct['code'])
-                print("Created:", created, "; ", product_searched)
-                if created: # or (save date < modified date):
-                # TODO: set data
-                    product_searched.brands = product_data_dct['brands']
-                    product_searched.name = product_data_dct['name']
-                    product_searched.save()
-                    user_cur.searches.add(product_searched)
-                print(user_cur.searches.all())
-
-
-
-            alternative_product_lst = products.nutrition(product_data_dct, 1)
-
+                if request.user.is_authenticated:
+                    # Save searched product according to authenticated user
+                    user_cur = get_user_model().objects.get(username=request.user.username)
+                    product_searched, created = ZProduct.objects.get_or_create(reference=product_data_dct['code'])
+                    print("Created:", created, "; ", product_searched)
+                    if created: # or (save date < modified date):
+                    # TODO: set data
+                        product_searched.brands = product_data_dct['brands']
+                        product_searched.name = product_data_dct['name']
+                        product_searched.save()
+                        user_cur.searches.add(product_searched)
+                    print(user_cur.searches.all())
+    
+                alternative_product_lst = products.nutrition(product_data_dct, 7)
+            else:
+                product_data_dct = {}
+                alternative_product_lst = []
+    
             context['query'] = user_query
             context['product_data'] = product_data_dct
+            context['alternative_lst'] = alternative_product_lst
             print('Form OK')
             return render(request, 'product/list.html', context)
             # return HttpResponseRedirect(reverse('product:result', args=(x,y,)))

@@ -33,8 +33,8 @@ class ZProduct(models.Model):
     
     isfavorite = models.BooleanField(default=False)
 
-    users = models.ManyToManyField(get_user_model(), through='ZSearch', related_name='searches', blank=True)
-    searches = models.ManyToManyField('ZSearch', related_name='alternative', blank=True)
+    searchers = models.ManyToManyField(get_user_model(), through='ZSearch', related_name='searches', blank=True)
+    users = models.ManyToManyField(get_user_model(), through='ZFavorite', related_name='favorites', blank=True)
 
     class Meta:
         verbose_name = "Produit"
@@ -44,10 +44,18 @@ class ZProduct(models.Model):
         return "{} - {} - {}".format(self.reference, self.brands, self.name)
 
 
+class ZFavorite(models.Model):
+    date = models.DateTimeField(auto_now=True)
+    user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
+    favorite = models.ForeignKey(ZProduct, on_delete=models.CASCADE)
+    # alternatives = models.ManyToManyField(ZFavorite, related_name='zsearches', blank=True)
+
+
 class ZSearch(models.Model):
     date = models.DateTimeField(auto_now=True)
     user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
-    product = models.ForeignKey(ZProduct, on_delete=models.CASCADE)
+    target = models.ForeignKey(ZProduct, on_delete=models.CASCADE)
+    alternatives = models.ManyToManyField(ZFavorite, related_name='zsearches', blank=True)
 
 
 class ZCategory(models.Model):
