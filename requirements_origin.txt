@@ -1,7 +1,7 @@
 pycodestyle
 pylint
 
-pyqt5
+# pyqt5
 
 requests
 
@@ -9,10 +9,17 @@ psycopg2
 mysql-connector-python		# do not use mysql-connector
 configparser
 
+whitenoise
+
+
+# SERVER
+
 # Flask
 # flask_sqlalchemy
 django
 django-debug-toolbar
+django-extensions
+dj-database-url
 gunicorn
 
 pytest
@@ -20,4 +27,7 @@ pytest-cov
 coverage
 
 
-
+# TOOLS
+pillow
+# pygraphviz
+pydotplus
