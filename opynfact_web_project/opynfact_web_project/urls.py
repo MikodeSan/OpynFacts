@@ -19,12 +19,8 @@ from django.urls import include, path, re_path
 from django.conf import settings
 from django.conf.urls import include, url  # For django versions before 2.0
 
-from store import views
-
-
 urlpatterns = [
-    url(r'^$', views.index), # call the method "index" in "views.py"
-    url(r'^product/', include('product.urls')),
+    url(r'^$', include('product.urls')),
     url(r'^store/', include('store.urls')),
     path('account/', include('account.urls')),
     re_path(r'^zadmyn/', admin.site.urls)

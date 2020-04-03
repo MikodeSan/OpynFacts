@@ -140,7 +140,7 @@ def product(request, _product_id):
 
 def notice(request):
 
-    return render(request, 'product/notice.html')
+    return render(request, 'product/notice.html', locals())
     
 
 #     id = int(album_id) # make sure we have an integer.
