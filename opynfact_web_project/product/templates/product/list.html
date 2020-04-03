@@ -55,13 +55,16 @@
     {% else %}
         {% for alternative in alternative_lst %}
             <div>
-                <h2>[{{ alternative.code }} - {{ alternative.brands }} - {{ alternative.name }}]</h2>
-                <h3>[{{alternative.nutrition_grades}} - {{alternative.nova_group}} - {{alternative.unique_scans_n}}]</h3>
+                <h4>[{{ alternative.code }} - {{ alternative.brands }} - {{ alternative.name }}]</h4>
+                <h5>[{{alternative.nutrition_grades}} - {{alternative.nova_group}} - {{alternative.unique_scans_n}}] - 
+                {% if alternative.compared_to_category %}
+                    [{{alternative.compared_to_category}}]
+                {% else %}
+                    [{{product_data.categories_hierarchy.0}}]
+                {% endif %}
+                 </h5>
                 {% if alternative.image_url %}
                 <p><img src={{ alternative.image_url }} alt=""></p>
-                {% endif %}
-                {% if alternative.compared_to_category %}
-                <h6>[{{ alternative.compared_to_category }}] </h6>
                 {% endif %}
             </div>
         {% endfor %}
