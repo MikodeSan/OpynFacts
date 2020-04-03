@@ -11,4 +11,5 @@ urlpatterns = [
     url(r'^favorite/$', views.favorite, name='favorite'), 
     url(r'^(?P<_product_id>[0-9]+)/$', views.product, name='info'),
     # url(r'^search/$', views.search),
+    url(r'^notice/$', views.notice, name='notice'), 
 ]
