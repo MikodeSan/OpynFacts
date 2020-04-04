@@ -123,7 +123,7 @@ def signup_password(request):
 def disconnect(request):
 
     logout(request)
-    return HttpResponseRedirect(reverse('account:signin'))
+    return HttpResponseRedirect(reverse('product:home'))
 
 
 @login_required()      # By default, use LOGIN_URL in settings

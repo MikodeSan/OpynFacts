@@ -138,6 +138,11 @@ def product(request, _product_id):
         message = "Unkown product id"
     return HttpResponse(message)
 
+def notice(request):
+
+    return render(request, 'product/notice.html', locals())
+    
+
 #     id = int(album_id) # make sure we have an integer.
 #     album = ALBUMS[id] # get the album with its id.
 #     artists = " ".join([artist['name'] for artist in album['artists']]) # grab artists name and create a string out of it.
