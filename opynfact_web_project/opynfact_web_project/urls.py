@@ -20,10 +20,11 @@ from django.conf import settings
 from django.conf.urls import include, url  # For django versions before 2.0
 
 urlpatterns = [
-    url(r'^$', include('product.urls')),
-    url(r'^store/', include('store.urls')),
+    # url(r'^$', include('product.urls')),
+    path('', include('product.urls')),
     path('account/', include('account.urls')),
-    re_path(r'^zadmyn/', admin.site.urls)
+    path('zadmyn/', admin.site.urls),
+    # re_path(r'^zadmyn/$', admin.site.urls)
 ]
 
 

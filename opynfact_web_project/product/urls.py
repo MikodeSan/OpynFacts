@@ -6,16 +6,15 @@ from . import views
 
 app_name = 'product'
 urlpatterns = [
-    url(r'^$', views.index, name='home'),
-    path('notices', views.notice, name='notice'),
-
-
+    # url(r'^$', views.index, name='home'),
+    path('', views.index, name='home'),
     # url(r'^index/$', views.index), 
     # url(r'^home/$', views.index), 
-    url(r'^result/$', views.result, name='result'), 
+    # url(r'^notices/$', views.notice, name='notice'),
+    path('notices', views.notice, name='notice'),
+    # url(r'^result/$', views.result, name='result'), 
+    re_path(r'^result/$', views.result, name='result'),
+    # url(r'^search/$', views.search),
     url(r'^favorite/$', views.favorite, name='favorite'), 
     url(r'^(?P<_product_id>[0-9]+)/$', views.product, name='info'),
-    # url(r'^notices/$', views.notice, name='notice'),
-
-    # url(r'^search/$', views.search),
 ]

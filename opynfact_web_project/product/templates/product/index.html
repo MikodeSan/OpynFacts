@@ -1,5 +1,8 @@
 {% extends 'product/base.html' %}
 
+{% load static %}
+
+
 {% block masthead_form %}
 <div class="col-lg-8 align-self-baseline">
     <!-- album_id=album_id -->
@@ -8,7 +11,7 @@
 
         <div class="form-group">
             <!-- {{ form_home.query }} -->
-            <button type="submit" class="btn btn-success">Rechercher !!!</button>
+            <button type="submit" class="btn btn-success">Rechercher</button>
         </div>
         <!-- <input type="hidden" class="hidden" value="{{ album_id }}" name="album_id"> -->
     </form>
@@ -21,11 +24,10 @@
 </div>
 {% endblock %}
 
-
-{% load static %}
-
-
 {% block content %}
+
+
+
 
 {% comment %} <ul>
     {% for contact in contact_lst %}
@@ -44,7 +46,7 @@
         Pur Beurre est l'initiative de deux amoureux de la gastronomie française, Colette Tatou et Rémy,
         que vous avez déjà certainement rencontrés dans notre excellent restaurant Ratatouille.</p>
       <div class="row">
-        <div class="col-lg-5 col-md-6 text-center">
+        <div class="col-lg-6 col-md-6 text-center">
           <div class="mt-5">
             <p><img class="img-fluid" id="zimcolette" src="{% static 'product/img/colette-tatou-full.png' %}" alt=""></p>
             {% comment %} <i class="fas fa-4x fa-globe text-primary mb-4"></i> {% endcomment %}

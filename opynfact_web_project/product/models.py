@@ -35,10 +35,14 @@ class ZProduct(models.Model):
 
     searchers = models.ManyToManyField(get_user_model(), through='ZSearch', related_name='searches', blank=True)
     users = models.ManyToManyField(get_user_model(), through='ZFavorite', related_name='favorites', blank=True)
+    alternatives = models.ManyToManyField('self', related_name='substituted', symmetrical=False, blank=True)
 
     class Meta:
         verbose_name = "Produit"
         verbose_name_plural = "Produits"
+        constraints = [
+            models.UniqueConstraint(fields=['reference', 'brands', 'name'], name='product_identifier_unique'),
+        ]
 
     def __str__(self):
         return "{} - {} - {}".format(self.reference, self.brands, self.name)
@@ -55,7 +59,7 @@ class ZSearch(models.Model):
     date = models.DateTimeField(auto_now=True)
     user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
     target = models.ForeignKey(ZProduct, on_delete=models.CASCADE)
-    alternatives = models.ManyToManyField(ZFavorite, related_name='zsearches', blank=True)
+    favorite_alternatives = models.ManyToManyField(ZFavorite, related_name='zsearches', blank=True)
 
 
 class ZCategory(models.Model):
