@@ -11,6 +11,7 @@ from .forms import ConnectionForm, SignUpForm, SignUpPasswordForm, ParagraphErro
 
 from enum import Enum, auto
 
+# from ..product.models import ZSearch
 
 class ZSign(Enum):
     UP = auto()
@@ -86,6 +87,7 @@ def signup(request):
     print(locals())
     return render(request, template, locals())
 
+
 def signup_password(request):
 
     sign_id = ZSign.PASSWORD
@@ -121,7 +123,7 @@ def signup_password(request):
 def disconnect(request):
 
     logout(request)
-    return HttpResponseRedirect(reverse('account:signin'))
+    return HttpResponseRedirect(reverse('product:home'))
 
 
 @login_required()      # By default, use LOGIN_URL in settings
