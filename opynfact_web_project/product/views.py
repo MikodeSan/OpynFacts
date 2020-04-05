@@ -5,8 +5,9 @@ from django.shortcuts import render, get_object_or_404
 from django.urls import reverse
 
 from django.contrib.auth import get_user_model
-from .models import ZProduct, ZCategory, ZSearch
+from .models import ZProduct, ZCategory, ZSearch, ZCategory_Product
 from .forms import QueryForm
+
 
 DIR_BASE = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 print(DIR_BASE)
@@ -45,7 +46,7 @@ def index(request):
             # We can proceed to booking.
             user_query = request.POST.get('query')
 
-            # Get most product according to query
+            # Get most popular product according to query
             r_json = products.search(user_query, locale='fr')
             if r_json['products']:
                 product_dct = r_json['products'][0]
@@ -53,20 +54,21 @@ def index(request):
                 # Get product data
                 product_data_dct = products.extract_data(product_dct)
 
+                # Update or insert product into db
+                product_targeted_mdl = set_product_model(product_data_dct)
+
                 if request.user.is_authenticated:
                     # Save searched product according to authenticated user
                     user_cur = get_user_model().objects.get(username=request.user.username)
-                    product_searched, created = ZProduct.objects.get_or_create(reference=product_data_dct['code'])
-                    print("Created:", created, "; ", product_searched)
-                    if created: # or (save date < modified date):
-                    # TODO: set data
-                        product_searched.brands = product_data_dct['brands']
-                        product_searched.name = product_data_dct['name']
-                        product_searched.save()
-                        user_cur.searches.add(product_searched)
+                    
+                    user_cur.searches.add(product_targeted_mdl)
                     print(user_cur.searches.all())
     
                 alternative_product_lst = products.nutrition(product_data_dct, 7)
+                
+                for alternative_data_dct in alternative_product_lst:
+                    product_targeted_mdl.alternatives.add( set_product_model(alternative_data_dct) )
+
             else:
                 product_data_dct = {}
                 alternative_product_lst = []
@@ -74,7 +76,6 @@ def index(request):
             context['query'] = user_query
             context['product_data'] = product_data_dct
             context['alternative_lst'] = alternative_product_lst
-            print('Form OK')
             return render(request, 'product/list.html', context)
             # return HttpResponseRedirect(reverse('product:result', args=(x,y,)))
 
@@ -141,7 +142,61 @@ def product(request, _product_id):
 def notice(request):
 
     return render(request, 'product/notice.html', locals())
-    
+
+
+def set_product_model(product_data_dct):
+    """
+    Update or insert product into database
+    """
+
+    product_targeted, created = ZProduct.objects.get_or_create(code=product_data_dct['code'])
+    print("Product created:", created, "; ", product_targeted)
+
+    if created or product_targeted.last_modified_t < product_data_dct['last_modified_t']:
+
+        product_targeted.categories.clear()
+
+        code = product_data_dct['code']
+        categories_hierarchy_lst = product_data_dct['categories_hierarchy']
+        nutrient_levels = product_data_dct['nutrient_levels']
+        image = product_data_dct['image']
+        del product_data_dct['code']
+        del product_data_dct['categories_hierarchy']
+        del product_data_dct['nutrient_levels']
+        del product_data_dct['image']
+
+        product_targeted, created = ZProduct.objects.update_or_create(defaults=product_data_dct, code=code)
+        if created:
+            # TODO: critical error
+            print("/!\\ CRITICAL ERROR: PRODUCT TARGETED CREATED AGAIN /!\\")
+
+        for idx, category_id in enumerate(categories_hierarchy_lst):
+
+            category_mdl, created = ZCategory.objects.get_or_create(identifier=category_id)
+            print(category_mdl, created)
+            product_targeted.categories.add(category_mdl, through_defaults={'hierarchy_index': idx} )
+            # category_mdl.products.add(product_targeted, through_defaults={'hierarchy_index': idx} )
+            # relation = ZCategory_Product.objects.create(product=product_targeted, category=category_mdl, hierarchy_index=idx)
+            # relation.save()
+
+        product_data_dct['code'] = code
+        product_data_dct['categories_hierarchy'] = categories_hierarchy_lst
+        product_data_dct['nutrient_levels'] = nutrient_levels
+        product_data_dct['image'] = image
+
+        # brands = product_data_dct['brands']
+        # product_targeted.name = product_data_dct['name']
+        # product_targeted.save()
+
+    # categories_hierarchy
+    # nutrient_levels
+    # created_t
+    # last_modified_t
+
+    return product_targeted
+
+
+
 
 #     id = int(album_id) # make sure we have an integer.
 #     album = ALBUMS[id] # get the album with its id.

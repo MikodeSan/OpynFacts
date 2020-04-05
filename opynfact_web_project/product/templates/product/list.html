@@ -77,7 +77,7 @@
         {% for alternative in alternative_lst %}
         <div class="col-lg-4 col-md-6 text-center">
           <div class="mt-5">
-            <h5 class="h1 mb-2">
+            <h4 class="h4 mb-2">
               {% if alternative.nutrition_grades == 'a' %}
               <img class="img-fluid" src={% static 'product/img/nutriscore-a.svg' %} alt="">
               {% elif alternative.nutrition_grades == 'b' %}
@@ -105,14 +105,14 @@
               {% endif %}              
 
               - {{ alternative.unique_scans_n }}
-            </h5>
+            </h4>
             {% if alternative.image_url %}
             <p><img class="img-fluid" id={{ alternative.code }} src={{ alternative.image_url }} alt=""></p>
             {% else %}
             <i class="fas fa-4x fa-globe text-primary mb-4"></i>
             {% endif %}
-            <h3 class="h6 mb-2">[{{ alternative.code }} - {{ alternative.brands }} - {{ alternative.name }}]</h3>
-            <h3 class="h4 mb-2">[
+            <h5 class="h5 mb-2">{{ alternative.code }} - {{ alternative.brands }} - {{ alternative.name }}</h5>
+            <h6 class="h6 mb-2">[
               {% if alternative.compared_to_category %}
               {{ alternative.compared_to_category }}
               {% else %}
