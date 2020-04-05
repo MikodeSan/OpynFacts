@@ -67,7 +67,7 @@ def index(request):
 
                     # Get user's favorite product
                     favorite_product_mdl_lst = user_cur.favorites.all()
-                    context['favrite_lst'] = favorite_product_mdl_lst
+                    context['favorite_lst'] = favorite_product_mdl_lst
 
     
                 alternative_product_lst = products.nutrition(product_data_dct, 7)

@@ -85,11 +85,12 @@
                     <h5 class="h5 mb-2">{{ alternative.code }} - {{ alternative.brands }} - {{ alternative.name }}</h5>
                     {% comment %} <h6 class="h6 mb-2">[ {{ alternative.categories.hierarchy_index == 0 }} ] </h6>{% endcomment %}
                     {% if user.is_authenticated %}
-                    <a class="btn btn-light btn-xs" onclick="set_favorite( {{alternative.code}}, true)">Favori</a>
-                    {% endif %}
+                    <a class="btn btn-light btn-xs" onclick="set_favorite({{alternative.code}}, {% if alternative in favorite_lst %}false{% else %}true{% endif %})">Favori</a>
+                    {% comment %} <a class="btn btn-light btn-xs" onclick="set_favorite( {{alternative.code}}, true)">Favori</a> {% endcomment %}
 
-                    {% if alternative in favorite_lst %}
-                    <p class="text-muted mb-0">Favori</p>
+                      {% if alternative in favorite_lst %}
+                      <p class="text-muted mb-0">Favori</p>
+                      {% endif %}
                     {% endif %}
                         
                     <p class="text-muted mb-0">Enregistrer</p>
