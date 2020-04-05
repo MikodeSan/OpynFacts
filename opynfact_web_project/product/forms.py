@@ -20,3 +20,17 @@ class QueryForm(forms.Form):
         widget=forms.TextInput(attrs={'class': 'form-control'}),
         required=True
         )
+
+class FavoriteForm(forms.Form):
+    code = forms.IntegerField(
+        label='Code',
+        min_value=0,
+        widget=forms.TextInput(attrs={'class': 'form-control'}),
+        # widget=forms.NumberInput(attrs={'class': 'form-control'}),
+        required=True
+        )
+    is_favorite = forms.BooleanField(
+        label='Favorite state',
+        widget=forms.CheckboxInput(attrs={'class': 'form-control'}),
+        required=False)
+

@@ -15,6 +15,8 @@ urlpatterns = [
     # url(r'^result/$', views.result, name='result'), 
     re_path(r'^result/$', views.result, name='result'),
     # url(r'^search/$', views.search),
-    url(r'^favorite/$', views.favorite, name='favorite'), 
+    url(r'^favorite/$', views.favorite, name='favorite'),
+    path('parse/favorite', views.parse_favorite, name='parse_favorite'),
+    
     url(r'^(?P<_product_id>[0-9]+)/$', views.product, name='info'),
 ]

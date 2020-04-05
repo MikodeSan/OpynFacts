@@ -1,4 +1,5 @@
 import os, sys
+import json
 
 from django.http import HttpResponse, HttpResponseRedirect, HttpResponsePermanentRedirect
 from django.shortcuts import render, get_object_or_404
@@ -6,7 +7,7 @@ from django.urls import reverse
 
 from django.contrib.auth import get_user_model
 from .models import ZProduct, ZCategory, ZSearch, ZCategory_Product
-from .forms import QueryForm
+from .forms import QueryForm, FavoriteForm
 
 
 DIR_BASE = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -63,6 +64,11 @@ def index(request):
                     
                     user_cur.searches.add(product_targeted_mdl)
                     print(user_cur.searches.all())
+
+                    # Get user's favorite product
+                    favorite_product_mdl_lst = user_cur.favorites.all()
+                    context['favrite_lst'] = favorite_product_mdl_lst
+
     
                 alternative_product_lst = products.nutrition(product_data_dct, 7)
                 
@@ -74,8 +80,8 @@ def index(request):
                 alternative_product_lst = []
     
             context['query'] = user_query
-            context['product_data'] = product_data_dct
-            context['alternative_lst'] = alternative_product_lst
+            context['product_data'] = product_targeted_mdl
+            context['alternative_lst'] = product_targeted_mdl.alternatives.all()
             return render(request, 'product/list.html', context)
             # return HttpResponseRedirect(reverse('product:result', args=(x,y,)))
 
@@ -142,6 +148,39 @@ def product(request, _product_id):
 def notice(request):
 
     return render(request, 'product/notice.html', locals())
+
+
+def parse_favorite(request):
+
+    context = {}
+
+    if request.method == 'POST':
+
+        code = request.POST.get('code')
+        favorite = request.POST.get('favorite')
+
+        print(code)
+        print(favorite)
+
+        # Update or create favorite product into db
+        user_mdl = get_user_model().objects.get(username=request.user.username)
+        print(request.user)
+        print(user_mdl)
+        try:
+            favorite_mdl = ZProduct.objects.get(code=code)
+        except ZProduct.DoesNotExist:
+            print("CRITICAL ERROR GETINNG FAVORITE PRODUCT")
+        else:
+            if favorite:
+                user_mdl.favorites.add(favorite_mdl)
+            else:
+                user_mdl.favorites.remove(favorite_mdl)
+            favorite = not favorite
+
+        print(user_mdl.favorites.all())
+        context = {'code' : code, 'favorite' : favorite}
+
+    return HttpResponse( json.dumps( context ) )
 
 
 def set_product_model(product_data_dct):
