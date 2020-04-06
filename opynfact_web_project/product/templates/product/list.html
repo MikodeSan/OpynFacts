@@ -26,7 +26,7 @@
 <p>Favorite</p>
 <ul>
     {% for favorite in favorite_lst %}
-    <li>{{ favorite.code }}</li>
+    <li>{{ favorite.code }} - {{ favorite.brands }} - {{ favorite.name }}</li>
     {% endfor %}
 </ul>
 
@@ -65,35 +65,40 @@
             <div class="col-lg-4 col-md-6 text-center">
                 <div class="mt-5">
                     <h4 class="h4 mb-2">
-                        {% if alternative.nutrition_grades == 'a' %}
-                        <img class="img-fluid" src={% static 'product/img/nutriscore-a.svg' %} alt=""> {% elif alternative.nutrition_grades == 'b' %}
-                        <img class="img-fluid" src={% static 'product/img/nutriscore-b.svg' %} alt=""> {% elif alternative.nutrition_grades == 'c' %}
-                        <img class="img-fluid" src={% static 'product/img/nutriscore-c.svg' %} alt=""> {% elif alternative.nutrition_grades == 'd' %}
-                        <img class="img-fluid" src={% static 'product/img/nutriscore-d.svg' %} alt=""> {% elif alternative.nutrition_grades == 'e' %}
-                        <img class="img-fluid" src={% static 'product/img/nutriscore-e.svg' %} alt=""> {% else %}
-                        <i class="fas fa-2x fa-globe text-primary mb-4"></i> {% endif %} {% if alternative.nova_group == 1 %}
-                        <img class="img-fluid" src={% static 'product/img/nova-group-1.svg' %} alt=""> {% elif alternative.nova_group == 2 %}
-                        <img class="img-fluid" src={% static 'product/img/nova-group-2.svg' %} alt=""> {% elif alternative.nova_group == 3 %}
-                        <img class="img-fluid" src={% static 'product/img/nova-group-3.svg' %} alt=""> {% elif alternative.nova_group == 4 %}
-                        <img class="img-fluid" src={% static 'product/img/nova-group-4.svg' %} alt=""> {% else %}
-                        <i class="fas fa-2x fa-globe text-primary mb-4"></i> {% endif %} - {{ alternative.unique_scans_n }}
+                        {% if alternative.nutrition_grades == 'a' %}<img class="img-fluid" src={% static 'product/img/nutriscore-a.svg' %} alt="">
+                        {% elif alternative.nutrition_grades == 'b' %}<img class="img-fluid" src={% static 'product/img/nutriscore-b.svg' %} alt="">
+                        {% elif alternative.nutrition_grades == 'c' %}<img class="img-fluid" src={% static 'product/img/nutriscore-c.svg' %} alt="">
+                        {% elif alternative.nutrition_grades == 'd' %}<img class="img-fluid" src={% static 'product/img/nutriscore-d.svg' %} alt="">
+                        {% elif alternative.nutrition_grades == 'e' %}<img class="img-fluid" src={% static 'product/img/nutriscore-e.svg' %} alt="">
+                        {% else %}<i class="fas fa-2x fa-globe text-primary mb-4"></i>
+                        {% endif %}
+                        {% if alternative.nova_group == 1 %}<img class="img-fluid" src={% static 'product/img/nova-group-1.svg' %} alt="">
+                        {% elif alternative.nova_group == 2 %}<img class="img-fluid" src={% static 'product/img/nova-group-2.svg' %} alt="">
+                        {% elif alternative.nova_group == 3 %}<img class="img-fluid" src={% static 'product/img/nova-group-3.svg' %} alt="">
+                        {% elif alternative.nova_group == 4 %}<img class="img-fluid" src={% static 'product/img/nova-group-4.svg' %} alt="">
+                        {% else %}<i class="fas fa-2x fa-globe text-primary mb-4"></i>
+                        {% endif %}
+                         - {{ alternative.unique_scans_n }}
                     </h4>
                     {% if alternative.image_url %}
-                    <p><img class="img-fluid" id={{ alternative.code }} src={{ alternative.image_url }} alt=""></p>
+                    <p><img class="img-fluid" src={{ alternative.image_url }} alt=""></p>
                     {% else %}
                     <i class="fas fa-4x fa-globe text-primary mb-4"></i> {% endif %}
-                    <h5 class="h5 mb-2">{{ alternative.code }} - {{ alternative.brands }} - {{ alternative.name }}</h5>
-                    {% comment %} <h6 class="h6 mb-2">[ {{ alternative.categories.hierarchy_index == 0 }} ] </h6>{% endcomment %}
+                    <h5 class="h5 mb-2">
                     {% if user.is_authenticated %}
-                    <a class="btn btn-light btn-xs" onclick="set_favorite({{alternative.code}}, {% if alternative in favorite_lst %}false{% else %}true{% endif %})">Favori</a>
-                    {% comment %} <a class="btn btn-light btn-xs" onclick="set_favorite( {{alternative.code}}, true)">Favori</a> {% endcomment %}
-
-                      {% if alternative in favorite_lst %}
-                      <p class="text-muted mb-0">Favori</p>
-                      {% endif %}
+                    <a class="" id={{ alternative.code }} data-state={% if alternative in favorite_lst %}"false"{% else %}"true"{% endif %} onclick="set_favorite(this.id, this.getAttribute('data-state'))">
+                        {% if alternative in favorite_lst %}
+                        <i class="fas fa-1x fa-heart text-primary mb-4"></i>    {% comment %} fa-star {% endcomment %}
+                        {% else %}
+                        <i class="far fa-1x fa-heart text-primary mb-4"></i>
+                        {% endif %}
+                    </a>
+                     - {{ alternative.code }} - {{ alternative.brands }} - {{ alternative.name }}
+                     </h5>
+                    {% comment %} <h6 class="h6 mb-2">[ {{ alternative.zcategory_product_set.hierarchy_index.0 }} ]</h6> {% endcomment %}
                     {% endif %}
                         
-                    <p class="text-muted mb-0">Enregistrer</p>
+                    {% comment %} <p class="text-muted mb-0">Enregistrer</p> {% endcomment %}
                 </div>
             </div>
             {% endfor %}

@@ -15,11 +15,15 @@
     <!-- Font Awesome Icons -->
     <link rel="stylesheet" type="text/css" href="{% static 'product/vendor/fontawesome-free/css/all.min.css' %}">
 
+    <!-- Font Awesome Icons -->
+    <link rel="shortcut icon" href="{% static 'product/img/logo_pur_beurre-favicon.png' %}" type="image/x-icon">
+    <link rel="icon" href="{% static 'product/img/logo_pur_beurre-favicon.png' %}" type="image/x-icon">
+
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css?family=Merriweather+Sans:400,700" rel="stylesheet">
     <link href='https://fonts.googleapis.com/css?family=Merriweather:400,300,300italic,400italic,700,700italic' rel='stylesheet' type='text/css'>
-    <link href="http://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
-    <link href="http://fonts.googleapis.com/css?family=Scope+One" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Scope+One" rel="stylesheet" type="text/css">
 
     <!-- Plugin CSS -->
     <link href="{% static 'product/vendor/magnific-popup/magnific-popup.css' %}" rel="stylesheet">
@@ -27,6 +31,7 @@
     <!-- Theme CSS - Includes Bootstrap -->
     <link rel="stylesheet" href="{% static 'product/css/creative.min.css' %}">
     <link rel="stylesheet" href="{% static 'product/css/zstyle.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'product/css/icons.css' %}" />
 
 </head>
 
@@ -55,7 +60,7 @@
                         </form>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link js-scroll-trigger" href="#about">Recherche</a>
+                        <a class="nav-link js-scroll-trigger" href="{% url 'product:home' %}">Recherche</a>
                     </li>
                     <li class="nav-item">
                         {% if user.is_authenticated %}

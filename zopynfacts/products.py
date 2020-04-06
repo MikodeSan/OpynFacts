@@ -108,11 +108,12 @@ def get_nutrition_grade_repartition(category):
 
     # search grade repartition from category
     grades_dct = drilldown_search('category', category, 'nutrition-grades', locale='fr')
-
+    print(grades_dct)
     # Sort nutrition grades
     count = grades_dct['count']
-    nutrition_grade_lst = sorted(grades_dct['tags'], key=itemgetter('id')) 
-
+    # if 'tags' in grades_dct:  [TODO: take into account this case]
+    nutrition_grade_lst = sorted(grades_dct['tags'], key=itemgetter('id'))
+    
     grade_lst = [grade['id'] for grade in nutrition_grade_lst]
 
     return count, grade_lst

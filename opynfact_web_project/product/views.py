@@ -156,8 +156,15 @@ def parse_favorite(request):
 
     if request.method == 'POST':
 
-        code = request.POST.get('code')
+        code = int(request.POST.get('code'))
         favorite = request.POST.get('favorite')
+        print(type(code), code)
+        print(type(favorite), favorite)
+
+        if favorite == 'true':
+            favorite = True
+        else:
+            favorite = False
 
         print(code)
         print(favorite)
@@ -167,7 +174,7 @@ def parse_favorite(request):
         print(request.user)
         print(user_mdl)
         try:
-            favorite_mdl = ZProduct.objects.get(code=code)
+            favorite_mdl = ZProduct.objects.get(code=int(code))
         except ZProduct.DoesNotExist:
             print("CRITICAL ERROR GETINNG FAVORITE PRODUCT")
         else:
@@ -176,6 +183,7 @@ def parse_favorite(request):
             else:
                 user_mdl.favorites.remove(favorite_mdl)
             favorite = not favorite
+            print(favorite)
 
         print(user_mdl.favorites.all())
         context = {'code' : code, 'favorite' : favorite}
