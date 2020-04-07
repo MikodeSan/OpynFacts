@@ -6,6 +6,8 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
 
 from django.contrib.auth import get_user_model
+from django.contrib.auth.decorators import login_required
+
 from .models import ZProduct, ZCategory, ZSearch, ZCategory_Product
 from .forms import QueryForm, FavoriteForm
 
@@ -85,12 +87,11 @@ def result(request, user_query):
 
         if request.user.is_authenticated:
             # Save searched product according to authenticated user
-            user_cur = get_user_model().objects.get(username=request.user.username)
-            
-            user_cur.searches.add(product_targeted_mdl)
+           
+            request.user.searches.add(product_targeted_mdl)
 
             # Get user's favorite product
-            favorite_product_mdl_lst = user_cur.favorites.all()
+            favorite_product_mdl_lst = request.user.favorites.all()
             context['favorite_lst'] = favorite_product_mdl_lst
 
         alternative_product_lst = products.nutrition(product_data_dct, 7)
@@ -103,21 +104,22 @@ def result(request, user_query):
         alternative_product_lst = []
 
     context['query'] = user_query
-    context['product_data'] = product_targeted_mdl
-    context['alternative_lst'] = product_targeted_mdl.alternatives.all()
+    context['product_target'] = product_targeted_mdl
+    context['product_lst'] = product_targeted_mdl.alternatives.all()
     return render(request, 'product/list.html', context)
 
 
+@login_required()      # By default, use LOGIN_URL in settings
 def favorite(request):
 
-    product_lst = ZProduct.objects.all().order_by('name')[:12]
-    context = {'page':'favorite', 'product_lst': product_lst}
+    product_lst = request.user.favorites.order_by('name')[:]
+
+    context = {'page':'favorite'}
+    context['product_lst'] = product_lst
+    context['favorite_lst'] = product_lst
 
     return render(request, 'product/list.html', context)
 
-def account(request):
-    message = "This is the account page"
-    return HttpResponse(message)
 
 def product(request, _product_id):
     product_id = int(_product_id) # make sure we have an integer.
@@ -129,13 +131,9 @@ def product(request, _product_id):
         message = "Unkown product id"
     return HttpResponse(message)
 
-def notice(request):
-
-    return render(request, 'product/notice.html', locals())
-
 
 def parse_favorite(request):
-
+    
     context = {}
 
     if request.method == 'POST':
@@ -173,6 +171,11 @@ def parse_favorite(request):
         context = {'code' : code, 'favorite' : favorite}
 
     return HttpResponse( json.dumps( context ) )
+
+
+def notice(request):
+
+    return render(request, 'product/notice.html', locals())
 
 
 def set_product_model(product_data_dct):

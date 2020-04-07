@@ -9972,6 +9972,10 @@ header.masthead {
     background-size: cover
 }
 
+header.masthead_product {
+    background: linear-gradient(to bottom, rgba(92, 77, 66, .8) 0, rgba(92, 77, 66, .8) 100%);
+}
+
 header.masthead h1 {
     font-size: 2.25rem
 }

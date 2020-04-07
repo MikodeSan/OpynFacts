@@ -1,28 +1,33 @@
-{% extends 'product/base.html' %} {% block content %}
+{% extends 'product/base.html' %}
+
+{% block content %}
 
 <h1>Ha hoy</h1>
 
 <div class="col-md-6">
 
-    {% if user.is_authenticated %}
-    <ul>
-        <li>Nom d'utilisateur : {{ user.username }}</li>
-        <li>Prénom : {{ user.first_name }}</li>
-        <li>Nom : {{ user.last_name }}</li>
-        <li>E-mail : {{ user.email }}</li>
-        <li>Mot de passe : {{ user.password }}</li>
-        <li>Staff : {{ user.is_staff }}</li>
-        <li>Actif : {{ user.is_active }}</li>
-        <li>Super user : {{ user.is_superuser }}</li>
-        <li>Last login : {{ user.last_login }}</li>
-        <li>Inscription : {{ user.date_joined }}</li>
-        <li>Permission : {{ user.user_permissions }}</li>
-        <li>Group : {{ user.groups }}</li>
-    </ul>
-    {% endif %}
+  {% if user.is_authenticated %}
+  <ul>
+      <li>Nom d'utilisateur : {{ user.username }}</li>
+      {% comment %} <li>Prénom : {{ user.first_name }}</li>
+      <li>Nom : {{ user.last_name }}</li>
+      <li>E-mail : {{ user.email }}</li> {% endcomment %}
+      {% comment %} <li>Mot de passe : {{ user.password }}</li> {% endcomment %}
+      <li>Staff : {{ user.is_staff }}</li>
+      <li>Actif : {{ user.is_active }}</li>
+      <li>Super user : {{ user.is_superuser }}</li>
+      <li>Last login : {{ user.last_login }}</li>
+      <li>Inscription : {{ user.date_joined }}</li>
+      {% comment %} <li>Permission : {{ user.user_permissions }}</li> {% endcomment %}
+      {% comment %} <li>Group : {{ user.groups }}</li> {% endcomment %}
+  </ul>
 
-    <p>Go back to <a href="{% url 'product:home' %}">Home</a></p>
+  {% if sign_id and sign_id == sign_enum.OUT %}
+    <p>Voulez-vous vraiment vous déconnecter ? <a href="{% url 'account:signout' %}">Déconnexion</a></p>
+  {% endif %}
+  
 
+  {% endif %}
 </div>
 
 {% endblock %}
