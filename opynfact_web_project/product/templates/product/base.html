@@ -40,10 +40,15 @@
     <!-- Navigation -->
     <nav class="navbar navbar-expand-lg navbar-light fixed-top py-3" id="mainNav">
         <div class="container">
+            {% if page == 'home' %}
             <a class="navbar-brand js-scroll-trigger" href="#page-top">
+            {% else %}
+            <a class="navbar-brand js-scroll-trigger" href="{% url 'product:home' %}">
+            {% endif %}
                 <img id="zlogo" src="{% static 'product/img/logo_pur_beurre.png' %}" alt=""> Pur Beurre
                 <!-- <img class="img-fluid" src="{% static 'product/img/logo_pur_beurre.svg' %}" alt=""> Pur Beurre -->
             </a>
+
             <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
               <span class="navbar-toggler-icon"></span>
             </button>
@@ -58,9 +63,6 @@
                                 <button type="submit" class="btn btn-success">Recherche</button>
                             </div>
                         </form>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link js-scroll-trigger" href="{% url 'product:home' %}">Recherche</a>
                     </li>
                     <li class="nav-item">
                         {% if user.is_authenticated %}
@@ -116,7 +118,7 @@
             </div>
             <div class="col-lg-4 mr-auto text-center">
               <!-- Make sure to change the email address in anchor text AND the link below! -->
-              <a class="d-block" href="{% url 'product:home' %}">Contact</a>
+              <a class="d-block" href="{% url 'product:home' %}#contact">Contact</a>
               {% comment %} <a class="d-block" href="mailto:contact@yourwebsite.com">contact@yourwebsite.com</a> {% endcomment %}
             </div>
           </div>

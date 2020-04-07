@@ -2,7 +2,7 @@ import os, sys
 import json
 
 from django.http import HttpResponse, HttpResponseRedirect, HttpResponsePermanentRedirect
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
 
 from django.contrib.auth import get_user_model
@@ -34,7 +34,7 @@ def index(request):
     #     'thumbnail': album.picture
     # }
     
-    context = {}
+    context = {'page': 'home'}
     user_query = ""
 
     if request.method == 'POST':
@@ -47,45 +47,10 @@ def index(request):
             # We can proceed to booking.
             user_query = request.POST.get('query')
 
-            # Get most popular product according to query
-            r_json = products.search(user_query, locale='fr')
-            if r_json['products']:
-                product_dct = r_json['products'][0]
+            # return HttpResponseRedirect(reverse('product:result', args=[user_query]))
+            return redirect('product:result', user_query=user_query)
 
-                # Get product data
-                product_data_dct = products.extract_data(product_dct)
-
-                # Update or insert product into db
-                product_targeted_mdl = set_product_model(product_data_dct)
-
-                if request.user.is_authenticated:
-                    # Save searched product according to authenticated user
-                    user_cur = get_user_model().objects.get(username=request.user.username)
-                    
-                    user_cur.searches.add(product_targeted_mdl)
-                    print(user_cur.searches.all())
-
-                    # Get user's favorite product
-                    favorite_product_mdl_lst = user_cur.favorites.all()
-                    context['favorite_lst'] = favorite_product_mdl_lst
-
-    
-                alternative_product_lst = products.nutrition(product_data_dct, 7)
-                
-                for alternative_data_dct in alternative_product_lst:
-                    product_targeted_mdl.alternatives.add( set_product_model(alternative_data_dct) )
-
-            else:
-                product_data_dct = {}
-                alternative_product_lst = []
-    
-            context['query'] = user_query
-            context['product_data'] = product_targeted_mdl
-            context['alternative_lst'] = product_targeted_mdl.alternatives.all()
-            return render(request, 'product/list.html', context)
-            # return HttpResponseRedirect(reverse('product:result', args=(x,y,)))
-
-        else:
+        else:   # [TODO]: is not necessary
             # Form data doesn't match the expected format.
             # Add errors to the template.
             context['errors'] = form.errors.items()
@@ -96,33 +61,52 @@ def index(request):
         form_nav = QueryForm()
         form_home = QueryForm()
         # contact_lst = ZContact.objects.all()
-        context = {
-            # 'contact_lst': contact_lst,
-            'form_nav': form_nav,
-            'form_home': form_home
-            }
+        context['form_nav'] = form_nav
+        context['form_home'] = form_home
+
         return render(request, 'product/index.html', context)
 
 
-def result(request):
+def result(request, user_query):
     # contact_lst = ZContact.objects.all().order_by('-name')[:12]
-    # contacts_fromatted = ["<li>{}</li>".format(contact) for contact in contact_lst]
 
-    # product_lst = ZProduct.objects.all().order_by('name')[:12]
-    # product_formatted = ["<li>{}</li>".format(product) for product in product_lst]
+    # Get most popular product according to query
+    context = {'page':'result'}
+        
+    r_json = products.search(user_query, locale='fr')
+    if r_json['products']:
+        product_dct = r_json['products'][0]
 
-    # message = "This is the result page:<br>The contacts:<ul>{}</ul><br>The products:<ul>{}</ul>".format("\n".join(contacts_fromatted), "\n".join(product_formatted))
+        # Get product data
+        product_data_dct = products.extract_data(product_dct)
 
-    product_lst = ZProduct.objects.all()
-    print(ZProduct.objects.all())
+        # Update or insert product into db
+        product_targeted_mdl = set_product_model(product_data_dct)
 
-    # if form.is_valid():
-    #     email = form.cleaned_data['email']
-    #     name = form.cleaned_data['name']
+        if request.user.is_authenticated:
+            # Save searched product according to authenticated user
+            user_cur = get_user_model().objects.get(username=request.user.username)
+            
+            user_cur.searches.add(product_targeted_mdl)
 
+            # Get user's favorite product
+            favorite_product_mdl_lst = user_cur.favorites.all()
+            context['favorite_lst'] = favorite_product_mdl_lst
 
-    context = {'page':'result', 'product_lst': product_lst}
+        alternative_product_lst = products.nutrition(product_data_dct, 7)
+        
+        for alternative_data_dct in alternative_product_lst:
+            product_targeted_mdl.alternatives.add( set_product_model(alternative_data_dct) )
+
+    else:
+        product_data_dct = {}
+        alternative_product_lst = []
+
+    context['query'] = user_query
+    context['product_data'] = product_targeted_mdl
+    context['alternative_lst'] = product_targeted_mdl.alternatives.all()
     return render(request, 'product/list.html', context)
+
 
 def favorite(request):
 
