@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
-from . import utils
 import requests
-
 from operator import itemgetter
+
+from . import utils
 
 
 def nutrition(reference_product_dct, n_product_max):
@@ -50,12 +50,16 @@ def nutrition(reference_product_dct, n_product_max):
                     product_data_dct = extract_data(product_src_dct)
 
                     # Get product better than known alternatine one
-                    code = product_data_dct['code']
                     is_unknown = True
+                    if product_data_dct:
 
-                    for alternative_product in alternative_product_lst:
-                        if code == alternative_product['code']:
-                            is_unknown = False
+                        code = product_data_dct['code']
+
+                        for alternative_product in alternative_product_lst:
+                            if code == alternative_product['code']:
+                                is_unknown = False
+                    else:
+                        is_unknown = False
 
                     if is_unknown:
                         if (product_data_dct['nutrition_grades'] < grade_max) \
@@ -104,15 +108,15 @@ def get_nutrition_grade_repartition(category):
 
     # search grade repartition from category
     grades_dct = drilldown_search('category', category, 'nutrition-grades', locale='fr')
-
+    print(grades_dct)
     # Sort nutrition grades
     count = grades_dct['count']
-    nutrition_grade_lst = sorted(grades_dct['tags'], key=itemgetter('id')) 
-
+    # if 'tags' in grades_dct:  [TODO: take into account this case]
+    nutrition_grade_lst = sorted(grades_dct['tags'], key=itemgetter('id'))
+    
     grade_lst = [grade['id'] for grade in nutrition_grade_lst]
 
     return count, grade_lst
-
 
 
 def extract_data(product_dict):
@@ -127,25 +131,25 @@ def extract_data(product_dict):
     # name
     name = ''
     lg_lst = ['_fr', '_en', '_es', '']
-    key_generic_base = 'generic_name'
     key_product_base = 'product_name'
+    key_generic_base = 'generic_name'
     lg_idx = 0
     is_found = False
     while lg_idx < len(lg_lst) and is_found == False:
 
-        key_generic = key_generic_base + lg_lst[lg_idx]
         key_product = key_product_base + lg_lst[lg_idx]
+        key_generic = key_generic_base + lg_lst[lg_idx]
 
-        if key_generic in product_dict:
-            if product_dict[key_generic] != '':
-                print(product_dict[key_generic])
-                name = product_dict[key_generic]
-                is_found = True
-        
-        if is_found == False and key_product in product_dict:
+        if key_product in product_dict:
             if product_dict[key_product] != '':
                 print(product_dict[key_product])
                 name = product_dict[key_product]
+                is_found = True
+        
+        if is_found == False and key_generic in product_dict:
+            if product_dict[key_generic] != '':
+                print(product_dict[key_generic])
+                name = product_dict[key_generic]
                 is_found = True
 
         lg_idx = lg_idx + 1
@@ -174,18 +178,18 @@ def extract_data(product_dict):
     # category hierarchy
     extracted_data_dict['categories_hierarchy'] = extract_category_hierarchy(product_dict)
 
-    # nova group
-    extracted_data_dict['nova_group'] = 127
-    if 'nova_group' in product_dict:
-        extracted_data_dict['nova_group'] = int(product_dict['nova_group'])
-            
     # nutrition grade
     extracted_data_dict['nutrition_grades'] = 'z'
     if 'nutrition_grades' in product_dict:
         extracted_data_dict['nutrition_grades'] = product_dict['nutrition_grades']
 
+    # nova group
+    extracted_data_dict['nova_group'] = 127
+    if 'nova_group' in product_dict:
+        extracted_data_dict['nova_group'] = int(product_dict['nova_group'])
+
     # nutrition score
-    extracted_data_dict['nutrition_score'] = -1
+    score = -1
     if 'nutriments' in product_dict:
         nutriments_dct = product_dict['nutriments']
         if 'nutrition-score-uk_100g' in nutriments_dct:
@@ -197,15 +201,12 @@ def extract_data(product_dict):
         elif 'nutrition-score-fr' in nutriments_dct:
             score = nutriments_dct['nutrition-score-fr']
 
+    extracted_data_dict['nutrition_score'] = score
+
     # nutrient level
     extracted_data_dict['nutrient_levels'] = {}
     if 'nutrient_levels' in product_dict:
         extracted_data_dict['nutrient_levels'] = product_dict['nutrient_levels']
-
-    # nutrition score beverage
-    extracted_data_dict['nutrition_score_beverage'] = -1
-    if 'nutrition_score_beverage' in product_dict:
-        extracted_data_dict['nutrition_score_beverage'] = product_dict['nutrition_score_beverage']
 
     # unique_scans_n
     extracted_data_dict['unique_scans_n'] = -1
@@ -218,12 +219,12 @@ def extract_data(product_dict):
         extracted_data_dict['nutrition_score_beverage'] = product_dict['nutrition_score_beverage']
     
     # created time
-    extracted_data_dict['created_t'] = -1
+    extracted_data_dict['created_t'] = 0
     if 'created_t' in product_dict:
         extracted_data_dict['created_t'] = product_dict['created_t']
     
     # last modified time
-    extracted_data_dict['last_modified_t'] = -1
+    extracted_data_dict['last_modified_t'] = 0
     if 'last_modified_t' in product_dict:
         extracted_data_dict['last_modified_t'] = product_dict['last_modified_t']
 
@@ -262,6 +263,7 @@ def extract_data(product_dict):
 
     return extracted_data_dict
 
+
 def extract_category_hierarchy(product_dict):
     """
     Extract category hierarchy list from openfoodfact
@@ -293,6 +295,62 @@ def extract_category_hierarchy(product_dict):
                 
     return category_lst
 
+# def extract_category_hierarchy(product_dict):
+#     """
+#     Extract category hierarchy list from openfoodfact
+#     """
+
+#     # category hierarchy
+#     category_lst = []
+#     # idx = 0
+
+#     if 'compared_to_category' in product_dict:
+#         category_lst.append(product_dict['compared_to_category'])
+#         # idx += 1
+#         print('Compared_to_category', category_lst)
+
+
+#     if 'categories_hierarchy' in product_dict:
+
+#         is_label = False
+
+#         if 'categories' in product_dict:
+#             if len(product_dict['categories']) == len(product_dict['categories_hierarchy']):
+#                 is_label = True
+
+#         for idx, category_id in enumerate(reversed(product_dict['categories_hierarchy'])):
+
+#             if is_label:
+#                 tp = (category_id, product_dict['categories'][idx])
+#             else:
+#                 tp = (category_id, "")
+
+#             if category_id not in category_lst:
+
+#                 if is_label:
+#                     category_lst.append((category_id, product_dict['categories'][idx]))
+#                 else:
+#                     category_lst.append((category_id, ""))
+                
+#             else:
+#                 category_lst[idx] = 
+#             if 'categories' in product_dict:
+#             category_lst[-1][category] = product_dict['categories']
+            
+#                 # print('categories_hierarchy', category_lst)
+
+#     # if 'categories_tags' in product_dict:
+#     #     for category in reversed(product_dict['categories_tags']):
+#     #         if category not in category_lst:
+#     #             category_lst.insert(idx, category)
+#     #             idx += 1
+#     #             print('categories_tags', category_lst)
+#     #         else:
+#     #             idx = category_lst.index(category)
+                
+#     return category_lst
+
+
 def search(query, page=1, page_size=20,
            sort_by='unique_scans', locale='world'):
     """
@@ -312,7 +370,8 @@ def search(query, page=1, page_size=20,
                           parameters=parameters)
     # print(url)
 
-    return utils.fetch(url, json_file=False)
+    return utils.fetch(url, json_file=False, app_name='zopynfact', system='django', app_version='Version 1.0', website=None)
+
 
 def advanced_search(criteria_dct, ingredient_dct={}, nutriment_dct={},
                     page=1, page_size=20,
@@ -346,7 +405,8 @@ def advanced_search(criteria_dct, ingredient_dct={}, nutriment_dct={},
                           parameters=parameters)
     print(url)
 
-    return utils.fetch(url, json_file=False)
+    return utils.fetch(url, json_file=False, app_name='zopynfact', system='django', app_version='Version 1.0', website=None)
+
 
 def drilldown_search(criteria, value, criteria_filter, filter_value=None, locale='world'):
     """
@@ -359,7 +419,7 @@ def drilldown_search(criteria, value, criteria_filter, filter_value=None, locale
                           resource_type=[criteria, value, criteria_filter],
                           parameters=filter_value)
     print(url)
-    return utils.fetch(url, json_file=True)
+    return utils.fetch(url, json_file=True, app_name='zopynfact', system='django', app_version='Version 1.0', website=None)
 
 
 # # -*- coding: utf-8 -*-

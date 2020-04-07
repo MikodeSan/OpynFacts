@@ -123,7 +123,7 @@ def build_url(geography="world", service=None,
     return base_url
 
 
-def fetch(path, json_file=True):
+def fetch(path, json_file=True, app_name=None, system=None, app_version=None, website=None):
     """
     Fetch data at a given path assuming that target match a json file and is
     located on the OFF API.
@@ -131,7 +131,14 @@ def fetch(path, json_file=True):
     if json_file:
         path = "{}.json".format(path)
 
-    response = requests.get(path)
+    # zstr = ""
+    # if appname:
+    #     zstr += 
+
+    zstr = " - ".join([el for el in [app_name, system, app_version, website] if el])
+    hdr = {'user-agent': zstr}
+    print("FETCH", hdr)
+    response = requests.get(path, headers=hdr)
     if response.status_code != 200:
         exit(1)
     # print(response)

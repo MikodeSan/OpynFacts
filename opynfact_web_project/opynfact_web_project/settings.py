@@ -21,15 +21,19 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'rrkt%ps7yqw*)o6gol*i(@c)ciu_7+f)p1h-!-d@xev!wd5yv+'
-
 # SECURITY WARNING: don't run with debug turned on in production!
 if os.environ.get('ENV') == 'PRODUCTION':
+
     DEBUG = False
+    ALLOWED_HOSTS = ['zopynfacts.herokuapp.com']
+
 else:
+
     DEBUG = True
-ALLOWED_HOSTS = ['zopynfacts.herokuapp.com']
+    ALLOWED_HOSTS = []
+
+    # SECURITY WARNING: keep the secret key used in production secret!
+    SECRET_KEY = 'rrkt%ps7yqw*)o6gol*i(@c)ciu_7+f)p1h-!-d@xev!wd5yv+'
 
 
 # Application definition
@@ -41,10 +45,11 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'debug_toolbar',
+    'django_extensions',
     'store.apps.StoreConfig',
     'product.apps.ProductConfig',
-
+    'account.apps.AccountConfig',
+    'debug_toolbar',
 ]
 
 MIDDLEWARE = [
@@ -90,23 +95,35 @@ WSGI_APPLICATION = 'opynfact_web_project.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-    }
-}
+if os.environ.get('ENV') == 'PRODUCTION':
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql', # on utilise l'adaptateur postgresql
-#         'NAME': 'opynfacts', # le nom de notre base de donnees creee precedemment
-#         'USER': 'opynfacts_adm', # attention : remplacez par votre nom d'utilisateur
-#         'PASSWORD': '',
-#         'HOST': '',
-#         'PORT': '5432',
-#     }
-# }
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql', # on utilise l'adaptateur postgresql
+            'NAME': 'opynfacts', # le nom de notre base de donnees creee precedemment
+            'USER': 'opynfacts_adm', # attention : remplacez par votre nom d'utilisateur
+            'PASSWORD': '',
+            'HOST': '',
+            'PORT': '5432',
+        }
+    }
+
+    db_from_env = dj_database_url.config(conn_max_age=500)
+    DATABASES['default'].update(db_from_env)
+
+
+else:
+    
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        }
+    }
+
+
+# AUTH_USER_MODEL = 'account.ZUser'
+
 
 # Password validation
 # https://docs.djangoproject.com/en/3.0/ref/settings/#auth-password-validators
@@ -126,13 +143,15 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+LOGIN_URL = 'account/sign-in/'
+
 
 # Internationalization
 # https://docs.djangoproject.com/en/3.0/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'fr-FR'
 
-TIME_ZONE = 'Europe/Paris'
+TIME_ZONE = 'UTC'       # 'Europe/Paris'
 
 USE_I18N = True
 
@@ -162,5 +181,5 @@ if os.environ.get('ENV') == 'PRODUCTION':
     # https://warehouse.python.org/project/whitenoise/
     STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
-    db_from_env = dj_database_url.config(conn_max_age=500)
-    DATABASES['default'].update(db_from_env)
+
+
