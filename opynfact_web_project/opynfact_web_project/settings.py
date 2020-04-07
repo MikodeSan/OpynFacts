@@ -27,6 +27,8 @@ if os.environ.get('ENV') == 'PRODUCTION':
     DEBUG = False
     ALLOWED_HOSTS = ['zopynfacts.herokuapp.com']
 
+    SECRET_KEY = os.environ['SECRET_KEY']
+
 else:
 
     DEBUG = True
@@ -44,11 +46,11 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
-    'django.contrib.staticfiles',
-    'django_extensions',
     'store.apps.StoreConfig',
     'product.apps.ProductConfig',
     'account.apps.AccountConfig',
+    'django.contrib.staticfiles',
+    'django_extensions',
     'debug_toolbar',
 ]
 
