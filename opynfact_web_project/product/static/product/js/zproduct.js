@@ -60,3 +60,9 @@ const ack = () => {
     console.log('Favorite setting Ack !');
     // console.log('function name:' + arguments.callee.name);
 };
+
+/* Set favorite state for the specified product */
+function hello(query) {
+
+    console.log('Hello !!!')
+}
