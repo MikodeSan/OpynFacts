@@ -50,7 +50,6 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
-    'store.apps.StoreConfig',
     'product.apps.ProductConfig',
     'account.apps.AccountConfig',
     'django.contrib.staticfiles',
