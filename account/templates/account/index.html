@@ -1,0 +1,86 @@
+{% extends 'product/base.html' %} {% block content %}
+
+
+{% if sign_id == sign_enum.UP or sign_id == sign_enum.PASSWORD %}
+    <h1>Inscription</h1>
+
+    {% if errors %}
+        <div>
+            <p><strong>Erreur lors de l'enregistrement.</strong></p>
+            {% for key, error in errors %}
+                {% autoescape off %}
+                    {{error}}            
+                {% endautoescape %}
+            {% endfor %}        
+        </div>
+    {% endif %}
+{% elif sign_id == sign_enum.IN %}
+    <h1>Se connecter</h1>
+{% endif %}
+
+
+
+{% if sign_id == sign_enum.UP %}
+
+    <form action="{% url 'account:signup' %}" method="post" >
+        {% csrf_token %}
+        {{ form.as_p }}
+        <input type="submit" value="S'inscrire" />
+    </form>
+
+{% elif sign_id == sign_enum.PASSWORD %}
+
+    <form action="{% url 'account:signup-pwd' %}" method="post" >
+        {% csrf_token %}
+        {{ pwd_form.as_p }}
+        <input type="submit" value="Valider" />
+    </form>
+
+{% elif sign_id == sign_enum.IN %}
+
+    {% if error %}
+    <p><strong>Utilisateur inconnu ou mauvais de mot de passe.</strong></p>
+    {% endif %}
+
+    {% if user.is_authenticated %}
+    Vous êtes connecté, {{ user.username }} !
+    {% else %}
+    <form method="post" action="{% url 'account:signin' %}">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <input type="submit" value="Se connecter" />
+    </form>
+    {% endif %}
+
+    <div class="col-md-6">
+
+        <ul>
+            <li>Go to <a href="{% url 'product:home' %}">Home</a></li>
+        </ul>
+
+        <h2 class="text-center artist_name">Artistes</h2>
+
+        <p style="margin-bottom: 20px;">Some text ! </p>
+
+        <form class="form-inline" action="{% url 'product:home' %}" method="post">
+            {% csrf_token %}
+
+            <div class="form-group">
+                <!-- {{ form_home.query }} -->
+                <button type="submit" class="btn btn-success">Recherche</button>
+            </div>
+            <!-- <input type="hidden" class="hidden" value="{{ album_id }}" name="album_id"> -->
+        </form>
+
+    </div>
+
+    <div>
+        {% comment %} {% if not sign_id %} {% endcomment %}
+            <p>Pas encore de compte ? <a href="{% url 'account:signup' %}">S'inscrire</a>.</p>
+            {# Inscrivez-vous / créer un compte / s enregistrer #}
+        {% comment %} {% endif %} {% endcomment %}
+    </div>
+{% endif %}
+
+
+{% endblock %}
