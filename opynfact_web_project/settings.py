@@ -25,8 +25,14 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if os.environ.get('ENV') == 'PRODUCTION':
 
     DEBUG = False
-    ALLOWED_HOSTS = ['zopynfacts.herokuapp.com']
+    ALLOWED_HOSTS = ['myuka.herokuapp.com']
 
+    SECRET_KEY = os.environ['SECRET_KEY']
+
+    # SESSION_COOKIE_SECURE = True
+    # CSRF_COOKIE_SECURE = True
+    # SECURE_SSL_REDIRECT = True
+    # SECURE_REFERRER_POLICY = True
 else:
 
     DEBUG = True
@@ -44,11 +50,11 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
-    'django.contrib.staticfiles',
-    'django_extensions',
     'store.apps.StoreConfig',
     'product.apps.ProductConfig',
     'account.apps.AccountConfig',
+    'django.contrib.staticfiles',
+    'django_extensions',
     'debug_toolbar',
 ]
 
