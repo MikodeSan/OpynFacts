@@ -29,6 +29,10 @@ if os.environ.get('ENV') == 'PRODUCTION':
 
     SECRET_KEY = os.environ['SECRET_KEY']
 
+    # SESSION_COOKIE_SECURE = True
+    # CSRF_COOKIE_SECURE = True
+    # SECURE_SSL_REDIRECT = True
+    # SECURE_REFERRER_POLICY = True
 else:
 
     DEBUG = True

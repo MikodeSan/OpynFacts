@@ -31,7 +31,7 @@
     <!-- Theme CSS - Includes Bootstrap -->
     <link rel="stylesheet" href="{% static 'product/css/creative.min.css' %}">
     <link rel="stylesheet" href="{% static 'product/css/zstyle.css' %}">
-    <link rel="stylesheet" type="text/css" href="{% static 'product/css/icons.css' %}" />
+    {% comment %} <link rel="stylesheet" type="text/css" href="{% static 'product/css/icons.css' %}" /> {% endcomment %}
 
 </head>
 
@@ -90,8 +90,8 @@
           </div>
           <div class="col-lg-8 align-self-baseline">
               <h2>Trouvez un produit de substitution pour ceux que vous consommez tous les jours</h2>
-                  {% comment %} <!-- <p class="text-white-75 font-weight-light mb-5">Start Bootstrap can help you build better websites using the Bootstrap framework! Just download a theme and start customizing, no strings attached!</p> -->
-                  <!-- <a class="btn btn-primary btn-xl js-scroll-trigger" href="#about">Find Out More</a> --> {% endcomment %}
+                  {% comment %} <!-- <p class="text-white-75 font-weight-light mb-5">Start Bootstrap can help you build better websites using the Bootstrap framework! Just download a theme and start customizing, no strings attached!</p> --> {% endcomment %}
+                  {% comment %} <!-- <a class="btn btn-primary btn-xl js-scroll-trigger" href="#about">Find Out More</a> --> {% endcomment %}
           </div>
           {% block masthead_form %}{% endblock %}
           
@@ -99,9 +99,10 @@
     </div>
   </header>
 
-{% comment %} 
+    {% comment %} 
     {% block mastead %}
-    {% endblock %}     {% endcomment %}
+    {% endblock %}     
+    {% endcomment %}
     
     {% block content %}{% endblock %}
 
