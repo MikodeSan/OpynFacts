@@ -25,7 +25,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if os.environ.get('ENV') == 'PRODUCTION':
 
     DEBUG = False
-    ALLOWED_HOSTS = ['zopynfacts.herokuapp.com']
+    ALLOWED_HOSTS = ['myuka.herokuapp.com']
 
     SECRET_KEY = os.environ['SECRET_KEY']
 
