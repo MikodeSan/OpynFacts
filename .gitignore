@@ -21,7 +21,7 @@ sdist/
 var/
 wheels/
 pip-wheel-metadata/
-share/python-wheels/
+share/python-wheels//*
 *.egg-info/
 .installed.cfg
 *.egg
@@ -159,6 +159,4 @@ packages/
 
 #misc.
 /dat/im/
-/README.pdf
-
-/opynfact_web_project/zxprt/*
+zxprt/
