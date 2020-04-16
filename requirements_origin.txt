@@ -1,18 +1,9 @@
-pycodestyle
-pylint
+# --- Framework ---
 
 # pyqt5
 
-requests
 
-psycopg2
-mysql-connector-python		# do not use mysql-connector
-configparser
-
-whitenoise
-
-
-# SERVER
+## -- Web --
 
 # Flask
 # flask_sqlalchemy
@@ -20,14 +11,39 @@ django
 django-debug-toolbar
 django-extensions
 dj-database-url
+
+### - Config -
+configparser
+
+### - Static file -
+whitenoise
+
+
+# --- Server ---
+
 gunicorn
+
+
+# --- Database ---
+
+psycopg2
+mysql-connector-python		# do not use mysql-connector
+
+
+# --- Test ---
+
+pycodestyle
+pylint
 
 pytest
 pytest-cov
 coverage
 
+selenium
 
-# TOOLS
+# --- TOOLS ---
+
+requests
 pillow
 # pygraphviz
 pydotplus

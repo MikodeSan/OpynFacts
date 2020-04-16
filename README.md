@@ -7,28 +7,33 @@ The site "___Pur Beurre___" is a web application where the main goal is to find 
 
 ## Packages / Epic
 
-* __View__
-  * Navigation
-* __Account__
-  * Authentification
-  * Personal Space
+* __Administration__
+  * Account
+    * Authentification
+    * Personal Space
+  * Database
+    * Account
+    * Product
+      * Category
+      * Favorite
+      * Search
+      * Alternative
 * __Product__
-  * ___Search___: To get a targeted product by 1 click, the user's query is gotten from the search bar and received by a html post request.
-  According to [Search request documentation](https://documenter.getpostman.com/view/8470508/SVtN3Wzy?version=latest#58efae40-73c3-4907-9a88-785faff6ffb1), a search is requested to the Openfoodfact service specifying the query into the get request ([example for "confiture"](https://world.openfoodfacts.org/cgi/search.pl?search_terms=confiture&search_simple=1&action=process&json=true&sort_by=unique_scans)).  
+  * __Search__: To get a targeted product by 1 click, the user's query is gotten from the search bar and received by a html post request.
+  According to [Search request documentation](https://documenter.getpostman.com/view/8470508/SVtN3Wzy?version=latest#58efae40-73c3-4907-9a88-785faff6ffb1), a search is requested to the Openfoodfact service specifying the query into the ```GET``` request ([example for "confiture"](https://world.openfoodfacts.org/cgi/search.pl?search_terms=confiture&search_simple=1&action=process&json=true&sort_by=unique_scans)).  
     From the returned formatted-JSON file, the first product of the list sorted by the popularity value ```unique_scans_n```, is used as reference to find an alternative product with better nutrition score.
-  * ___Recommendation___: The strategy is to find the best healthy aternative products by browsing, from children to parents, the categories hierarchy of the reference product.  
+  * __Recommendation__: The strategy is to find the best healthy aternative products by browsing, from children to parents, the categories hierarchy of the reference product.  
   For each category, the grades repartition is gotten by a drilldown search in order to limit the number of HTML requests, (see example for ['_chocolate-nuts-cookie-bars_' category](https://fr-en.openfoodfacts.org/category/en:chocolate-nuts-cookie-bars/nutrition-grades)).  
   Then only for each identified grade from the category, products are extracted by an [advanced search](https://fr-en.openfoodfacts.org/cgi/search.pl?action=process&page=1&page_size=1000&sort_by=unique_scans&json=true&tagtype_0=categories&tag_contains_0=contains&tag_0=en%3Achocolate-nuts-cookie-bars&tagtype_1=nutrition_grades&tag_contains_1=contains&tag_1=d) and next are compared according to respective priority criteria: amount of healthy nutrients (```nutrition_grades```), the degree of processing of products (```nova_group```) and popularity (```unique_scans_n```). The most healthy are sorted and saved.
-* __Non volatile memory__
-  * Database
-    * PostGreSQL
+* __View__
+  * Navigation
 
 ## Features (Release / Story)
 
 Two Apps:
 
 * Product: openfoodfact items
-* Account: Account Management
+* Account: Authentification Management and Profil
 
 ### Use case / User story
 
@@ -196,20 +201,18 @@ python run.py
 ``` 
 -->
 
-## Installation
+## Setup
 
 ### Database
-* Download and install MySQL
-* Create database '__openfacts__' 
-* Create user '_app_' with password '_No@app23_' on localhost with GRANT ALL PRIVILEGES on '__openfacts__' database 
+* Use SQLite for developpement
 
 ### Virtual environment
-* Create virtual environment named '_env_' for example
+* Create virtual environment named '_venv_' for example
 * Activate the new environment
 * install requirements from '_requirements.txt_'
 
-### Run application
-execute : python '_opynfacts.py_'
+### Run application locally 
+execute : python manage.py runserver
 
 ## Resources
 
