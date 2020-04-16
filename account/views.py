@@ -51,7 +51,7 @@ def signup(request):
     else:
         form = SignUpForm()
 
-    print(locals())
+    # print(locals())
     return render(request, template, locals())
 
 
@@ -81,7 +81,7 @@ def signup_password(request):
             errors = pwd_form.errors.items()
     else:
         errors = {'err': "Erreur d'initialisation"}.items()
-        print("Sign-up password: Initialisation Error")
+        print("/!\\ Sign-up password: Initialisation Error /!\\")
         return HttpResponseRedirect(reverse('account:signup'))
 
     return render(request, template, locals())
@@ -127,7 +127,6 @@ def signout_request(request):
     return render(request, 'account/profil.html', locals())
 
 
-@login_required()
 def signout(request):
 
     logout(request)

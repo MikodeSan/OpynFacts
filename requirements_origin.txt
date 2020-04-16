@@ -37,6 +37,8 @@ pylint
 
 pytest
 pytest-cov
+pytest-django
+pytest-xdist        # plugin: running tests in parallel
 coverage
 
 selenium
