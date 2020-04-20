@@ -111,16 +111,14 @@
         <div class="container">
           <div class="row">
             <div class="col-lg-4 ml-auto text-center mb-5 mb-lg-0">
-              <div><a class="d-block" href="{% url 'product:notice' %}">Mentions légales</a></div>
+              <div><a id=notice_lnk class="d-block" href="{% url 'product:notice' %}">Mentions légales</a></div>
             </div>
             <div class="col-lg-4 mr-auto text-center">
-              <!-- Make sure to change the email address in anchor text AND the link below! -->
-              <a class="d-block" href="{% url 'product:home' %}#contact">Contact</a>
-              {% comment %} <a class="d-block" href="mailto:contact@yourwebsite.com">contact@yourwebsite.com</a> {% endcomment %}
+              <a id=contact_lnk class="d-block" href="{% url 'product:home' %}#contact">Contact</a>
             </div>
           </div>
 
-          <div class="small text-center text-muted">Copyright &copy; 2019 - Start Bootstrap</div>
+          {% comment %} <div class="small text-center text-muted">Copyright &copy; 2019 - Start Bootstrap</div> {% endcomment %}
         </div>
     </footer>
 
