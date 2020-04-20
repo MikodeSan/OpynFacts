@@ -1,15 +1,28 @@
-{% extends 'product/base.html' %} {% block content %}
+{% extends 'product/base.html' %}
 
-<h1>Mentions Légales</h1>
+{% block masthead_title %}
+<div class="col-lg-10 align-self-end">
+  <h1 class="text-uppercase text-white font-weight-bold">Mentions Légales</h1>
+</div>
+{% endblock %}
+
+{% block content %}
+
+  <section class="page-section" id="history">
+    <div class="container">
+      {% comment %} <ul>
+          <li class="text-muted text-center mb-0">Icônes <a href="https://thenounproject.com/FabienJ/uploads/?i=29691" target="_blank" rel="noopener noreferrer">Carrot</a> par Fabien Jouin de the Noun Project</li>
+          <li class="text-muted text-center mb-0">Icônes générales et de Colette et Remy par IconMoon</li>
+      </ul> {% endcomment %}
+      <p class="text-muted text-center mb-0">Icônes <a href="https://thenounproject.com/FabienJ/uploads/?i=29691" target="_blank" rel="noopener noreferrer">Carrot</a> par Fabien Jouin de the Noun Project</p>
+      <p class="text-muted text-center mb-0">Icônes générales et de Colette et Remy par IconMoon</p>
+      <hr class="divider my-4">
+      {% comment %} <p class="text-muted text-center mb-0">Retour à l'<a href="{% url 'product:home' %}">accueil</a></p> {% endcomment %}
+      <p class="text-muted mb-0">Retour à l'<a href="{% url 'product:home' %}">accueil</a></p>
+    </div>
+  </section>
+
 <div>
-    <ul>
-        <li>Icônes <a href="https://thenounproject.com/FabienJ/uploads/?i=29691" target="_blank" rel="noopener noreferrer">Carrot</a> par Fabien Jouin de the Noun Project</li>
-        <li>Icônes générales et de Colette et Remy par IconMoon</li>
-    </ul>
-    <p>Icônes <a href="https://thenounproject.com/FabienJ/uploads/?i=29691" target="_blank" rel="noopener noreferrer">Carrot</a> par Fabien Jouin de the Noun Project</p>
-    <p>Icônes générales et de Colette et Remy par IconMoon</p>
-
-    <p>Retour à l'<a href="{% url 'product:home' %}">accueil</a></p>
 
 
 </div>

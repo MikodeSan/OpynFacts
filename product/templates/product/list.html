@@ -2,69 +2,55 @@
 
 {% load static %}
 
+{% block masthead_title %}
+<div class="col-lg-10 align-self-end">
+  <h2 class="text-uppercase text-black font-weight-bold">Recherche: {{ query }}</h2>
+  <hr class="divider my-4">
+</div>
+<div class="col-lg-8 align-self-baseline">
+  <h3>{{ product_target.code }} - {{ product_target.brands }} - {{ product_target.name }} - {{product_target.nutrition_grades}} - {{product_target.nova_group}} - {{product_target.unique_scans_n}}</h3>
+  {% comment %}
+  <!-- <p class="text-white-75 font-weight-light mb-5">Start Bootstrap can help you build better websites using the Bootstrap framework! Just download a theme and start customizing, no strings attached!</p> -->
+  <!-- <a class="btn btn-primary btn-xl js-scroll-trigger" href="#about">Find Out More</a> -->{% endcomment %}
+  {% if product_target.image_url %}
+  <p><img src={{ product_target.image_url }} alt=""></p>
+  {% endif %}
+</div>
+{% endblock %}
+
 {% block content %}
 
 {% if page == 'result' %}
 
-    {% if query and product_target %}
+{% if query and product_target %}
 
-    <!-- Masthead -->
-    <div class="container h-50">
-        <div class="row h-50 align-items-center justify-content-center text-center">
-            <div class="col-lg-10 align-self-end">
-                <h2 class="text-uppercase text-black font-weight-bold">Recherche: {{ query }}</h2>
-                <hr class="divider my-4">
-            </div>
-            <div class="col-lg-8 align-self-baseline">
-                <h3>{{ product_target.code }} - {{ product_target.brands }} - {{ product_target.name }} - {{product_target.nutrition_grades}} - {{product_target.nova_group}} - {{product_target.unique_scans_n}}</h3>
-                {% comment %}
-                <!-- <p class="text-white-75 font-weight-light mb-5">Start Bootstrap can help you build better websites using the Bootstrap framework! Just download a theme and start customizing, no strings attached!</p> -->
-                <!-- <a class="btn btn-primary btn-xl js-scroll-trigger" href="#about">Find Out More</a> -->{% endcomment %}
-                {% if product_target.image_url %}
-                <p><img src={{ product_target.image_url }} alt=""></p>
-                {% endif %}
-            </div>
-        </div>
-    </div>
-    <ul>
-        {% for category in product_target.categories.all %}
-        <li>{{ category }}</li>
-        {% endfor %}
-    </ul>
-    <p>Favorite</p>
-    <ul>
-        {% for favorite in favorite_lst %}
-        <li>{{ favorite.code }} - {{ favorite.brands }} - {{ favorite.name }}</li>
-        {% endfor %}
-    </ul>
+<ul>
+    {% for category in product_target.categories.all %}
+    <li>{{ category }}</li>
+    {% endfor %}
+</ul>
+<p>Favorite</p>
+<ul>
+    {% for favorite in favorite_lst %}
+    <li>{{ favorite.code }} - {{ favorite.brands }} - {{ favorite.name }}</li>
+    {% endfor %}
+</ul>
 
-    <ul>
-        {% for category in product_target.categories_tags %}
-        <li>{{ category }}</li>
-        {% endfor %}
-    </ul>
-    {% if product_target.compared_to_category %}
-    <h6>[{{ product_target.compared_to_category }}] </h6>
-    {% endif %}
-    {% include 'product/result.html' with list_title='Result Content' %}
-
-    {% else %}
-    <h2>[No product found for {{ query }}]</h2>
-    {% endif %}
-
-{% elif page == 'favorite'%}
-{% include 'product/favorite.html' with list_title='Favorite Content' %}
-{% else %}
-{% include 'product/result.html' with list_title='Unknown Content' %}
-{% endif %}
-
-{% comment %}
+<ul>
+    {% for category in product_target.categories_tags %}
+    <li>{{ category }}</li>
+    {% endfor %}
+</ul>
+{% if product_target.compared_to_category %}
+<h6>[{{ product_target.compared_to_category }}] </h6>
+{% endif %} {% include 'product/result.html' with list_title='Result Content' %} {% else %}
+<h2>[No product found for {{ query }}]</h2>
+{% endif %} {% elif page == 'favorite'%} {% include 'product/favorite.html' with list_title='Favorite Content' %} {% else %} {% include 'product/result.html' with list_title='Unknown Content' %} {% endif %} {% comment %}
 <form>
     <div class="form-group  {% if form.name.errors %}has-warning has-feedback{% endif %}">
         <p>Salut l'artist</p>
     </div>
-</form> {% endcomment %}
-{% if errors %}
+</form> {% endcomment %} {% if errors %}
 <div>
     {% for key, error in errors %} {% autoescape off %} {{ error }} {% endautoescape %} {% endfor %}
 </div>
@@ -85,40 +71,29 @@
             <div class="col-lg-4 col-md-6 text-center">
                 <div class="mt-5">
                     <h4 class="h4 mb-2">
-                        {% if product.nutrition_grades == 'a' %}<img class="img-fluid" src={% static 'product/img/nutriscore-a.svg' %} alt="">
-                        {% elif product.nutrition_grades == 'b' %}<img class="img-fluid" src={% static 'product/img/nutriscore-b.svg' %} alt="">
-                        {% elif product.nutrition_grades == 'c' %}<img class="img-fluid" src={% static 'product/img/nutriscore-c.svg' %} alt="">
-                        {% elif product.nutrition_grades == 'd' %}<img class="img-fluid" src={% static 'product/img/nutriscore-d.svg' %} alt="">
-                        {% elif product.nutrition_grades == 'e' %}<img class="img-fluid" src={% static 'product/img/nutriscore-e.svg' %} alt="">
-                        {% else %}<i class="fas fa-2x fa-globe text-primary mb-4"></i>
-                        {% endif %}
-                        {% if product.nova_group == 1 %}<img class="img-fluid" src={% static 'product/img/nova-group-1.svg' %} alt="">
-                        {% elif product.nova_group == 2 %}<img class="img-fluid" src={% static 'product/img/nova-group-2.svg' %} alt="">
-                        {% elif product.nova_group == 3 %}<img class="img-fluid" src={% static 'product/img/nova-group-3.svg' %} alt="">
-                        {% elif product.nova_group == 4 %}<img class="img-fluid" src={% static 'product/img/nova-group-4.svg' %} alt="">
-                        {% else %}<i class="fas fa-2x fa-globe text-primary mb-4"></i>
-                        {% endif %}
-                         - {{ product.unique_scans_n }}
+                        {% if product.nutrition_grades == 'a' %}<img class="img-fluid" src={% static 'product/img/nutriscore-a.svg' %} alt=""> {% elif product.nutrition_grades == 'b' %}<img class="img-fluid" src={% static
+                            'product/img/nutriscore-b.svg' %} alt=""> {% elif product.nutrition_grades == 'c' %}<img class="img-fluid" src={% static 'product/img/nutriscore-c.svg' %} alt=""> {% elif product.nutrition_grades == 'd' %}<img class="img-fluid" src={% static
+                            'product/img/nutriscore-d.svg' %} alt=""> {% elif product.nutrition_grades == 'e' %}<img class="img-fluid" src={% static 'product/img/nutriscore-e.svg' %} alt=""> {% else %}<i class="fas fa-2x fa-globe text-primary mb-4"></i> {% endif %} {% if product.nova_group
+                        == 1 %}<img class="img-fluid" src={% static 'product/img/nova-group-1.svg' %} alt=""> {% elif product.nova_group == 2 %}<img class="img-fluid" src={% static 'product/img/nova-group-2.svg' %} alt=""> {% elif product.nova_group ==
+                        3 %}<img class="img-fluid" src={% static 'product/img/nova-group-3.svg' %} alt=""> {% elif product.nova_group == 4 %}<img class="img-fluid" src={% static 'product/img/nova-group-4.svg' %} alt=""> {% else %}<i class="fas fa-2x fa-globe text-primary mb-4"></i>                        {% endif %} - {{ product.unique_scans_n }}
                     </h4>
                     {% if product.image_url %}
                     <p><img class="img-fluid" src={{ product.image_url }} alt=""></p>
                     {% else %}
                     <i class="fas fa-4x fa-globe text-primary mb-4"></i> {% endif %}
                     <h5 class="h5 mb-2">
-                    {% if user.is_authenticated %}
-                    <a class="" id={{ product.code }} data-state={% if product in favorite_lst %}"false"{% else %}"true"{% endif %} onclick="set_favorite(this.id, this.getAttribute('data-state'))">
+                        {% if user.is_authenticated %}
+                        <a class="" id={{ product.code }} data-state={% if product in favorite_lst %} "false"{% else %} "true"{% endif %} onclick="set_favorite(this.id, this.getAttribute('data-state'))">
                         {% if product in favorite_lst %}
                         <i class="fas fa-1x fa-heart text-primary mb-4"></i>    {% comment %} fa-star {% endcomment %}
                         {% else %}
                         <i class="far fa-1x fa-heart text-primary mb-4"></i>
                         {% endif %}
-                    </a>
-                     - {{ product.code }} - {{ product.brands }} - {{ product.name }}
-                     </h5>
-                    {% comment %} <h6 class="h6 mb-2">[ {{ product.zcategory_product_set.hierarchy_index.0 }} ]</h6> {% endcomment %}
-                    {% endif %}
-                        
-                    {% comment %} <p class="text-muted mb-0">Enregistrer</p> {% endcomment %}
+                    </a> - {{ product.code }} - {{ product.brands }} - {{ product.name }}
+                    </h5>
+                    {% comment %}
+                    <h6 class="h6 mb-2">[ {{ product.zcategory_product_set.hierarchy_index.0 }} ]</h6> {% endcomment %} {% endif %} {% comment %}
+                    <p class="text-muted mb-0">Enregistrer</p> {% endcomment %}
                 </div>
             </div>
             {% endfor %}
@@ -127,7 +102,9 @@
     </div>
 </section>
 
-<script>var parse_favorite_url="{% url 'product:parse_favorite' %}"</script>
+<script>
+    var parse_favorite_url = "{% url 'product:parse_favorite' %}"
+</script>
 <script src="{% static 'product/js/zajax.js' %}"></script>
 <script src="{% static 'product/js/zproduct.js' %}"></script>
 

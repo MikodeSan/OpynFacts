@@ -48,25 +48,24 @@ class TestHomeAnomymous(TestCase):
         # with webdriver.Chrome(executable_path=os.path.join(base, 'chromedriver.exe')) as driver:
         self.WEB_DRIVER = driver
         self.WEB_DRIVER.get(self.HOST)
-        time.sleep(3)
+        time.sleep(1)
 
     def tearDown(self):
         self.client.logout()
         self.WEB_DRIVER.quit()
-        time.sleep(3)
 
     def test_home_2_notice_page(self):
         """
-        test that notice page returns a 200
+        test navigation from home to notices page
         """
         driver = self.WEB_DRIVER
 
         # notice_link = driver.find_element_by_id('notice_lnk')
         notice_link = driver.find_element_by_partial_link_text('Mention')
 
-        time.sleep(3)
+        time.sleep(1)
         notice_link.click()
-        time.sleep(3)
+        time.sleep(1)
 
         # response = self.client.get(reverse('account:signup'))
         # self.assertEqual(response.status_code, 200)
@@ -74,18 +73,16 @@ class TestHomeAnomymous(TestCase):
 
     def test_home_2_contact_section(self):
         """
-        test that notice page returns a 200
+        test that contact section returns a 200
         """
         driver = self.WEB_DRIVER
         driver.get(self.HOST + reverse('product:notice'))
-        time.sleep(3)
+        time.sleep(1)
 
         contact_link = driver.find_element_by_id('contact_lnk')
         # contact_link = driver.find_element_by_partial_link_text('Contact')
-        time.sleep(3)
-
         contact_link.click()
-        time.sleep(3)
+        time.sleep(1)
 
         # response = self.client.get(reverse('account:signup'))
         # self.assertEqual(response.status_code, 200)
@@ -115,4 +112,32 @@ class TestHomeAnomymous(TestCase):
 #         [TODO] Test that sign-up page redirects to sign-out request page
 #         """
 #         pass
+
+class TestMisc(TestCase):
+    
+    @classmethod
+    def setUpTestData(cls):
+
+        cls.HOST = 'http://127.0.0.1:8000'
+        
+    def setUp(self):
+        pass
+
+    def tearDown(self):
+        pass
+
+    def test_notice_page(self):
+        """
+        test that notice page returns a 200
+        """
+        response = self.client.get(reverse('product:notice'))
+        self.assertEqual(response.status_code, 200)
+
+    def test_contact_section(self):
+        """
+        test that contact section returns a 200
+        """
+        url = reverse('product:home') + '#contact'
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
 
