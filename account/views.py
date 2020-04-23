@@ -109,7 +109,8 @@ def signin(request):
             if user:  # Si l'objet renvoyé n'est pas None
                 login(request, user)  # nous connectons l'utilisateur
                 template = 'account/profil.html'
-                return HttpResponseRedirect(reverse('account:profile', kwargs={'user_id': user.id}))
+                # return HttpResponseRedirect(reverse('account:profile', kwargs={'user_id': user.id}))
+                return HttpResponseRedirect(reverse('account:profile'))
             else: # sinon une erreur sera affichée
                 error = True
     else:
@@ -134,7 +135,7 @@ def signout(request):
 
 
 @login_required()
-def profil(request, user_id):
+def profile(request, user_id=0):
     return render(request, 'account/profil.html', locals())
 
 

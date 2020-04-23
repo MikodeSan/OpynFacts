@@ -204,15 +204,22 @@ python run.py
 ## Setup
 
 ### Database
+
 * Use SQLite for developpement
 
 ### Virtual environment
+
 * Create virtual environment named '_venv_' for example
 * Activate the new environment
 * install requirements from '_requirements.txt_'
 
-### Run application locally 
-execute : python manage.py runserver
+### Run application locally
+
+Execute : ```python manage.py runserver```
+
+### Test and coverage
+
+Execute: ```pytest [-s] [-Wa] [--exitfirst] [--reuse-db] [-vv] --cov=./ --cov-report html```
 
 ## Resources
 

@@ -89,7 +89,8 @@ class TestFrontAnomymous(TestCase):
         }
         response = self.client.post(reverse('account:signin'), data, follow=True)
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, reverse('account:profile', kwargs={'user_id':1}))
+        # self.assertContains(response, reverse('account:profile', kwargs={'user_id':1}))
+        self.assertContains(response, reverse('account:profile'))
         self.assertNotIn('error', response.context)
 
     def test_front_profile_page(self):
@@ -126,7 +127,7 @@ class TestFrontAuthenticated(TestCase):
         cls.USER_PWD = 'dummy_pwd'
         email = 'user@dummy.com'
         username = email
-        cls.USER = get_user_model().objects. create_user(username, email, cls.USER_PWD)
+        cls.USER = get_user_model().objects.create_user(username, email, cls.USER_PWD)
         print('Dummy user {} is created for test: {}'.format(cls.USER, cls.USER != None))
 
     def setUp(self):

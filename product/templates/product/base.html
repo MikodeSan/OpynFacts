@@ -58,14 +58,15 @@
                   <li class="nav-item">{% include "product/query.html" %}</li>
                   <li class="nav-item">
                     {% if user.is_authenticated %}
-                    <a class="nav-link js-scroll-trigger" href="{% url 'account:profile' user.id %}">Mon Compte {{ user.username }}</a>
+                    {% comment %} <a id=profile_a class="nav-link js-scroll-trigger" href="{% url 'account:profile' user.id %}">Mon Compte {{ user.username }}</a> {% endcomment %}
+                    <a id=profile_a class="nav-link js-scroll-trigger" href="{% url 'account:profile' %}">Mon Compte {{ user.username }}</a>
                     {% else %}
-                    <a class="nav-link js-scroll-trigger" href="{% url 'account:signin' %}">Connexion</a>
+                    <a id=signin_a class="nav-link js-scroll-trigger" href="{% url 'account:signin' %}">Connexion</a>
                     {% endif %}
                   </li>
                   {% if user.is_authenticated %}
-                  <li class="nav-item"><a class="nav-link js-scroll-trigger" href="{% url 'product:favorite' %}">Mes aliments</a></li>
-                  <li class="nav-item"><a class="nav-link js-scroll-trigger" href="{% url 'account:signout_request' %}">Déconnexion</a></li>
+                  <li class="nav-item"><a id=favorite_a class="nav-link js-scroll-trigger" href="{% url 'product:favorite' %}">Mes aliments</a></li>
+                  <li class="nav-item"><a id=signout_a class="nav-link js-scroll-trigger" href="{% url 'account:signout_request' %}">Déconnexion</a></li>
                   {% endif %}
                 </ul>
             </div>
@@ -92,7 +93,7 @@
         <div class="container">
           <div class="row">
             <div class="col-lg-4 ml-auto text-center mb-5 mb-lg-0">
-              <div><a id=notice_lnk class="d-block" href="{% url 'product:notice' %}">Mentions légales</a></div>
+              <div><a id=notice_a class="d-block" href="{% url 'product:notice' %}">Mentions légales</a></div>
             </div>
             <div class="col-lg-4 mr-auto text-center">
               <a id=contact_lnk class="d-block" href="{% url 'product:home' %}#contact">Contact</a>
