@@ -45,7 +45,7 @@
             {% else %}
             <a class="navbar-brand js-scroll-trigger" href="{% url 'product:home' %}">
             {% endif %}
-                <img id="zlogo" src="{% static 'product/img/logo_pur_beurre.png' %}" alt=""> Pur Beurre
+                <img id="zlogo" src="{% static 'product/img/logo_pur_beurre.png' %}" alt="Home Top"> Pur Beurre
                 <!-- <img class="img-fluid" src="{% static 'product/img/logo_pur_beurre.svg' %}" alt=""> Pur Beurre -->
             </a>
 
@@ -59,14 +59,20 @@
                   <li class="nav-item">
                     {% if user.is_authenticated %}
                     {% comment %} <a id=profile_a class="nav-link js-scroll-trigger" href="{% url 'account:profile' user.id %}">Mon Compte {{ user.username }}</a> {% endcomment %}
-                    <a id=profile_a class="nav-link js-scroll-trigger" href="{% url 'account:profile'%}">Mon Compte {{ user.username }}</a>
+                    <a id=profile_a class="nav-link js-scroll-trigger" href="{% url 'account:profile'%}" title="Compte">
+                      <i class="fas fa-2x fa-user-circle mb-4"></i> {{ user.username }}</a>
                     {% else %}
-                    <a id=signin_a class="nav-link js-scroll-trigger" href="{% url 'account:signin' %}">Connexion</a>
+                    <a id=signin_a class="nav-link js-scroll-trigger" href="{% url 'account:signin' %}" title="Connexion"><i class="fas fa-2x fa-sign-in-alt mb-4"></i></a>
                     {% endif %}
                   </li>
                   {% if user.is_authenticated %}
-                  <li class="nav-item"><a id=favorite_a class="nav-link js-scroll-trigger" href="{% url 'product:favorite' %}">Mes aliments</a></li>
-                  <li class="nav-item"><a id=signout_a class="nav-link js-scroll-trigger" href="{% url 'account:signout_request' %}">Déconnexion</a></li>
+                  <li class="nav-item">
+                    <a id=favorite_a class="nav-link js-scroll-trigger" href="{% url 'product:favorite' %}" title="Mes aliments">
+                      <i class="fas fa-2x fa-carrot mb-4"></i></a></li>
+                      {% comment %} <img id="zcarrot" src="{% static 'product/img/noun_Carrot_29691.png' %}" alt="Mes aliments"></a></li> {% endcomment %}
+                  <li class="nav-item">
+                    <a id=signout_a class="nav-link js-scroll-trigger" href="{% url 'account:signout_request' %}" title="Déconnexion">
+                      <i class="fas fa-2x fa-sign-out-alt mb-4"></i></a></li>
                   {% endif %}
                 </ul>
             </div>

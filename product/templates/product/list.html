@@ -71,11 +71,21 @@
             <div class="col-lg-4 col-md-6 text-center">
                 <div class="mt-5">
                     <h4 class="h4 mb-2">
-                        {% if product.nutrition_grades == 'a' %}<img class="img-fluid" src={% static 'product/img/nutriscore-a.svg' %} alt=""> {% elif product.nutrition_grades == 'b' %}<img class="img-fluid" src={% static
-                            'product/img/nutriscore-b.svg' %} alt=""> {% elif product.nutrition_grades == 'c' %}<img class="img-fluid" src={% static 'product/img/nutriscore-c.svg' %} alt=""> {% elif product.nutrition_grades == 'd' %}<img class="img-fluid" src={% static
-                            'product/img/nutriscore-d.svg' %} alt=""> {% elif product.nutrition_grades == 'e' %}<img class="img-fluid" src={% static 'product/img/nutriscore-e.svg' %} alt=""> {% else %}<i class="fas fa-2x fa-globe text-primary mb-4"></i> {% endif %} {% if product.nova_group
-                        == 1 %}<img class="img-fluid" src={% static 'product/img/nova-group-1.svg' %} alt=""> {% elif product.nova_group == 2 %}<img class="img-fluid" src={% static 'product/img/nova-group-2.svg' %} alt=""> {% elif product.nova_group ==
-                        3 %}<img class="img-fluid" src={% static 'product/img/nova-group-3.svg' %} alt=""> {% elif product.nova_group == 4 %}<img class="img-fluid" src={% static 'product/img/nova-group-4.svg' %} alt=""> {% else %}<i class="fas fa-2x fa-globe text-primary mb-4"></i>                        {% endif %} - {{ product.unique_scans_n }}
+                    {% if product.nutrition_grades == 'a' %}<img class="img-fluid" src="{% static 'product/img/nutriscore-a.svg' %}" alt="">
+                    {% elif product.nutrition_grades == 'b' %}<img class="img-fluid" src="{% static 'product/img/nutriscore-b.svg' %}" alt="">
+                    {% elif product.nutrition_grades == 'c' %}<img class="img-fluid" src="{% static 'product/img/nutriscore-c.svg' %}" alt="">
+                    {% elif product.nutrition_grades == 'd' %}<img class="img-fluid" src="{% static 'product/img/nutriscore-d.svg' %}" alt="">
+                    {% elif product.nutrition_grades == 'e' %}<img class="img-fluid" src="{% static 'product/img/nutriscore-e.svg' %}" alt="">
+                    {% else %}<i class="fas fa-2x fa-globe text-primary mb-4"></i>
+                    {% endif %}
+                    
+                    {% if product.nova_group == 1 %}<img class="img-fluid" src="{% static 'product/img/nova-group-1.svg' %}" alt="">
+                    {% elif product.nova_group == 2 %}<img class="img-fluid" src="{% static 'product/img/nova-group-2.svg' %}" alt="">
+                    {% elif product.nova_group == 3 %}<img class="img-fluid" src="{% static 'product/img/nova-group-3.svg' %}" alt="">
+                    {% elif product.nova_group == 4 %}<img class="img-fluid" src="{% static 'product/img/nova-group-4.svg' %}" alt="">
+                    {% else %}<i class="fas fa-2x fa-globe text-primary mb-4"></i>
+                    {% endif %}
+                    - {{ product.unique_scans_n }}
                     </h4>
                     {% if product.image_url %}
                     <p><img class="img-fluid" src={{ product.image_url }} alt=""></p>
@@ -83,13 +93,14 @@
                     <i class="fas fa-4x fa-globe text-primary mb-4"></i> {% endif %}
                     <h5 class="h5 mb-2">
                         {% if user.is_authenticated %}
-                        <a class="" id={{ product.code }} data-state={% if product in favorite_lst %} "false"{% else %} "true"{% endif %} onclick="set_favorite(this.id, this.getAttribute('data-state'))">
-                        {% if product in favorite_lst %}
-                        <i class="fas fa-1x fa-heart text-primary mb-4"></i>    {% comment %} fa-star {% endcomment %}
-                        {% else %}
-                        <i class="far fa-1x fa-heart text-primary mb-4"></i>
+                        <a id={{ product.code }} href="javascript:;" data-state="{% if product in favorite_lst %}false{% else %}true{% endif %}"
+                            onclick="set_favorite(this.id, this.getAttribute('data-state'))">
+                            {% if product in favorite_lst %}
+                            <i class="fas fa-1x fa-heart mb-4"></i>    {% comment %} fa-star {% endcomment %}
+                            {% else %}
+                            <i class="far fa-1x fa-heart mb-4"></i>
                         {% endif %}
-                    </a> - {{ product.code }} - {{ product.brands }} - {{ product.name }}
+                        </a> - {{ product.code }} - {{ product.brands }} - {{ product.name }}
                     </h5>
                     {% comment %}
                     <h6 class="h6 mb-2">[ {{ product.zcategory_product_set.hierarchy_index.0 }} ]</h6> {% endcomment %} {% endif %} {% comment %}

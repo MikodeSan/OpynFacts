@@ -46,7 +46,6 @@ function zajaxPost(url, data, callback, callback_sync, isJson) {
 
     var csrftoken = getCookie('csrftoken');
     // var csrftoken = Cookies.get('csrftoken');
-    console.log('Token', csrftoken);
 
     let request = new XMLHttpRequest();
 
