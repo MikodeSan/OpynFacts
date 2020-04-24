@@ -136,6 +136,7 @@ class TestFrontAuthenticated(TestCase):
 
     def tearDown(self):
         self.client.logout()
+        pass
 
     def test_front_signup_page(self):
         """

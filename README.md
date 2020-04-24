@@ -207,6 +207,11 @@ python run.py
 
 * Use SQLite for developpement
 
+#### Report
+
+To generate and see the database model, execute: ```python manage.py graph_models -a -g -o .\path\to\your\destination\graph.svg```
+Your specified own destination folder must be created first.
+
 ### Virtual environment
 
 * Create virtual environment named '_venv_' for example

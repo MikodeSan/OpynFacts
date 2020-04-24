@@ -59,7 +59,7 @@
                   <li class="nav-item">
                     {% if user.is_authenticated %}
                     {% comment %} <a id=profile_a class="nav-link js-scroll-trigger" href="{% url 'account:profile' user.id %}">Mon Compte {{ user.username }}</a> {% endcomment %}
-                    <a id=profile_a class="nav-link js-scroll-trigger" href="{% url 'account:profile' %}">Mon Compte {{ user.username }}</a>
+                    <a id=profile_a class="nav-link js-scroll-trigger" href="{% url 'account:profile'%}">Mon Compte {{ user.username }}</a>
                     {% else %}
                     <a id=signin_a class="nav-link js-scroll-trigger" href="{% url 'account:signin' %}">Connexion</a>
                     {% endif %}
