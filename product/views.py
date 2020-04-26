@@ -38,9 +38,11 @@ def index(request):
     
     context = {'page': 'home'}
     user_query = ""
+    response = None
 
     if request.method == 'POST':
-
+        # POST method
+        
         form = QueryForm(request.POST)
         context['page'] = 'result'
         context['query'] = user_query
@@ -50,23 +52,20 @@ def index(request):
             user_query = request.POST.get('query')
 
             # return HttpResponseRedirect(reverse('product:result', args=[user_query]))
-            return redirect('product:result', user_query=user_query)
+            response = redirect('product:result', user_query=user_query)
 
         else:   # [TODO]: is not necessary
             # Form data doesn't match the expected format.
             # Add errors to the template.
             context['errors'] = form.errors.items()
             print('Form error')
-            return render(request, 'product/list.html', context)
+            response = render(request, 'product/list.html', context)
     else:
-        # GET method. Create a new form to be used in the template.
-        form_nav = QueryForm()
-        form_home = QueryForm()
-        # contact_lst = ZContact.objects.all()
-        context['form_nav'] = form_nav
-        context['form_home'] = form_home
-
-        return render(request, 'product/index.html', context)
+        # GET method.
+        
+        response = render(request, 'product/index.html', context)
+    
+    return response
 
 
 def result(request, user_query):
