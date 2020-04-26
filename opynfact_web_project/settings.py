@@ -186,5 +186,3 @@ if os.environ.get('ENV') == 'PRODUCTION':
     # https://warehouse.python.org/project/whitenoise/
     STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
-
-
