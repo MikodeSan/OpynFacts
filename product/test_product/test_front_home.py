@@ -14,13 +14,16 @@ import pytest
 from selenium import webdriver
 # from selenium.webdriver.firefox.webdriver import WebDriver
 from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
 # from .models import Album, Artist, Contact, Booking
 
 
-DEFAULT_TIMEOUT_S = 7
+DEFAULT_TIMEOUT_S = 12
+SEARCH_TIMEOUT_S = 180
+DISABLE_TEST = True
 
 # Front Base and Home Anomymous
 class TestFrontHomeAnomymous(StaticLiveServerTestCase):
@@ -88,7 +91,7 @@ class TestFrontHomeAnomymous(StaticLiveServerTestCase):
 
         self.assertEqual(driver.current_url[:-1], self.live_server_url)
 
-    @unittest.skipIf(True, "ERROR:Random timeout by using WebDriverWait")
+    @unittest.skipIf(DISABLE_TEST, "ERROR:Random timeout by using WebDriverWait")
     def test_home_2_signin_page(self):
         """
         Check navigation from Home to Sign-in page
@@ -105,8 +108,62 @@ class TestFrontHomeAnomymous(StaticLiveServerTestCase):
 
         self.assertEqual(driver.current_url, self.live_server_url + '/#contact')
 
+    def test_nav_search_bar_2_result_page(self):
+        """
+        Check navigation from search bar to product result page
+        """
+        driver = self.WEB_DRIVER
+        query = "nutella"
+
+        # Set the query and send by Enter key pressed
+        nav = WebDriverWait(driver, DEFAULT_TIMEOUT_S).until(EC.visibility_of_element_located((By.ID, 'navbarResponsive')))
+        # nav = WebDriverWait(driver, DEFAULT_TIMEOUT_S).until(lambda drv: drv.find_element_by_id('navbarResponsive'))
+        nav.find_element_by_name("query").send_keys(query+Keys.ENTER)
+        WebDriverWait(driver, SEARCH_TIMEOUT_S).until(lambda drv: drv.find_element_by_id('product_section'))
+
+        self.assertEqual(driver.current_url, build_full_url(self, 'product:result', {'user_query':query}))
+
+    @unittest.skipIf(DISABLE_TEST, "ERROR:server error occurs")
+    def test_nav_search_bar_2_result_page_button(self):
+        """
+        Check navigation from search bar to product result page
+        """
+        driver = self.WEB_DRIVER
+        query = "oreo"
+
+        # Set the query
+        nav = WebDriverWait(driver, DEFAULT_TIMEOUT_S).until(EC.visibility_of_element_located((By.ID, 'navbarResponsive')))
+        nav.find_element_by_name("query").send_keys(query)
+
+        # Send the query by clicking the search button
+        nav.find_element_by_css_selector("button[type='submit']").click()
+
+        WebDriverWait(driver, SEARCH_TIMEOUT_S).until(lambda drv: drv.find_element_by_id('product_section'))
+
+        self.assertEqual(driver.current_url, build_full_url(self, 'product:result', {'user_query':query}))
+
+    # --- Home search bar ---
+    # @unittest.skipIf(DISABLE_TEST, "ERROR:server error occurs")
+    def test_home_search_bar_2_result_page(self):
+        """
+        Check navigation from search bar to product result page
+        """
+        driver = self.WEB_DRIVER
+        query = "twix"
+
+        # Set the query
+        masthead = WebDriverWait(driver, DEFAULT_TIMEOUT_S).until(EC.visibility_of_element_located((By.CLASS_NAME, 'masthead')))
+        masthead.find_element_by_name("query").send_keys(query)
+
+        # Send the query by clicking the search button
+        masthead.find_element_by_css_selector("button[type='submit']").click()
+
+        WebDriverWait(driver, SEARCH_TIMEOUT_S).until(lambda drv: drv.find_element_by_id('product_section'))
+
+        self.assertEqual(driver.current_url, build_full_url(self, 'product:result', {'user_query':query}))
+
     # --- Footer ---
-    @unittest.skipIf(True, "ERROR:Random timeout by using WebDriverWait")
+    @unittest.skipIf(DISABLE_TEST, "ERROR:Random timeout by using WebDriverWait")
     def test_home_2_notice_page(self):
         """
         Check navigation from Home to Notices page
@@ -189,7 +246,7 @@ class TestFrontHomeAuthenticated(StaticLiveServerTestCase):
         # self.client.logout()
         pass
 
-    @unittest.skipIf(True, "ERROR:Random timeout by using WebDriverWait")
+    @unittest.skipIf(DISABLE_TEST, "ERROR:Random timeout by using WebDriverWait")
     def test_home_to_profil(self):
         """
         Check navigation from Home to Profile page
@@ -206,7 +263,7 @@ class TestFrontHomeAuthenticated(StaticLiveServerTestCase):
         self.assertEqual(driver.current_url, build_full_url(self, 'account:profile'))
 
 
-    @unittest.skipIf(True, "ERROR:Random timeout by using WebDriverWait")
+    @unittest.skipIf(DISABLE_TEST, "ERROR:Random timeout by using WebDriverWait")
     def test_home_to_favorite(self):
         """
         Check navigation from Home to Favorite page
@@ -278,11 +335,11 @@ def create_webdriver():
 
     return driver
 
-def build_full_url(obj, relative_url_name):
+def build_full_url(obj, relative_url_name, kwargs=None):
     """
     Build full url from domain root and with specified reltive part
     """
-    return obj.live_server_url + reverse(relative_url_name)
+    return obj.live_server_url + reverse(relative_url_name, kwargs=kwargs)
 
 def create_user():
     """

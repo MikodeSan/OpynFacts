@@ -22,37 +22,43 @@
 
 {% if page == 'result' %}
 
-{% if query and product_target %}
+  {% if query and product_target %}
 
-<ul>
+  <ul>
     {% for category in product_target.categories.all %}
     <li>{{ category }}</li>
     {% endfor %}
-</ul>
-<p>Favorite</p>
-<ul>
+  </ul>
+  <p>Favorite</p>
+  <ul>
     {% for favorite in favorite_lst %}
     <li>{{ favorite.code }} - {{ favorite.brands }} - {{ favorite.name }}</li>
     {% endfor %}
-</ul>
+  </ul>
 
-<ul>
+  <ul>
     {% for category in product_target.categories_tags %}
     <li>{{ category }}</li>
     {% endfor %}
-</ul>
-{% if product_target.compared_to_category %}
-<h6>[{{ product_target.compared_to_category }}] </h6>
-{% endif %} {% include 'product/result.html' with list_title='Result Content' %} {% else %}
-<h2>[No product found for {{ query }}]</h2>
-{% endif %} {% elif page == 'favorite'%} {% include 'product/favorite.html' with list_title='Favorite Content' %} {% else %} {% include 'product/result.html' with list_title='Unknown Content' %} {% endif %} {% comment %}
-<form>
-    <div class="form-group  {% if form.name.errors %}has-warning has-feedback{% endif %}">
-        <p>Salut l'artist</p>
-    </div>
-</form> {% endcomment %} {% if errors %}
+  </ul>
+    {% if product_target.compared_to_category %}
+    <h6>[{{ product_target.compared_to_category }}] </h6>
+    {% endif %}
+  {% include 'product/result.html' with list_title='Result Content' %}
+  {% else %}
+  <h2>[No product found for {{ query }}]</h2>
+  {% endif %}
+{% elif page == 'favorite'%}
+{% include 'product/favorite.html' with list_title='Favorite Content' %}
+{% else %}
+{% include 'product/result.html' with list_title='Unknown Content' %}
+{% endif %}
+
+{% if errors %}
 <div>
-    {% for key, error in errors %} {% autoescape off %} {{ error }} {% endautoescape %} {% endfor %}
+  {% for key, error in errors %}
+  {% autoescape off %} {{ error }} {% endautoescape %}
+  {% endfor %}
 </div>
 {% endif %}
 
@@ -103,8 +109,8 @@
                         </a> - {{ product.code }} - {{ product.brands }} - {{ product.name }}
                     </h5>
                     {% comment %}
-                    <h6 class="h6 mb-2">[ {{ product.zcategory_product_set.hierarchy_index.0 }} ]</h6> {% endcomment %} {% endif %} {% comment %}
-                    <p class="text-muted mb-0">Enregistrer</p> {% endcomment %}
+                    <h6 class="h6 mb-2">[ {{ product.zcategory_product_set.hierarchy_index.0 }} ]</h6> {% endcomment %}
+                    {% endif %}
                 </div>
             </div>
             {% endfor %}
