@@ -18,12 +18,11 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
-# from .models import Album, Artist, Contact, Booking
-
 
 DEFAULT_TIMEOUT_S = 12
 SEARCH_TIMEOUT_S = 180
 DISABLE_TEST = True
+
 
 # Front Base and Home Anomymous
 class TestFrontHomeAnomymous(StaticLiveServerTestCase):
@@ -137,7 +136,6 @@ class TestFrontHomeAnomymous(StaticLiveServerTestCase):
 
         # Send the query by clicking the search button
         nav.find_element_by_css_selector("button[type='submit']").click()
-
         WebDriverWait(driver, SEARCH_TIMEOUT_S).until(lambda drv: drv.find_element_by_id('product_section'))
 
         self.assertEqual(driver.current_url, build_full_url(self, 'product:result', {'user_query':query}))
@@ -227,13 +225,12 @@ class TestFrontHomeAuthenticated(StaticLiveServerTestCase):
         # Close driver
         # cls.WEB_DRIVER.close()
         cls.WEB_DRIVER.quit()   # Warning: Quit webdriver but generate exception
+        time.sleep(3)
         super().tearDownClass()
 
 
     def setUp(self):
-        # print('CLIENT_A', self.client)
-        # self.client = Client()
-
+        
         print('CLIENT_B', self.client, 'OUT')
         print('SESSION', self.client.session)
         print('COOKIES', self.client.cookies)
@@ -361,10 +358,10 @@ def sign_in_user_into_webdriver(obj, user, password, driver, relative_url):
     obj.client.login(username=user.username, password=password)
 
     # share session to webdriver
+    # [TODO] Check doc or forum to understand why it is mandatory to load session
     print('COOKIE_A', obj.client.cookies, 'THERE_IS', obj.client.session, 'OFF')
     cookie = obj.client.cookies['sessionid']
     print('COOKIE_B', cookie)
     driver.get(build_full_url(obj, relative_url))  #selenium will set cookie domain based on current page domain
     driver.add_cookie({'name': 'sessionid', 'value': cookie.value, 'secure': False, 'path': '/'})
-    print('COOKIE_C', cookie)
     driver.refresh() #need to update page for logged in user
