@@ -2,26 +2,26 @@ from . import products as script
 import requests
 
 
-def test_search(monkeypatch):
+# def test_search(monkeypatch):
 
-    geocoding_reply_dct = {"products":["kinder bueno"], "count": 1}
-    result_dct = {'address': '74300 Cluses, France', 'location': {'lat': 46.06039, 'lng': 6.580582}}
+#     geocoding_reply_dct = {"products":["kinder bueno"], "count": 1}
+#     result_dct = {'address': '74300 Cluses, France', 'location': {'lat': 46.06039, 'lng': 6.580582}}
 
-    class ResponseMocked:
+#     class ResponseMocked:
 
-        def __init__(self, status_code, data):
-            self.status_code = status_code
-            self.data = data
+#         def __init__(self, status_code, data):
+#             self.status_code = status_code
+#             self.data = data
 
-        def json(self):
-            return self.data
+#         def json(self):
+#             return self.data
 
-    def mockreturn(url):
-        return ResponseMocked(200, geocoding_reply_dct)
+#     def mockreturn(url):
+#         return ResponseMocked(200, geocoding_reply_dct)
 
-    monkeypatch.setattr(requests, 'get', mockreturn)
+#     monkeypatch.setattr(requests, 'get', mockreturn)
 
-    assert script.search('confiture bonne maman')['products'] == ["kinder bueno"]
+#     assert script.search('confiture bonne maman')['products'] == ["kinder bueno"]
 
 
 # def advanced_search(monkeypatch):

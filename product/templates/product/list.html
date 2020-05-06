@@ -98,7 +98,7 @@
   <h2>Aucun produit de substitution trouvé pour "{{ query }}"</h2>
   {% endif %}
 
-{% elif page == 'favorite'%}
+{% elif page == 'favorite' %}
 {% include 'product/favorite.html' with list_title='Produits favoris' %}
 {% else %}
 {% include 'product/result.html' with list_title='Unknown Content' %}
@@ -139,12 +139,20 @@
             {% elif product.nova_group == 2 %}<img class="img-fluid" src="{% static 'product/img/nova-group-2.svg' %}" alt="">
             {% elif product.nova_group == 3 %}<img class="img-fluid" src="{% static 'product/img/nova-group-3.svg' %}" alt="">
             {% elif product.nova_group == 4 %}<img class="img-fluid" src="{% static 'product/img/nova-group-4.svg' %}" alt="">
-            {% else %}<i class="fas fa-2x fa-globe text-primary mb-4"></i>                        
+            {% else %}<i class="fas fa-2x fa-globe text-primary mb-4"></i>
             {% endif %}
               {% comment %} - {{ product.unique_scans_n }} {% endcomment %}
           </h4>
           {% if product.image_url %}
-          <p><img class="img-fluid" src={{ product.image_url }} alt=""></p>
+          <p>
+            {% if page == 'result' %}
+            <a class="portfolio-box" href="{% url 'product:product' product.code page product_target.code %}">
+            {% else %}
+            <a class="portfolio-box" href="{% url 'product:product' product.code page %}">
+            {% endif %}
+              <img class="img-fluid" src="{{ product.image_url }}" alt="">
+            </a>
+          </p>
           {% else %}
           <i class="fas fa-4x fa-globe text-primary mb-4"></i>
           {% endif %}

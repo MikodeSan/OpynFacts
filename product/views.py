@@ -120,14 +120,15 @@ def favorite(request):
     return render(request, 'product/list.html', context)
 
 
-def product(request, _product_id):
-    product_id = int(_product_id) # make sure we have an integer.
+def product(request, product_id, page_origin=None, product_id_origin=None):
+
     try:
-        product = ZProduct.objects.get(pk=product_id)
-        s = ", ".join([contact.name for contact in product.contact.all()])
-        message = "This is the product #{} description page owned by: {}".format(product_id, s)
-    except:
+        product = ZProduct.objects.get(code=int(product_id))
+    except ZProduct.DoesNotExist:
         message = "Unkown product id"
+    else:
+        # s = ", ".join([contact.name for contact in product.contact.all()])
+        message = "This is the product #{}-{} description page".format(product_id, product.name)
     return HttpResponse(message)
 
 

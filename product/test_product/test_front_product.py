@@ -195,16 +195,37 @@ class TestFrontProductAuthenticated(StaticLiveServerTestCase):
         favorite_link_lst = product_section.find_elements_by_tag_name('a')
         product_id_lst = []
         for favorite in favorite_link_lst:
-            product_id_lst.append(int(favorite.get_attribute("id")))
-            print('ID', product_id_lst[-1], product_id_lst[-1] % 2)
-            favorite.click()
-            time.sleep(3)
-            if not product_id_lst[-1] % 2:
-                favorite_link = product_section.find_element_by_id(str(product_id_lst[-1]))
-                favorite_link.click()
-                time.sleep(3)
 
-        # self.assertEqual(response.status_code, 200)
+            if favorite.get_attribute('data-state') is not None:
+                product_id = int(favorite.get_attribute('id'))
+                product_id_lst.append(product_id)
+                print('ID', product_id, product_id % 2)
+                favorite.click()
+                time.sleep(3)
+                if not product_id % 2:
+                    product_id_lst.pop()
+                    favorite_link = product_section.find_element_by_id(str(product_id))
+                    favorite_link.click()
+                    time.sleep(3)
+
+        # Go to Favorite page
+        favorite_page_link = driver.find_element_by_id('favorite_a')
+        # favorite_link = WebDriverWait(driver, DEFAULT_TIMEOUT_S).until(
+        #                                     EC.element_to_be_clickable((By.ID, 'favorite_a')))
+        favorite_page_link.click()
+        time.sleep(7)
+        # WebDriverWait(driver, DEFAULT_TIMEOUT_S).until(lambda drv: drv.find_element_by_id('product_section'))
+
+        self.assertEqual(driver.current_url, self.live_server_url + reverse('product:favorite'))
+
+        # Check each favorite state
+        for favorite_id in product_id_lst:
+            favorite_link = driver.find_element_by_id(str(favorite_id))
+            data_state = favorite_link.get_attribute('data-state')
+            print('TTTTTYYYYYPPPPPPPPPPEE', type(data_state))
+            self.assertEqual(data_state, 'false')
+
+
 
     # def test_front_info_page(self):
     #     """
