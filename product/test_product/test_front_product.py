@@ -174,13 +174,15 @@ class TestFrontProductAuthenticated(StaticLiveServerTestCase):
 
     def test_front_parse_favorite_page(self):
         """
-        test that index page returns a 200
+        Test that favorite product can be set and then Go to product information page
         """
         # data = {
         #     'user_query': 'oreo',
         # }
         driver = self.WEB_DRIVER
         query = "oreo"
+
+        # --- Go to Result page ---
 
         # Set the query and send by Enter key pressed
         nav = WebDriverWait(driver, DEFAULT_TIMEOUT_S).until(EC.visibility_of_element_located((By.ID, 'navbarResponsive')))
@@ -190,8 +192,73 @@ class TestFrontProductAuthenticated(StaticLiveServerTestCase):
 
         self.assertEqual(driver.current_url, self.live_server_url + reverse('product:result', args=[query]))
 
-        # product_section = WebDriverWait(driver, SEARCH_TIMEOUT_S).until(lambda drv: drv.find_element_by_id('product_section'))
+        # --- Targeted product ---
+        masthead = driver.find_element_by_class_name('masthead')
+        link_lst = masthead.find_elements_by_tag_name('a')
 
+        # Set targeted product as favorite
+        link_itr = iter(link_lst)
+        enable = True
+        while enable:
+
+            try:
+                link = next(link_itr)
+            
+                if link.get_attribute('data-state'):        # Warning: if it can be set to False
+                    product_id = int(link.get_attribute('id'))
+                    print('ID', product_id, product_id % 2)
+                    link.click()
+                    time.sleep(3)
+                    if not product_id % 2:
+                        # link = masthead.find_element_by_id(str(product_id))
+                        link.click()
+                        time.sleep(3)
+                    
+                    enable = False
+            
+            except StopIteration:
+                enable = False 
+
+        # Go to targeted product information page
+        link_itr = iter(link_lst)
+        enable = True
+        while enable:
+
+            try:
+                link = next(link_itr)
+            
+                if not link.get_attribute('data-state'):        # Warning: if it can be set to False
+
+                    link.click()
+                    # time.sleep(3)
+                    WebDriverWait(driver, DEFAULT_TIMEOUT_S).until(lambda drv: drv.find_element_by_id('product_info'))
+
+                    self.assertEqual(driver.current_url, self.live_server_url + reverse('product:product', args=[product_id, 'result', product_id, query]))
+
+                    # Check state
+                    product = driver.find_element_by_id(str(product_id))
+                    data_state = product.get_attribute('data-state')
+                    self.assertEqual(data_state, 'true')
+
+                    product.click()
+                    time.sleep(3)
+                    data_state = product.get_attribute('data-state')
+                    self.assertEqual(data_state, 'false')
+                    
+                    enable = False
+            
+            except StopIteration:
+                enable = False 
+
+        # Go back to Result page
+        back_lnk = driver.find_element_by_id('result_back_link')
+        back_lnk.click()
+
+        product_section = WebDriverWait(driver, SEARCH_TIMEOUT_S).until(lambda drv: drv.find_element_by_id('product_section'))
+
+        self.assertEqual(driver.current_url, self.live_server_url + reverse('product:result', args=[query]))
+
+        # --- Set favorite with odd code ---
         favorite_link_lst = product_section.find_elements_by_tag_name('a')
         product_id_lst = []
         for favorite in favorite_link_lst:
@@ -208,7 +275,7 @@ class TestFrontProductAuthenticated(StaticLiveServerTestCase):
                     favorite_link.click()
                     time.sleep(3)
 
-        # Go to Favorite page
+        # --- Go to Favorite page ---
         favorite_page_link = driver.find_element_by_id('favorite_a')
         # favorite_link = WebDriverWait(driver, DEFAULT_TIMEOUT_S).until(
         #                                     EC.element_to_be_clickable((By.ID, 'favorite_a')))
@@ -222,7 +289,6 @@ class TestFrontProductAuthenticated(StaticLiveServerTestCase):
         for favorite_id in product_id_lst:
             favorite_link = driver.find_element_by_id(str(favorite_id))
             data_state = favorite_link.get_attribute('data-state')
-            print('TTTTTYYYYYPPPPPPPPPPEE', type(data_state))
             self.assertEqual(data_state, 'false')
 
 

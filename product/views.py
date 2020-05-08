@@ -122,12 +122,15 @@ def favorite(request):
 
 def product(request, product_id, page_origin=None, product_id_origin=None, user_query=None):
 
+    if request.user.is_authenticated:
+        # Get user's favorite product
+        favorite_lst = request.user.favorites.all()
+
     try:
         product = ZProduct.objects.get(code=int(product_id))
     except ZProduct.DoesNotExist:
         message = "Unkown product id"
     else:
-        # s = ", ".join([contact.name for contact in product.contact.all()])
         message = "This is the product #{}-{} description page".format(product_id, product.name)
 
     return render(request, 'product/product.html', locals())
