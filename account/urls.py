@@ -9,6 +9,7 @@ urlpatterns = [
     path('sign-up/id', views.signup, name='signup'),     # register
     path('sign-up/key', views.signup_password, name='signup-pwd'),
     path('sign-in', views.signin, name='signin'),
+    # path('sign-in', views.signin, name='signin'),
     # path('logon', auth_views.LoginView.as_view()),
     path('<int:user_id>', views.profile, name='profile'),
     path('', views.profile, name='profile'),
