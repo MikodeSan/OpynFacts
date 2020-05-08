@@ -86,7 +86,7 @@ def result(request, user_query):
 
         if request.user.is_authenticated:
             # Save searched product according to authenticated user
-           
+
             request.user.searches.add(product_targeted_mdl)
 
             # Get user's favorite product
@@ -120,15 +120,20 @@ def favorite(request):
     return render(request, 'product/list.html', context)
 
 
-def product(request, _product_id):
-    product_id = int(_product_id) # make sure we have an integer.
+def product(request, product_id, page_origin=None, product_id_origin=None, user_query=None):
+
+    if request.user.is_authenticated:
+        # Get user's favorite product
+        favorite_lst = request.user.favorites.all()
+
     try:
-        product = ZProduct.objects.get(pk=product_id)
-        s = ", ".join([contact.name for contact in product.contact.all()])
-        message = "This is the product #{} description page owned by: {}".format(product_id, s)
-    except:
+        product = ZProduct.objects.get(code=int(product_id))
+    except ZProduct.DoesNotExist:
         message = "Unkown product id"
-    return HttpResponse(message)
+    else:
+        message = "This is the product #{}-{} description page".format(product_id, product.name)
+
+    return render(request, 'product/product.html', locals())
 
 
 def parse_favorite(request):

@@ -224,11 +224,14 @@ Execute : ```python manage.py runserver```
 
 ### Test and coverage
 
-Execute: ```pytest [-s] [-Wa] [--exitfirst] [--reuse-db] [-vv] --cov=./ --cov-report html```
+Tests use the chromium driver to manage Chrome browser.
+[Download](https://chromedriver.chromium.org) the current stable release and copy the ```chromedriver.exe``` at the same level than your project directory.
+
+Run tests by executing: ```pytest [-s] [-Wa] [--exitfirst] [--reuse-db] [-vv] --cov=./ --cov-report html```.
 
 ## Resources
 
-* [Web application](https://z-pur-beurre.herokuapp.com)
+* [Web application](https://myuka.herokuapp.com)
 * [Planning P05](https://trello.com/b/LZOSEDow/opynfacts)
 * [Planning P08](https://www.pivotaltracker.com/n/projects/2436156)
 * [Source Code](https://github.com/MikodeSan/OpynFacts)

@@ -188,20 +188,64 @@ def extract_data(product_dict):
     if 'nova_group' in product_dict:
         extracted_data_dict['nova_group'] = int(product_dict['nova_group'])
 
-    # nutrition score
+    # nutrition score fr
+    score = -1
+    if 'nutriments' in product_dict:
+        nutriments_dct = product_dict['nutriments']
+        if 'nutrition-score-fr_100g' in nutriments_dct:
+            score = nutriments_dct['nutrition-score-fr_100g']
+        elif 'nutrition-score-fr' in nutriments_dct:
+            score = nutriments_dct['nutrition-score-fr']
+
+    extracted_data_dict['nutrition_score_fr'] = score
+
+    # nutrition score uk
     score = -1
     if 'nutriments' in product_dict:
         nutriments_dct = product_dict['nutriments']
         if 'nutrition-score-uk_100g' in nutriments_dct:
             score = nutriments_dct['nutrition-score-uk_100g']
-        elif 'nutrition-score-fr_100g' in nutriments_dct:
-            score = nutriments_dct['nutrition-score-fr_100g']
         elif 'nutrition-score-uk' in nutriments_dct:
             score = nutriments_dct['nutrition-score-uk']
-        elif 'nutrition-score-fr' in nutriments_dct:
-            score = nutriments_dct['nutrition-score-fr']
 
-    extracted_data_dict['nutrition_score'] = score
+    extracted_data_dict['nutrition_score_uk'] = score
+
+    # fat_100g
+    score = -1
+    if 'nutriments' in product_dict:
+        nutriments_dct = product_dict['nutriments']
+        if 'fat_100g' in nutriments_dct:
+            score = nutriments_dct['fat_100g']
+
+
+    extracted_data_dict['fat_100g'] = score
+
+    # saturated-fat_100g
+    score = -1
+    if 'nutriments' in product_dict:
+        nutriments_dct = product_dict['nutriments']
+        if 'saturated-fat_100g' in nutriments_dct:
+            extracted_data_dict['saturated_fat_100g'] = nutriments_dct['saturated-fat_100g']
+        else:
+            extracted_data_dict['saturated_fat_100g'] = -1
+
+    # sugars_100g
+    score = -1
+    if 'nutriments' in product_dict:
+        nutriments_dct = product_dict['nutriments']
+        if 'sugars_100g' in nutriments_dct:
+            score = nutriments_dct['sugars_100g']
+
+    extracted_data_dict['sugars_100g'] = score
+
+    # salt_100g
+    score = -1
+    if 'nutriments' in product_dict:
+        nutriments_dct = product_dict['nutriments']
+        if 'salt_100g' in nutriments_dct:
+            score = nutriments_dct['salt_100g']
+
+    extracted_data_dict['salt_100g'] = score
 
     # nutrient level
     extracted_data_dict['nutrient_levels'] = {}

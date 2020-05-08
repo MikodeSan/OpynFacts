@@ -9988,6 +9988,10 @@ header.masthead h1 {
         padding-top: 72px;
         padding-bottom: 0
     }
+    header.masthead_list {
+        height: 100vh;
+        min-height: 40rem;
+    }
     header.masthead_home {
         height: 100vh;
         min-height: 40rem;
