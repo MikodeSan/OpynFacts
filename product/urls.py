@@ -14,6 +14,8 @@ urlpatterns = [
     path('favorite', views.favorite, name='favorite'),
     path('parse/favorite', views.parse_favorite, name='parse_favorite'),
     # url(r'^(?P<_product_id>[0-9]+)/$', views.product, name='info'),
+    path('product/<int:product_id>/from/<str:page_origin>', views.product, name='product'),
+    path('product/<int:product_id>/from/<str:page_origin>/<str:product_id_origin>/<str:user_query>', views.product, name='product'),
     # url(r'^notices/$', views.notice, name='notice'),
     path('notices', views.notice, name='notice'),
     ]
