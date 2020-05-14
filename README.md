@@ -7,207 +7,44 @@ The site "___Pur Beurre___" is a web application where the main goal is to find 
 
 ## Packages / Epic
 
-* __Administration__
-  * Account
-    * Authentification
-    * Personal Space
-  * Database
-    * Account
-    * Product
-      * Category
-      * Favorite
-      * Search
-      * Alternative
-* __Product__
-  * __Search__: To get a targeted product by 1 click, the user's query is gotten from the search bar and received by a html post request.
-  According to [Search request documentation](https://documenter.getpostman.com/view/8470508/SVtN3Wzy?version=latest#58efae40-73c3-4907-9a88-785faff6ffb1), a search is requested to the Openfoodfact service specifying the query into the ```GET``` request ([example for "confiture"](https://world.openfoodfacts.org/cgi/search.pl?search_terms=confiture&search_simple=1&action=process&json=true&sort_by=unique_scans)).  
-    From the returned formatted-JSON file, the first product of the list sorted by the popularity value ```unique_scans_n```, is used as reference to find an alternative product with better nutrition score.
-  * __Recommendation__: The strategy is to find the best healthy aternative products by browsing, from children to parents, the categories hierarchy of the reference product.  
-  For each category, the grades repartition is gotten by a drilldown search in order to limit the number of HTML requests, (see example for ['_chocolate-nuts-cookie-bars_' category](https://fr-en.openfoodfacts.org/category/en:chocolate-nuts-cookie-bars/nutrition-grades)).  
-  Then only for each identified grade from the category, products are extracted by an [advanced search](https://fr-en.openfoodfacts.org/cgi/search.pl?action=process&page=1&page_size=1000&sort_by=unique_scans&json=true&tagtype_0=categories&tag_contains_0=contains&tag_0=en%3Achocolate-nuts-cookie-bars&tagtype_1=nutrition_grades&tag_contains_1=contains&tag_1=d) and next are compared according to respective priority criteria: amount of healthy nutrients (```nutrition_grades```), the degree of processing of products (```nova_group```) and popularity (```unique_scans_n```). The most healthy are sorted and saved.
-* __View__
-  * Navigation
+Considering the main features and the potential reusability, the project is divided in two parts.
 
-## Features (Release / Story)
+### Account administration (Authentification management)
 
-Two Apps:
+* __Sign-up__ is performed in 2 steps:
+  * The user keys his e-mail as username. The username unicity is checked according to existing user data stored in database.
+  * The password has to be keyed two times to be confirmed and validated.
+* __Sign-in__: the user is identified with keyed username if this last one is already stored into database. The login operation succeeds according to the corresponding password, otherwise an error message is prompted.
+* __Profil__ (i.e. Personal page) is enabled once signed-in. It shows the user data such as registration date, login date and e-mail.
+* __Logout__ operation sets the session as anonymous.
 
-* Product: openfoodfact items
-* Account: Authentification Management and Profil
+### Product Management
 
-### Use case / User story
+* __Search__: To get a targeted product by 1 click, the user's query is got from the search bar and received by a html post request.
+According to [Search request documentation](https://documenter.getpostman.com/view/8470508/SVtN3Wzy?version=latest#58efae40-73c3-4907-9a88-785faff6ffb1), a search is requested to the Openfoodfact service specifying the query into the ```GET``` request ([example for "confiture"](https://world.openfoodfacts.org/cgi/search.pl?search_terms=confiture&search_simple=1&action=process&json=true&sort_by=unique_scans)).  
+From the returned formatted-JSON file, the first product of the list sorted by the popularity value ```unique_scans_n```, is used as reference to find an alternative product with better nutrition score.
+* __Recommendation__: The strategy is to find the best healthy aternative products by browsing, from children to parents, the categories hierarchy of the reference product.  
+For each category, the grades repartition is got by a _drilldown search_ in order to limit the number of HTML requests, (see example for ['_chocolate-nuts-cookie-bars_' category](https://fr-en.openfoodfacts.org/category/en:chocolate-nuts-cookie-bars/nutrition-grades)).  
+Then only for each identified grade from the category, products are extracted by an [advanced search](https://fr-en.openfoodfacts.org/cgi/search.pl?action=process&page=1&page_size=1000&sort_by=unique_scans&json=true&tagtype_0=categories&tag_contains_0=contains&tag_0=en%3Achocolate-nuts-cookie-bars&tagtype_1=nutrition_grades&tag_contains_1=contains&tag_1=d) request and next are sorted according to respective priority criteria: amount of healthy nutrients (```nutrition_grades```), the degree of processing of products (```nova_group```) and popularity (```unique_scans_n```). The most healthy are saved.
+* __Favorite__: If authentified, user set a product as favorite by clincking an heart icon.
+On HTML click event, the custom ```data-state``` attribute/property value is sent to javascript function that will notify the Django application backend via a AJAX POST request to modify the products database.
+According to the asynchronously HTTP response, the icon view state is updated without refresh the web page.  
+Favorite products are shown on the specific web page by extracting from database the identified user's products data.
+* __Details__: An anonymous user can see more information about a product by clicking on its image. For each [product page](https://myuka.herokuapp.com/product/3017620422003/result/3017620422003/nutella), more information are indicated such as nutrients levels for 100 g (extracted from the [```nutrient_levels```](https://world.openfoodfacts.org/api/v0/product/3017620422003.json) dictionary) and the corresponding OpenFoodFacts product page link.
 
-#### Sequence
+## Database
 
-* As a user, I want to Initialize/Update database with French products coming from OpenFoodFacts
-  * Initialize db
-  * Download list of categories
-  * Store categories into db
-  * Download list of products for each specified category
-  * Extract product data
-  * Store only new product data
-  * Set Category/Product Relation
-  * Store Category/Product relation for only new relation 
-  * Set db as completed
+The database contains:
 
-* As a user, I want to see all stored products by category
-  * Populate/Display category list
-  * Select all categories as default
-  * Populate/Display products list
-  * Select a set of category by clicking
-  * Populate/Display products list related to selected category
+* The list of user's account using the default user model of ```Django```
+* The list of all exported products from the OpenFoodFacts database
 
-* As a user, I want to Select a stored product and see its characteristics
-  * Product Selection
-  * Display Product description
-
-* As a user, I want to find alternative product according to '_nutri score_' and '_nova_group_'
-  * Check the categogy hierarchy where my selected product is included
-  * Select a categogy to find an alternative product
-  * Find a substitute under the same category
-    * Get alternative food criteria by successive priority: '_nutri score_' then '_nova_group_'
-  * Display alternative
-
-* As a user, I want to store and restore my favorite alternative food/product
-  * Set selected product as favorite by click on button '_>>_'
-  * Populate/Display favorite list
-    * Get all product set as favorite
-  * Remove selected product from favorite list by click on button '_<<_'
-
-<!--
-* As a user, at first I want to get the categories list from Open Food Facts and secondly get the products list from the selected category.
-  * Model
-    * Get data from openXfacts site
-      * use the openfoodfacts API
-    * Get data from db
-* As a user, I want to find alternative product according to __some criterias to define__
-  * Check the categogy hierarchy where my selected product is included.
-  * Select a categogy to find an alternative product.
-* As a user, I want to store and restore my data into database
-  * system use a MySQL DB
-    * Create db
-    * Initialize db
-      * Store categories data into db
-* As a user, I want to use a GUI to interact with db
-
-### tasks
-
-* sub-task
-
-## Algorithm
-
-## Workflow
-
-* Activity diagram
-* Processus
-
-## Difficulty
-
-* Solution
-
--->
-
-## Architecture
-
-### Front-end
-
-#### HTML / CSS: Content and layout
-
-- __Header__: Displays Logo, title and pickupline
-- __Central zone__:
-  - The _Dialog box_ is a void zone displaying messages from Grand-Py and the user.
-    - Loader (Spinner) is an infinite loop animation coordinated by `keyframes`. The animation will be started and interrupted asynchronously according to HTTP request states.
-  - The _Query field_ is compound of a text input to type a query and a submit button to validate the user's query.
-- __Footer__: Lists the author's name and links to contact, source code (Github repository), project planning and social networks.
-- __Responsiveness__: Maximal and minimal blocks size are defined and CSS `flex` property is used to stretch block if necessary.
-
-#### JavaScript: Dynamic update of the application view and interface (data exchange) with the back-end
-
-On submit event (~~enter key pressed or submit image click~~), the user's query is catched from input form and displayed into the dialog box as a text block. The `innerHTML` method is used to update the view content without refresh the web page.
-Then, a spinner animation is started to simulate Grand-Py's reflection at the same time the query is sent as form data to the flask server via a AJAX post request.
-
-When the response is received asynchronously from the server, a callback function extracts the received JSON-formatted data and displays the Grand-Py's reply and the defined map if necessary into the dialog box.
-
-### Back-end (model)
-
-#### Class diagram (Functional model)
-
-##### Interface
-
-#### Component
-
-#### Deployment
-
-#### Query analysis: identification of requested place
-
-The goal is to identify the requested place from the user's query received from the front-end side.  
-The punctuations signs defined in the python `string` class and the most common [_French_ stop words](https://github.com/6/stopwords-json/blob/master/dist/fr.json) are discarded from the sentence. In addition, a list of specific stop words such as [_adresse_, _situe_, _où est_, _trouve_, _cherche_, _aller_, _connais_, ...] are defined to delimit text block that could be a requested place.
-Finally, the only one remaining text block is considered as the searched location. If more than one text block are remaining, a random pre-defined Grand-Py's reply is returned to the front-end, telling the query is not understood.
-
-#### Localization of a specified place/site
-
-#### Geocoding
-
-The [Google Maps Geocoding API](https://developers.google.com/maps/documentation/geocoding) is used to locate the identified place.  
-The place name is sent to the geocoding service via a HTTP request, as a result the standard address and the coordinates (longitude/latitude) are returned as JSON-formatted data.
-In order to improve localization result, taking into account that the user is French, the local language as '_french_' and the preferential search region as ccTLD code '_fr_' are also specified to the service.
-
-#### Map
-
-Knowing the geocode (coodinates), the relative map can be got by sending a HTTP request to the [Google Maps Static API](https://developers.google.com/maps/documentation/maps-static). By specifying to the service some parameters like image size, zoom level and coordinates of the pin, as a result the image URL of a static map (non-interactive) is returned.  
-Then this URL can be transfered to the front-end side without the Google key for security.
-
-#### Media Wiki
-
-The geocode is also used to get back from [MediaWiki API](https://www.mediawiki.org/wiki/API:Main_page) the descritption of points of interest near the place. By sending to the service a HTTP `GET` request as `query` operation, and specifying the _coordinates_ and the _maximal perimeter_, a list of Wikipedia page identifiers is returned sorted by distance from specified coordinates.  
-So, a random page can be selected in order to return Grand-Py's replies more diversified for the same user's query.
-
-With another request speciying the selected _page identifier_, the page text of the point of interest is returned. So, by discarding titles, the first sentences are extracted and used to complete the Grand-Py's reply to the user.
-
-#### Random reply
-
-For each Grand-Py's reply, predefined text is randomly selected to embellish information returned to the user.
-
-
-### Database interface
-
-<!--
-#### Hosting
-
-- As a user, I want to  > Prod
-  - configure heroku
-  - variable d'environnement : clé google
-
-## Intégration continue
-
-Tests unitaires
-- mock
-couverture
-linter
--->
-<!-- 
-## Installation
-
-### Virtual environment
-
-- Create virtual environment named '_venv_' for example
-- Activate the new environment
-- Install requirements from '_requirements.txt_'
-
-### Start
-
-```Python
-python run.py
-``` 
--->
+The database model define relationships such as each user has a list of their Searched products and a list of their Favorite products. In Addition, each searched product is linked to the determined Alternative products.   
+```SQLite``` is used for developpement and ```PostGreSQL``` for production.
 
 ## Setup
 
-### Database
-
-* Use SQLite for developpement
-
-#### Report
+### Report
 
 To generate and see the database model, execute: ```python manage.py graph_models -a -g -o .\path\to\your\destination\graph.svg```
 Your specified own destination folder must be created first.
@@ -216,7 +53,7 @@ Your specified own destination folder must be created first.
 
 * Create virtual environment named '_venv_' for example
 * Activate the new environment
-* install requirements from '_requirements.txt_'
+* Install requirements from '_requirements.txt_'
 
 ### Run application locally
 
@@ -232,10 +69,10 @@ Run tests by executing: ```pytest [-s] [-Wa] [--exitfirst] [--reuse-db] [-vv] --
 ## Resources
 
 * [Web application](https://myuka.herokuapp.com)
-* [Planning P05](https://trello.com/b/LZOSEDow/opynfacts)
 * [Planning P08](https://www.pivotaltracker.com/n/projects/2436156)
-* [Source Code](https://github.com/MikodeSan/OpynFacts)
+* [Source Code](https://github.com/MikodeSan/OpynFacts/tree/py08)
 
 ## Legal notices / Credits
 
-Open Food Facts is the exclusive source of the data, any additions will be shared and back to the community under the OdBL licence.
+OpenFoodFacts is the exclusive source of the data, any additions will be shared and back to the community under the OdBL licence.
+As recommended by the [API Documentation](https://documenter.getpostman.com/view/8470508/SVtN3Wzy?version=latest#4a0c27c3-3abc-42c4-bf97-63f4e4108294), for READ operations, a User-Agent HTTP Header has to be added into request with the name of app, the version, system and a url (if any) in order not to be blocked by mistake.
