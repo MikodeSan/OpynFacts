@@ -395,6 +395,22 @@ def extract_category_hierarchy(product_dict):
 #     return category_lst
 
 
+def download_categories(locale='world', language=None):
+
+    # - Get List of category ---
+
+    geo_code = geography_code(locale, language)
+
+    geo_url = utils.ENTITY_MAP['food'] % geo_code
+    geo_url += 'categories'
+    # print(geo_url)
+
+    response = utils.fetch(geo_url, json_file=True, app_name='zopynfact', system='django', app_version='Version 1.0', website=None)
+    # print(response)
+
+    return response
+
+
 def search(query, page=1, page_size=20,
            sort_by='unique_scans', locale='world'):
     """
@@ -441,9 +457,9 @@ def advanced_search(criteria_dct, ingredient_dct={}, nutriment_dct={},
         parameters['tag_{}'.format(idx)] = value
         idx += 1 
         print(parameters)
-    geography_code = locale + '-' + utils.API_LANGUAGE_CODE
+    geo_code = geography_code(locale)
 
-    url = utils.build_url(geography=geography_code,
+    url = utils.build_url(geography=geo_code,
                           service='cgi',
                           resource_type='search.pl',
                           parameters=parameters)
@@ -457,13 +473,23 @@ def drilldown_search(criteria, value, criteria_filter, filter_value=None, locale
     Perform an drilldown search by getting secondary criteria for products from main criteria.
     """
 
-    geography_code = locale + '-' + utils.API_LANGUAGE_CODE
+    geo_code = geography_code(locale)
 
-    url = utils.build_url(geography=geography_code,
+    url = utils.build_url(geography=geo_code,
                           resource_type=[criteria, value, criteria_filter],
                           parameters=filter_value)
     print(url)
     return utils.fetch(url, json_file=True, app_name='zopynfact', system='django', app_version='Version 1.0', website=None)
+
+
+def geography_code(locale, lang=None):
+
+    if lang:
+        locale_id = locale + '-' + lang
+    else:
+        locale_id = locale + '-' + utils.API_LANGUAGE_CODE
+
+    return locale_id
 
 
 # # -*- coding: utf-8 -*-
