@@ -397,18 +397,34 @@ def extract_category_hierarchy(product_dict):
 
 def download_categories(locale='world', language=None):
 
-    # - Get List of category ---
+    """
+    Get List of categories
+    """
 
-    geo_code = geography_code(locale, language)
+    category_lst = []
+    is_valid = True
+    idx = 1
+    while is_valid:
 
-    geo_url = utils.ENTITY_MAP['food'] % geo_code
-    geo_url += 'categories'
-    # print(geo_url)
+        geo_code = geography_code(locale, language)
 
-    response = utils.fetch(geo_url, json_file=True, app_name='zopynfact', system='django', app_version='Version 1.0', website=None)
-    # print(response)
+        geo_url = utils.ENTITY_MAP['food'] % geo_code
+        geo_url += 'categories/{}'.format(idx)
+        print(geo_url)
 
-    return response
+        response = utils.fetch(geo_url, json_file=True, app_name='zopynfact', system='django', app_version='Version 1.0', website=None)
+        n = response['count']
+        print('CATEGORY RESPONSE COUNT:', n)
+
+        idx += 1
+        
+        lst = response['tags']
+        if lst:
+            category_lst.extend(lst)
+        else:
+            is_valid = False
+
+    return category_lst
 
 
 def search(query, page=1, page_size=20,
