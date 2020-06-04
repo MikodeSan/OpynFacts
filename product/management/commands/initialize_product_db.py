@@ -1,3 +1,7 @@
+import requests
+from operator import itemgetter
+
+
 from django.core.management.base import BaseCommand, CommandError
 from product.models import ZCategory, ZProduct
 
@@ -8,16 +12,25 @@ from product.models import ZCategory, ZProduct
 from zopynfacts import products as source
 
 
+
 class Command(BaseCommand):
     help = 'Initialize or alternately Update Product module database'
+
+    LOCALE = 'fr'
+    LANGAGE_DEFAULT = 'en'
+    LANGAGE = 'fr'
+
 
     def add_arguments(self, parser):
         parser.add_argument('poll_ids', nargs='+', type=int)
 
     def handle(self, *args, **options):
 
+        # Update category db        
+        category_lst = self.init_category_db()
 
-        self.zfunct()
+        # Update product db
+        self.init_product_db(category_lst)
 
         for poll_id in options['poll_ids']:
             # try:
@@ -27,11 +40,9 @@ class Command(BaseCommand):
 
             # poll.opened = False
             # poll.save()
-
             self.stdout.write(self.style.SUCCESS('Successfully read poll "%s"' % poll_id))
 
-    
-    def zfunct(self):
+    def init_category_db(self):
 
         # Init db
 
@@ -40,7 +51,7 @@ class Command(BaseCommand):
         ## Get Categories from db
 
         ## Get new categories 
-        category_source_lst = source.download_categories('fr', 'fr')
+        category_source_lst = source.get_categories(self.LOCALE, self.LANGAGE)
         Ncat_src = len(category_source_lst)
         print('Categories count:', Ncat_src)
 
@@ -78,25 +89,90 @@ class Command(BaseCommand):
 
         print('Categories count:', len(category_source_lst))
 
+        ## Add new categories
         Nmax = 50
         Ncategory = len(category_lst)
         if Ncategory < Nmax:
+            ### Get most complete/full categories
             n = Nmax - Ncategory
             category_lst.extend(category_source_lst[:n])
 
         for idx, cat_dct in enumerate(category_lst):
             print(idx, 'Products:', cat_dct['products'], 'Name', cat_dct['name'])
 
-        ### Get most complete/full categories
-        ### Get randomly categories
-        ## Add new categories into db 
+        ## Update categories into db (new and existing)
 
-        ## Update Categories into db (new and existing)
 
-        # Update db
-        # Get Product from category
-        # Get existing product
-        # Get healthiest and popular product
+        return category_lst
+
+
+    def init_product_db(self, category_lst):
+
+        # Update existing product from db
+
+        ## Get all product from db
+        product_lst = []
+
+        ## Get products from source
+        for idx, product_dct in enumerate(product_lst):
+
+            product_id = product_dct['id']
+            ### download product
+            product_dct = source.get_product(product_id, locale=self.LOCALE)
+            print(product_dct['code'])
+
+            ### extract data
+            product_data_dct = source.extract_data(product_dct)
+    
+            ## Update db
+            # set_product_model()
+
+
+
+
+        # Product from category source
+
+        ## Get category from db
+
+        ## Get all products of category from source
+        for idx, category_dct in enumerate(category_lst):
+
+            category_id = category_dct['id']
+            category_url = category_dct['url']
+
+            product_lst = source.get_products_from_category(category_url)
+            print('\t> {}. Process category #{} - {} Products'.format(idx, category_id, len(product_lst)))
+            for idx, p in enumerate(product_lst):
+                print(idx, p['code'], p['name'], p['unique_scans_n'])
+
+            best_product_lst = []
+
+            ### Get most popular product. Sort list of products prior by popularity
+            product_lst.sort(key=itemgetter('unique_scans_n'), reverse=True)
+
+            best_product_lst.extend(product_lst[:23]) 
+            for idx, p in enumerate(best_product_lst):
+                print(idx, p['code'], p['name'], p['unique_scans_n'])
+            
+            ### Get healthiest product. Sort list of product prior by nutrition grade, nova score
+            product_lst.sort(key=itemgetter('nova_group'))
+            product_lst.sort(key=itemgetter('nutrition_grades'))
+
+            for product_dct in product_lst[:12]:
+                #### Add only new product into final product list
+                if not any(product_dct['code'] in dct.values() for dct in best_product_lst):
+                    best_product_lst.append(product_dct) 
+            
+            for idx, p in enumerate(best_product_lst):
+                print(idx, p['code'], p['name'])
+
+
+
+        # print(category_lst[0])
+        # test = source.get_product_from_category_by_facets(category_lst[0]['url'], page=1, locale=self.LOCALE)
+        # print(test)
+        print('AZERTY')
+
 
 
         # Get existing cat from 
