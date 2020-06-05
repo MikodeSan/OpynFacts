@@ -403,7 +403,7 @@ def get_product(barcode, locale='world'):
                           service='api',
                           resource_type='product',
                           parameters=barcode)
-    print(url)
+    # print(url)
     return utils.fetch(url)
 
 def get_by_facets(query, page=1, locale='world'):

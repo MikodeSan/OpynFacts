@@ -32,10 +32,11 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
 
         # Update category db        
-        category_lst = self.init_category_db()
-
+        # category_lst = self.init_category_db()
+        category_lst = []
         # Update product db
         self.init_product_db(category_lst)
+
 
         for poll_id in options['poll_ids']:
             # try:
@@ -116,23 +117,37 @@ class Command(BaseCommand):
         # Update existing product from db
 
         ## Get all product from db
-        product_lst = []
+        # for idx in range()
+        # offset = 0
+        # step = 10
+        product_lst_db = ZProduct.objects.all()            # [offset:step]
+        for product_db in product_lst_db:
 
-        ## Get products from source
-        for idx, product_dct in enumerate(product_lst):
+            # print(product_db.code)
+            product_response_dct = source.get_product(str(product_db.code), locale=self.LOCALE)
+            if 'product' in product_response_dct:
+                product_dct = product_response_dct['product']
+            
+                ### extract data
+                product_data_dct = source.extract_data(product_dct)
 
-            product_id = product_dct['id']
-            ### download product
-            product_dct = source.get_product(product_id, locale=self.LOCALE)
-            print(product_dct['code'])
+                update_product_db(product_data_dct, force=True)
+        
+                # product_code_lst.append(str(product_db.code))
+            else:
+                print('Deleted product #', product_db.code, product_db.name)
+                ZProduct.objects.filter(code=product_db.code).delete()
 
-            ### extract data
-            product_data_dct = source.extract_data(product_dct)
+        # ## Get products from source
+        # for idx, product_code in enumerate(product_code_lst):
+
+        #     product_dct = source.get_product(product_code, locale=self.LOCALE)
+
+        #     ### extract data
+        #     product_data_dct = source.extract_data(product_dct)
     
-            ## Update db
-            # set_product_model()
-
-
+        #     ## Update db
+        #     # set_product_model()
 
 
         # Product from category source
@@ -182,3 +197,44 @@ class Command(BaseCommand):
         # cat_lst = [el_dct for idx, el_dct in enumerate(categories_dct['tags']) if idx % delta == 0]
         # for idx, cat_dct in enumerate(cat_lst):
         #     print(idx, cat_dct)
+
+def update_product_db(data_dct, force=False):
+    """
+    Update object from specified data
+    """
+    
+    # print('DATA_DCT', data_dct)
+    product_code = data_dct['code']
+
+    product_targeted = ZProduct.objects.get(code=product_code)
+    # print("Product get:", product_targeted)
+
+    if force or (not force and product_targeted.last_modified_t < data_dct['last_modified_t']):
+
+        ## Clean parameter
+        
+        # product_targeted.categories.clear()
+
+        categories_hierarchy_lst = data_dct['categories_hierarchy']
+        # nutrient_levels = data_dct['nutrient_levels']
+        # image = data_dct['image']
+        del data_dct['code']
+        del data_dct['categories_hierarchy']
+        del data_dct['nutrient_levels']
+        del data_dct['image']
+
+        ## Update product
+        n = ZProduct.objects.filter(code=product_code).update(**data_dct)
+        # print('N:', n)
+
+        ## Update relative categories
+        for idx, category_id in enumerate(categories_hierarchy_lst):
+
+            category_db, created = ZCategory.objects.get_or_create(identifier=category_id)
+            # print(category_db, created)
+            product_targeted.categories.add(category_db, through_defaults={'hierarchy_index': idx})
+    #         # category_db.products.add(product_targeted, through_defaults={'hierarchy_index': idx} )
+    #         # relation = ZCategory_Product.objects.create(product=product_targeted, category=category_db, hierarchy_index=idx)
+    #         # relation.save()
+
+
