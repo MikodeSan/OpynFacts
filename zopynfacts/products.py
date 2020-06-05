@@ -448,8 +448,6 @@ def get_categories(locale='world', language=None):
         print(geo_url)
 
         response = utils.fetch(geo_url, json_file=True, app_name='zopynfact', system='django', app_version='Version 1.0', website=None)
-        n = response['count']
-        print('CATEGORY RESPONSE COUNT:', n)
 
         idx += 1
 
@@ -457,6 +455,9 @@ def get_categories(locale='world', language=None):
         lst = response['tags']
         if lst:
             category_lst.extend(lst)
+            print('CATEGORY RESPONSE COUNT: {}/{}'.format(len(category_lst), response['count']))
+            if len(category_lst) >= response['count']:
+                is_valid = False
         else:
             is_valid = False
 
@@ -473,8 +474,8 @@ def get_products_from_category(category_url, n_product_max=50):
     response = requests.get(category_url)
     if response.status_code == 200:
         if response.url != category_url:
+            print('Initial:', category_url, 'vs', 'Alternative:', response.url)
             category_url = response.url
-            # print(category_url, response.url)
             # exit(1)
     else:
         exit(1)
@@ -491,8 +492,8 @@ def get_products_from_category(category_url, n_product_max=50):
     while not is_category_complete and not is_product_max:
 
         # Get category page
-        category_page_path = category_url + '/{}.json'.format(page_idx)
-        # print(category_page_path)
+        category_page_path = category_url + '/{}'.format(page_idx)
+        # print('Category page URL:', category_page_path)
         category_page_dct = utils.fetch(category_page_path)
 
         # Get n total products
@@ -502,6 +503,7 @@ def get_products_from_category(category_url, n_product_max=50):
         # Get products from page
         page_products_lst = category_page_dct['products']
         page_size = len(page_products_lst)
+        # print('Page size', page_size)
 
         # for product_idx, product_dct in enumerate(page_products_lst):
         for product_dct in page_products_lst:
@@ -510,7 +512,7 @@ def get_products_from_category(category_url, n_product_max=50):
 
             if product_data_dct :
                 products_lst.append(product_data_dct)
-                # print('popularity', product_data_dct['unique_scans_n'])
+                # print('#', product_data_dct['code'], product_data_dct['name'], product_data_dct['unique_scans_n'])
                 # print(product_idx+1, product_data_dict)
 
         page_idx += 1
