@@ -30,10 +30,12 @@ class Command(BaseCommand):
         parser.add_argument('poll_ids', nargs='+', type=int)
 
     def handle(self, *args, **options):
+        """Init db"""
 
         # Update category db        
-        # category_lst = self.init_category_db()
+        category_lst = self.init_category_db()
         category_lst = []
+
         # Update product db
         self.init_product_db(category_lst)
 
@@ -50,66 +52,51 @@ class Command(BaseCommand):
 
     def init_category_db(self):
 
-        # Init db
+        """
+        Initialize and update category db with the biggest/most complete ones from source
+        """
 
-        # Init category db
-
-        ## Get Categories from db
-
-        ## Get new categories 
+        ## Get categories from source
         category_source_lst = source.get_categories(self.LOCALE, self.LANGAGE)
-        Ncat_src = len(category_source_lst)
-        print('Raw Categories count:', Ncat_src)
+        n_cat = len(category_source_lst)
+        print('Raw Categories count:', n_cat)
 
-        # nCategory_cur = Ncat_src
-        category_idx = Ncat_src-1
+        # ## Discard non-valid categories from source
+        # category_idx = n_cat-1
 
-        category_lst = []
+        # while category_idx >= 0:
 
-        while category_idx >= 0:
+        #     is_valid = False
+        #     category_dct = category_source_lst[category_idx]
 
-            ### Get existing Categories from source
-            is_stored = False
+        #     # if 'known' in category_dct and 'sameAs' in category_dct:
+        #     if 'known' in category_dct:
+        #         if category_dct['known'] == 1:
+        #             is_valid = True
 
-            if is_stored:
-                category_dct = category_source_lst.pop(category_idx)
-                print(category_idx, category_dct)
-                category_lst.append(category_dct)
+        #     if not is_valid:
+        #         category_dct = category_source_lst.pop(category_idx)
+        #         # print(category_idx, 'Poped category:', category_dct, 'Source count', len(category_source_lst))
 
-            else:
-                ### Discard non-valid categories from source
-                is_valid = False
-                category_dct = category_source_lst[category_idx]
+        #     category_idx -= 1
+        # print('Final Categories count:', len(category_source_lst))
 
-                # if 'known' in category_dct and 'sameAs' in category_dct:
-                if 'known' in category_dct:
-                    if category_dct['known'] == 1:
-                        is_valid = True
+        ## Get Biggest categories
+        ### sort by amount of products (useless because are already sorted from source)
 
-                if not is_valid:
-                    category_dct = category_source_lst.pop(category_idx)
+        ## Add new categories into db
+        new_category_lst = []
+        for idx, category_dct in enumerate(category_source_lst[:self.N_CATEGORY_MAX]):
+            category_id = category_dct['id']
+            obj, is_created = ZCategory.objects.get_or_create(identifier=category_id)
+            if is_created:
+                new_category_lst.append(category_id)
+                print(idx, 'New category added to DB:', category_id, '-', category_dct['name'])
 
-                    # print(category_idx, 'Poped category:', category_dct, 'Source count', len(category_source_lst))
-
-            category_idx -= 1
-
-        print('Final Categories count:', len(category_source_lst))
-
-        ## Add new categories
-        Nmax = self.N_CATEGORY_MAX
-        Ncategory = len(category_lst)
-        if Ncategory < Nmax:
-            ### Get most complete/full categories
-            n = Nmax - Ncategory
-            category_lst.extend(category_source_lst[:n])
-
-        for idx, cat_dct in enumerate(category_lst):
-            print(idx, 'Category:', cat_dct['name'], '-', cat_dct['products'], 'Products')
-
-        ## Update categories into db (new and existing)
+        print(len(new_category_lst), 'new categories added to DB:')
 
 
-        return category_lst
+        return category_source_lst
 
 
     def init_product_db(self, category_lst):
@@ -123,6 +110,7 @@ class Command(BaseCommand):
         product_lst_db = ZProduct.objects.all()            # [offset:step]
         for product_db in product_lst_db:
 
+            ## Get products from source
             # print(product_db.code)
             product_response_dct = source.get_product(str(product_db.code), locale=self.LOCALE)
             if 'product' in product_response_dct:
@@ -131,23 +119,13 @@ class Command(BaseCommand):
                 ### extract data
                 product_data_dct = source.extract_data(product_dct)
 
+                ## Update db
                 update_product_db(product_data_dct, force=True)
-        
+
                 # product_code_lst.append(str(product_db.code))
             else:
                 print('Deleted product #', product_db.code, product_db.name)
                 ZProduct.objects.filter(code=product_db.code).delete()
-
-        # ## Get products from source
-        # for idx, product_code in enumerate(product_code_lst):
-
-        #     product_dct = source.get_product(product_code, locale=self.LOCALE)
-
-        #     ### extract data
-        #     product_data_dct = source.extract_data(product_dct)
-    
-        #     ## Update db
-        #     # set_product_model()
 
 
         # Product from category source
