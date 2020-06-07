@@ -1,8 +1,8 @@
 import requests
 from operator import itemgetter
 
-
 from django.core.management.base import BaseCommand, CommandError
+from django.core.exceptions import ObjectDoesNotExist
 from product.models import ZCategory, ZProduct
 
 # DIR_BASE = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -33,13 +33,50 @@ class Command(BaseCommand):
         """Init db"""
 
         # Initialize biggest category list into db
-        category_lst = self.init_category_db()
+        print('> Initialize biggest category list into dbs')
+        category_lst, category_source_lst = self.init_category_db()
 
         # Update product db
+        print('> Update product into db')
         self.init_product_db(category_lst)
 
         # Update category fields
-        category_lst = self.init_category_db()
+        print('> Update category fields')
+        category_update_lst = []
+        
+        # ## Method #1: scan each category from source list then check and update existing category from db
+        # for idx, category_src_dct in enumerate(category_source_lst):
+            
+        #     try:
+        #         category_db = ZCategory.objects.get(identifier=category_src_dct['id'])
+        #     except ObjectDoesNotExist:
+        #         pass
+        #     except :
+        #         print('CRITICAL EXCEPTION: exit from category fields update')
+        #         exit(1)
+        #     else:
+        #         category_name = category_src_dct['name']
+        #         ZCategory.objects.filter(identifier=category_src_dct['id']).update(label=category_name)
+        #         category_update_lst.append(category_name)
+        #         print(len(category_update_lst), idx, 'Update category name', category_name)
+
+        ## Method #2: scan each category from db then check and update existing category from source
+        category_lst_db = ZCategory.objects.all()
+
+        for idx, category_db in enumerate(category_lst_db):
+            category_db_id = category_db.identifier
+
+            category_src_dct = next((category_dct for idx, category_dct in enumerate(category_source_lst) if category_dct["id"] == category_db_id), None)
+            # category_lst = list(filter(lambda category_dct: category_dct['id'] == category_db_id, category_source_lst))
+            if category_src_dct:
+                category_name = category_src_dct['name']
+                ZCategory.objects.filter(identifier=category_src_dct['id']).update(label=category_name)
+                category_update_lst.append(category_name)
+                print(len(category_update_lst), idx, 'Update category name', category_name)
+            else:
+                print('Category', category_db_id, 'not found in source')
+
+
 
         for poll_id in options['poll_ids']:
             # try:
@@ -96,10 +133,10 @@ class Command(BaseCommand):
                 new_category_lst.append(category_id)
                 print(idx, 'New category added to DB:', category_id, '-', category_dct['name'])
 
-        print(len(new_category_lst), 'new categories added to DB:')
+        print(len(new_category_lst), 'new categories added to DB')
 
 
-        return category_lst
+        return category_lst, category_source_lst
 
 
     def init_product_db(self, category_lst):
@@ -127,8 +164,8 @@ class Command(BaseCommand):
 
                 # product_code_lst.append(str(product_db.code))
             else:
-                print('Deleted product #', product_db.code, product_db.name)
-                ZProduct.objects.filter(code=product_db.code).delete()
+                print('/!\\Warning/!\\: Product #', product_db.code, product_db.name, 'Not in source any more')
+                # ZProduct.objects.filter(code=product_db.code).delete()
 
         print('Existing products updated')
 
