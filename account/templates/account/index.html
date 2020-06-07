@@ -1,0 +1,83 @@
+{% extends 'product/base.html' %}
+
+{% block masthead_title %}
+<div class="col-lg-10 align-self-end">
+
+{% if sign_id == sign_enum.UP or sign_id == sign_enum.PASSWORD %}
+    <h1 class="text-uppercase text-white font-weight-bold">Inscription</h1>
+
+    {% if errors %}
+        <div>
+            <p><strong>Erreur lors de l'enregistrement.</strong></p>
+            {% for key, error in errors %}
+                {% autoescape off %}
+                    {{error}}            
+                {% endautoescape %}
+            {% endfor %}        
+        </div>
+    {% endif %}
+{% elif sign_id == sign_enum.IN %}
+    <h1 class="text-uppercase text-white font-weight-bold">Se connecter</h1>
+{% endif %}
+</div>
+
+{% endblock %}
+
+{% block content %}
+
+<!-- Section -->
+<section id="sign_section" class="page-section">
+  <div class="container">
+    {% comment %} <h2 class="text-center mt-0">Colette et Rémy</h2> {% endcomment %}
+
+{% if sign_id == sign_enum.UP %}
+
+    <form action="{% url 'account:signup' %}" method="post" >
+        {% csrf_token %}
+        {{ form.as_p }}
+        <input type="submit" class="btn btn-success" value="S'inscrire" />
+    </form>
+
+{% elif sign_id == sign_enum.PASSWORD %}
+
+    <form action="{% url 'account:signup-pwd' %}" method="post" >
+        {% csrf_token %}
+        {{ pwd_form.as_p }}
+        <input type="submit" class="btn btn-success" value="Valider" />
+    </form>
+
+{% elif sign_id == sign_enum.IN %}
+
+    {% if error %}
+    <p><strong>Utilisateur inconnu ou mauvais de mot de passe.</strong></p>
+    {% endif %}
+
+    {% if user.is_authenticated %}
+    Vous êtes connecté, {{ user.username }} !
+    {% else %}
+    <form method="post" action="{% url 'account:signin' %}">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <input type="submit" class="btn btn-success" value="Se connecter" />
+    </form>
+    {% endif %}
+
+    {% comment %} <div class="col-md-6"> {% endcomment %}
+        {% comment %} <h2 class="text-center artist_name">Artistes</h2> {% endcomment %}
+    {% comment %} </div> {% endcomment %}
+
+    <hr class="divider my-4">
+
+        {% comment %} {% if not sign_id %} {% endcomment %}
+            <p class="text-muted text-center mb-0">
+            Pas encore de compte ? <a href="{% url 'account:signup' %}">S'inscrire</a>.</p>
+            {# Inscrivez-vous / créer un compte / s enregistrer #}
+        {% comment %} {% endif %} {% endcomment %}
+
+{% endif %}
+
+  </div>
+</section>
+
+
+{% endblock %}
