@@ -32,13 +32,14 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         """Init db"""
 
-        # Update category db        
+        # Initialize biggest category list into db
         category_lst = self.init_category_db()
-        category_lst = []
 
         # Update product db
         self.init_product_db(category_lst)
 
+        # Update category fields
+        category_lst = self.init_category_db()
 
         for poll_id in options['poll_ids']:
             # try:
@@ -50,8 +51,8 @@ class Command(BaseCommand):
             # poll.save()
             self.stdout.write(self.style.SUCCESS('Successfully read poll "%s"' % poll_id))
 
-    def init_category_db(self):
 
+    def init_category_db(self):
         """
         Initialize and update category db with the biggest/most complete ones from source
         """
@@ -85,8 +86,10 @@ class Command(BaseCommand):
         ### sort by amount of products (useless because are already sorted from source)
 
         ## Add new categories into db
+        category_lst = category_source_lst[:self.N_CATEGORY_MAX]
         new_category_lst = []
-        for idx, category_dct in enumerate(category_source_lst[:self.N_CATEGORY_MAX]):
+
+        for idx, category_dct in enumerate(category_lst):
             category_id = category_dct['id']
             obj, is_created = ZCategory.objects.get_or_create(identifier=category_id)
             if is_created:
@@ -96,7 +99,7 @@ class Command(BaseCommand):
         print(len(new_category_lst), 'new categories added to DB:')
 
 
-        return category_source_lst
+        return category_lst
 
 
     def init_product_db(self, category_lst):
@@ -127,14 +130,15 @@ class Command(BaseCommand):
                 print('Deleted product #', product_db.code, product_db.name)
                 ZProduct.objects.filter(code=product_db.code).delete()
 
+        print('Existing products updated')
 
-        # Product from category source
 
-        ## Get category from db
+        # Add new product from category source into db
 
-        ## Get all products of category from source
+        new_product_lst = []
         for idx, category_dct in enumerate(category_lst):
 
+            ## Get products of category from source
             category_id = category_dct['id']
             category_url = category_dct['url']
 
@@ -164,6 +168,23 @@ class Command(BaseCommand):
             for idx, p in enumerate(best_product_lst):
                 print(idx, p['code'], p['name'], p['nutrition_grades'], p['nova_group'], p['unique_scans_n'])
 
+            ## add only new products into db
+
+            for idx, product_dct in enumerate(best_product_lst):
+
+                ### Create new product
+                product_code = product_dct['code']
+                obj, is_created = ZProduct.objects.get_or_create(code=product_code)
+                if is_created:
+
+                    ### Update new product into db
+                    new_product_lst.append(product_code)
+
+                    update_product_db(product_dct, force=True)
+                    print('New product added to DB:', idx,  '#', product_code, '-', product_dct['brands'], '-', product_dct['name'])
+
+        print('Total', len(new_product_lst), 'new products added to DB')
+
         print('AZERTY')
 
         # Get existing cat from 
@@ -190,12 +211,7 @@ def update_product_db(data_dct, force=False):
     if force or (not force and product_targeted.last_modified_t < data_dct['last_modified_t']):
 
         ## Clean parameter
-        
-        # product_targeted.categories.clear()
-
         categories_hierarchy_lst = data_dct['categories_hierarchy']
-        # nutrient_levels = data_dct['nutrient_levels']
-        # image = data_dct['image']
         del data_dct['code']
         del data_dct['categories_hierarchy']
         del data_dct['nutrient_levels']
@@ -206,6 +222,8 @@ def update_product_db(data_dct, force=False):
         # print('N:', n)
 
         ## Update relative categories
+        product_targeted.categories.clear()
+
         for idx, category_id in enumerate(categories_hierarchy_lst):
 
             category_db, created = ZCategory.objects.get_or_create(identifier=category_id)
