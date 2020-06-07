@@ -234,8 +234,6 @@ def set_product_model(product_data_dct):
     return product_targeted
 
 
-
-
 #     id = int(album_id) # make sure we have an integer.
 #     album = ALBUMS[id] # get the album with its id.
 #     artists = " ".join([artist['name'] for artist in album['artists']]) # grab artists name and create a string out of it.
