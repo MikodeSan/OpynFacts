@@ -142,13 +142,13 @@ def extract_data(product_dict):
 
         if key_product in product_dict:
             if product_dict[key_product] != '':
-                print(product_dict[key_product])
+                # print(product_dict[key_product])
                 name = product_dict[key_product]
                 is_found = True
         
         if is_found == False and key_generic in product_dict:
             if product_dict[key_generic] != '':
-                print(product_dict[key_generic])
+                # print(product_dict[key_generic])
                 name = product_dict[key_generic]
                 is_found = True
 
@@ -320,7 +320,7 @@ def extract_category_hierarchy(product_dict):
     if 'compared_to_category' in product_dict:
         category_lst.append(product_dict['compared_to_category'])
         idx += 1
-        print('compared_to_category', category_lst)
+        # print('compared_to_category', category_lst)
 
     if 'categories_hierarchy' in product_dict:
         for category in reversed(product_dict['categories_hierarchy']):
@@ -395,6 +395,139 @@ def extract_category_hierarchy(product_dict):
 #     return category_lst
 
 
+def get_product(barcode, locale='world'):
+    """
+    Return information of a given product.
+    """
+    url = utils.build_url(geography=locale,
+                          service='api',
+                          resource_type='product',
+                          parameters=barcode)
+    # print(url)
+    return utils.fetch(url)
+
+def get_by_facets(query, page=1, locale='world'):
+    """
+    Return products for a set of facets.
+    """
+    path = []
+    keys = query.keys()
+
+    if len(keys) == 0:
+        return []
+
+    else:
+        keys = sorted(keys)
+        for key in keys:
+            path.append(key)
+            path.append(query[key])
+
+        url = utils.build_url(geography=locale,
+                              resource_type=path,
+                              parameters=str(page))
+        return utils.fetch(url)['products']
+
+def get_categories(locale='world', language=None):
+
+    """
+    Get list of all categories from source according to the specified locale code id
+    """
+
+    category_lst = []
+    is_valid = True
+    idx = 1
+
+    # Get category pages 
+    while is_valid:
+
+        ## Download categories list as json format from source
+        geo_code = geography_code(locale, language)
+
+        geo_url = utils.ENTITY_MAP['food'] % geo_code
+        geo_url += 'categories/{}'.format(idx)
+        print(geo_url)
+
+        response = utils.fetch(geo_url, json_file=True, app_name='zopynfact', system='django', app_version='Version 1.0', website=None)
+
+        idx += 1
+
+        ## Join categories list
+        lst = response['tags']
+        if lst:
+            category_lst.extend(lst)
+            print('CATEGORY RESPONSE COUNT: {}/{}'.format(len(category_lst), response['count']))
+            if len(category_lst) >= response['count']:
+                is_valid = False
+        else:
+            is_valid = False
+
+    ## Return categories list
+    return category_lst
+
+
+def get_products_from_category(category_url, n_product_max=50):
+    """
+    Get products from category
+    """
+
+    # Check category url
+    response = requests.get(category_url)
+    if response.status_code == 200:
+        if response.url != category_url:
+            print('Initial:', category_url, 'vs', 'Alternative:', response.url)
+            category_url = response.url
+            # exit(1)
+    else:
+        exit(1)
+
+    # Get category pages
+    is_category_complete = False
+    is_product_max = False
+    page_idx = 1
+    n_scan = 0
+    n_product = 0
+    products_lst = []
+
+    # Stop if all product of category is scanned or specified amount of products is reached
+    while not is_category_complete and not is_product_max:
+
+        # Get category page
+        category_page_path = category_url + '/{}'.format(page_idx)
+        # print('Category page URL:', category_page_path)
+        category_page_dct = utils.fetch(category_page_path)
+
+        # Get n total products
+        n_product_total = int(category_page_dct['count'])
+        # print(n_product_total)
+
+        # Get products from page
+        page_products_lst = category_page_dct['products']
+        page_size = len(page_products_lst)
+        # print('Page size', page_size)
+
+        # for product_idx, product_dct in enumerate(page_products_lst):
+        for product_dct in page_products_lst:
+            # Get product data
+            product_data_dct = extract_data(product_dct)
+
+            if product_data_dct :
+                products_lst.append(product_data_dct)
+                # print('#', product_data_dct['code'], product_data_dct['name'], product_data_dct['unique_scans_n'])
+                # print(product_idx+1, product_data_dict)
+
+        page_idx += 1
+        n_scan += page_size
+        n_product = len(products_lst)
+
+        if n_scan >= n_product_total:
+            is_category_complete = True
+
+        if n_product_max > 0 and n_product >= n_product_max:
+            is_product_max = True
+
+    return products_lst
+
+
 def search(query, page=1, page_size=20,
            sort_by='unique_scans', locale='world'):
     """
@@ -441,9 +574,9 @@ def advanced_search(criteria_dct, ingredient_dct={}, nutriment_dct={},
         parameters['tag_{}'.format(idx)] = value
         idx += 1 
         print(parameters)
-    geography_code = locale + '-' + utils.API_LANGUAGE_CODE
+    geo_code = geography_code(locale)
 
-    url = utils.build_url(geography=geography_code,
+    url = utils.build_url(geography=geo_code,
                           service='cgi',
                           resource_type='search.pl',
                           parameters=parameters)
@@ -457,29 +590,28 @@ def drilldown_search(criteria, value, criteria_filter, filter_value=None, locale
     Perform an drilldown search by getting secondary criteria for products from main criteria.
     """
 
-    geography_code = locale + '-' + utils.API_LANGUAGE_CODE
+    geo_code = geography_code(locale)
 
-    url = utils.build_url(geography=geography_code,
+    url = utils.build_url(geography=geo_code,
                           resource_type=[criteria, value, criteria_filter],
                           parameters=filter_value)
     print(url)
     return utils.fetch(url, json_file=True, app_name='zopynfact', system='django', app_version='Version 1.0', website=None)
 
 
+def geography_code(locale, lang=None):
+
+    if lang:
+        locale_id = locale + '-' + lang
+    else:
+        locale_id = locale + '-' + utils.API_LANGUAGE_CODE
+
+    return locale_id
+
+
 # # -*- coding: utf-8 -*-
 # from . import utils
 # import requests
-
-
-# def get_product(barcode, locale='world'):
-#     """
-#     Return information of a given product.
-#     """
-#     url = utils.build_url(geography=locale,
-#                           service='api',
-#                           resource_type='product',
-#                           parameters=barcode)
-#     return utils.fetch(url)
 
 
 # def get_by_facets(query, page=1, locale='world'):

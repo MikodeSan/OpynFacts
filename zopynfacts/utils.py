@@ -137,7 +137,7 @@ def fetch(path, json_file=True, app_name=None, system=None, app_version=None, we
 
     zstr = " - ".join([el for el in [app_name, system, app_version, website] if el])
     hdr = {'user-agent': zstr}
-    print("FETCH", hdr)
+    # print("FETCH", hdr)
     response = requests.get(path, headers=hdr)
     if response.status_code != 200:
         exit(1)
