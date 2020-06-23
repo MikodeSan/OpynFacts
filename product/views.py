@@ -70,7 +70,7 @@ def index(request):
 
 def result(request, user_query):
 
-    context = {'page':'result'}
+    context = {'page':'result', 'product_lst':[]}
 
     # Get most popular product according to query
 
@@ -106,13 +106,14 @@ def result(request, user_query):
         for alternative_mdl in alternative_product_lst:
             product_targeted_mdl.alternatives.add(alternative_mdl)
 
-    else:
-        product_data_dct = {}
-        alternative_product_lst = []
+        context['product_lst'] = product_targeted_mdl.alternatives.all().order_by('nutrition_grades', 'nova_group', '-unique_scans_n')
+
+    # else:
+    #     product_data_dct = {}
+    #     alternative_product_lst = []
 
     context['query'] = user_query
     context['product_target'] = product_targeted_mdl
-    context['product_lst'] = product_targeted_mdl.alternatives.all().order_by('nutrition_grades', 'nova_group', '-unique_scans_n')
     return render(request, 'product/list.html', context)
 
 
