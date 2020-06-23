@@ -27,7 +27,7 @@ class Command(BaseCommand):
 
 
     def add_arguments(self, parser):
-        parser.add_argument('poll_ids', nargs='+', type=int)
+        parser.add_argument('zargs', nargs='+', type=int)
 
     def handle(self, *args, **options):
         """Init db"""
@@ -76,17 +76,8 @@ class Command(BaseCommand):
             else:
                 print('Category', category_db_id, 'not found in source')
 
-
-
-        for poll_id in options['poll_ids']:
-            # try:
-            #     poll = Poll.objects.get(pk=poll_id)
-            # except Poll.DoesNotExist:
-            #     raise CommandError('Poll "%s" does not exist' % poll_id)
-
-            # poll.opened = False
-            # poll.save()
-            self.stdout.write(self.style.SUCCESS('Successfully read poll "%s"' % poll_id))
+        for arg in options['zargs']:
+            self.stdout.write(self.style.SUCCESS('Successfully read arg "%s"' % arg))
 
 
     def init_category_db(self):
@@ -221,8 +212,6 @@ class Command(BaseCommand):
                     print('New product added to DB:', idx,  '#', product_code, '-', product_dct['brands'], '-', product_dct['name'])
 
         print('Total', len(new_product_lst), 'new products added to DB')
-
-        print('AZERTY')
 
         # Get existing cat from 
         
