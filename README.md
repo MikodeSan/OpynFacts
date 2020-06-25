@@ -22,7 +22,7 @@ Considering the main features and the potential reusability, the project is divi
 
 * __Search__: To get a targeted product by 1 click, the user's query is got from the search bar and sent via a html post request to the server side.  
 First, the search of the targeted product is performed from the application database. Each word of the query must be contained into either the brand field or the name field of a product stored into the database.  
-Otherwise, according to [documentation](https://documenter.getpostman.com/view/8470508/SVtN3Wzy?version=latest#58efae40-73c3-4907-9a88-785faff6ffb1), a search is requested to the Openfoodfact service specifying the query via a ```GET``` request ([example for "confiture"](https://world.openfoodfacts.org/cgi/search.pl?search_terms=confiture&search_simple=1&action=process&json=true&sort_by=unique_scans)), in reply to the request, a list of products is returned into a formatted-JSON file.  
+Otherwise, according to [documentation](https://documenter.getpostman.com/view/8470508/SVtN3Wzy?version=latest#58efae40-73c3-4907-9a88-785faff6ffb1), a search is requested to the OpenFoodFacts service specifying the query via a ```GET``` request ([example for "confiture"](https://world.openfoodfacts.org/cgi/search.pl?search_terms=confiture&search_simple=1&action=process&json=true&sort_by=unique_scans)), in reply to the request, a list of products is returned into a formatted-JSON file.  
 Finally, in both cases, the product with the biggest popularity value ```unique_scans_n```, is used as reference to find an alternative product with better nutrition score.
 * __Recommendation__: The strategy is to find the best healthy aternative products by browsing, from children to parents, the categories hierarchy of the reference product.  
 For each category, the grades repartition is got by a _drilldown search_ in order to limit the number of HTML requests, (see example for ['_chocolate-nuts-cookie-bars_' category](https://fr-en.openfoodfacts.org/category/en:chocolate-nuts-cookie-bars/nutrition-grades)).  
@@ -44,6 +44,14 @@ The database model define relationships such as each user has a list of their Se
 ```SQLite``` is used for developpement and ```PostGreSQL``` for production.
 
 To generate and see the database model, first create the destination folder, then execute: ```python manage.py graph_models -a -g -o .\path\to\your\destination\graph.svg```.
+
+### Iniatialization and update
+
+The application database is first initialized and updated by adding only the new categories containing the most amount of products. The [list of all categories](https://world.openfoodfacts.org/categories.json) is dowloaded from OpenFoodFacts ([documentation](https://documenter.getpostman.com/view/8470508/SVtN3Wzy?version=latest#categories)).  
+Moreover each existing products from the database are updated with data extracted from [OpenFoodFacts source](https://documenter.getpostman.com/view/8470508/SVtN3Wzy?version=latest#4a0c27c3-3abc-42c4-bf97-63f4e4108294).
+
+Then, from each category downloaded from source at the first step, the most popular products sorted by popularity and the healthiest ones sorted by nutrition grade and nova score are added to database. For each new product added, their categories are also added to database.  
+Finally label for each stored category is updated from OpenFoodFacts source.
 
 ## Setup
 
