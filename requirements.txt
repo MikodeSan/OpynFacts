@@ -12,6 +12,7 @@ Django==3.0.5
 django-debug-toolbar==2.2
 django-extensions==2.2.9
 dnspython==1.16.0
+get==2019.4.13
 gunicorn==20.0.4
 idna==2.9
 importlib-metadata==1.6.0
@@ -23,8 +24,10 @@ mysql-connector-python==8.0.19
 packaging==20.3
 Pillow==7.1.1
 pluggy==0.13.1
+post==2019.4.13
 protobuf==3.6.1
 psycopg2==2.8.5
+public==2019.4.13
 py==1.8.1
 pycodestyle==2.5.0
 pydotplus==2.0.2
@@ -33,7 +36,9 @@ pyparsing==2.4.7
 pytest==5.4.1
 pytest-cov==2.8.1
 pytz==2019.3
+query-string==2019.4.13
 requests==2.23.0
+selenium==3.141.0
 six==1.14.0
 sqlparse==0.3.1
 typed-ast==1.4.1

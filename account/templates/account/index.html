@@ -1,8 +1,10 @@
-{% extends 'product/base.html' %} {% block content %}
+{% extends 'product/base.html' %}
 
+{% block masthead_title %}
+<div class="col-lg-10 align-self-end">
 
 {% if sign_id == sign_enum.UP or sign_id == sign_enum.PASSWORD %}
-    <h1>Inscription</h1>
+    <h1 class="text-uppercase text-white font-weight-bold">Inscription</h1>
 
     {% if errors %}
         <div>
@@ -15,17 +17,25 @@
         </div>
     {% endif %}
 {% elif sign_id == sign_enum.IN %}
-    <h1>Se connecter</h1>
+    <h1 class="text-uppercase text-white font-weight-bold">Se connecter</h1>
 {% endif %}
+</div>
 
+{% endblock %}
 
+{% block content %}
+
+<!-- Section -->
+<section id="sign_section" class="page-section">
+  <div class="container">
+    {% comment %} <h2 class="text-center mt-0">Colette et Rémy</h2> {% endcomment %}
 
 {% if sign_id == sign_enum.UP %}
 
     <form action="{% url 'account:signup' %}" method="post" >
         {% csrf_token %}
         {{ form.as_p }}
-        <input type="submit" value="S'inscrire" />
+        <input type="submit" class="btn btn-success" value="S'inscrire" />
     </form>
 
 {% elif sign_id == sign_enum.PASSWORD %}
@@ -33,7 +43,7 @@
     <form action="{% url 'account:signup-pwd' %}" method="post" >
         {% csrf_token %}
         {{ pwd_form.as_p }}
-        <input type="submit" value="Valider" />
+        <input type="submit" class="btn btn-success" value="Valider" />
     </form>
 
 {% elif sign_id == sign_enum.IN %}
@@ -48,39 +58,26 @@
     <form method="post" action="{% url 'account:signin' %}">
         {% csrf_token %}
         {{ form.as_p }}
-        <input type="submit" value="Se connecter" />
+        <input type="submit" class="btn btn-success" value="Se connecter" />
     </form>
     {% endif %}
 
-    <div class="col-md-6">
+    {% comment %} <div class="col-md-6"> {% endcomment %}
+        {% comment %} <h2 class="text-center artist_name">Artistes</h2> {% endcomment %}
+    {% comment %} </div> {% endcomment %}
 
-        <ul>
-            <li>Go to <a href="{% url 'product:home' %}">Home</a></li>
-        </ul>
+    <hr class="divider my-4">
 
-        <h2 class="text-center artist_name">Artistes</h2>
-
-        <p style="margin-bottom: 20px;">Some text ! </p>
-
-        <form class="form-inline" action="{% url 'product:home' %}" method="post">
-            {% csrf_token %}
-
-            <div class="form-group">
-                <!-- {{ form_home.query }} -->
-                <button type="submit" class="btn btn-success">Recherche</button>
-            </div>
-            <!-- <input type="hidden" class="hidden" value="{{ album_id }}" name="album_id"> -->
-        </form>
-
-    </div>
-
-    <div>
         {% comment %} {% if not sign_id %} {% endcomment %}
-            <p>Pas encore de compte ? <a href="{% url 'account:signup' %}">S'inscrire</a>.</p>
+            <p class="text-muted text-center mb-0">
+            Pas encore de compte ? <a href="{% url 'account:signup' %}">S'inscrire</a>.</p>
             {# Inscrivez-vous / créer un compte / s enregistrer #}
         {% comment %} {% endif %} {% endcomment %}
-    </div>
+
 {% endif %}
+
+  </div>
+</section>
 
 
 {% endblock %}

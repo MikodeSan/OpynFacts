@@ -9964,16 +9964,17 @@ hr.light {
 header.masthead {
     padding-top: 10rem;
     padding-bottom: calc(10rem - 72px);
-    background: linear-gradient(to bottom, rgba(92, 77, 66, .8) 0, rgba(92, 77, 66, .8) 100%), url(../img/kawin-harasai-k60JspcBwKE-unsplash.jpg);
-    /* olenka-kotyk-eqsEZNCm4-c-unsplash.jpg */
+    background: linear-gradient(to bottom, rgba(92, 77, 66, .8) 0, rgba(92, 77, 66, .8) 100%);
     background-position: center;
     background-repeat: no-repeat;
     background-attachment: scroll;
-    background-size: cover
+    background-size: cover;
 }
 
-header.masthead_product {
-    background: linear-gradient(to bottom, rgba(92, 77, 66, .8) 0, rgba(92, 77, 66, .8) 100%);
+header.masthead_home {
+    background: linear-gradient(to bottom, rgba(92, 77, 66, .8) 0, rgba(92, 77, 66, .8) 100%), url(../img/kawin-harasai-k60JspcBwKE-unsplash.jpg);
+    /* olenka-kotyk-eqsEZNCm4-c-unsplash.jpg */
+    background-size: cover;
 }
 
 header.masthead h1 {
@@ -9982,10 +9983,18 @@ header.masthead h1 {
 
 @media (min-width:992px) {
     header.masthead {
-        height: 100vh;
-        min-height: 40rem;
+        height: 50vh;
+        min-height: 20rem;
         padding-top: 72px;
         padding-bottom: 0
+    }
+    header.masthead_list {
+        height: 100vh;
+        min-height: 40rem;
+    }
+    header.masthead_home {
+        height: 100vh;
+        min-height: 40rem;
     }
     header.masthead p {
         font-size: 1.15rem
