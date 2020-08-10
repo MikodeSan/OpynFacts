@@ -17,4 +17,5 @@ services:
 
 script:
   # - ./manage.py test
+  # - dummy
   pytest -s -Wa [--exitfirst] [--reuse-db] -vv --cov=./ --cov-report html
