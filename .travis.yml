@@ -10,12 +10,12 @@ branches:
 before_install:
   - pip install -r requirements_origin.txt
 
-env: DJANGO_SETTINGS_MODULE="opynfact_web_project.settings.production"
+env: DJANGO_SETTINGS_MODULE="opynfact_web_project.settings"
 
 services:
   - postgresql
 
 script:
   # - ./manage.py test
-  # - dummy
-  pytest -s -Wa [--exitfirst] [--reuse-db] -vv --cov=./ --cov-report html
+  # pytest -s -Wa [--exitfirst] [--reuse-db] -vv --cov=./ --cov-report html
+  pytest -s -Wa -vv --cov=./ --cov-report html
