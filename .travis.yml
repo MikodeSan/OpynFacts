@@ -1,0 +1,20 @@
+language: python
+python:
+  - '3.6'
+
+# safelist
+branches:
+  only:
+    - py10
+
+before_script:
+  - pip install -r requirements.txt
+
+env: DJANGO_SETTINGS_MODULE="disquaire_project.settings.production"
+
+services:
+  - postgresql
+
+script:
+  # - ./manage.py test
+  pytest -s -Wa [--exitfirst] [--reuse-db] -vv --cov=./ --cov-report html
