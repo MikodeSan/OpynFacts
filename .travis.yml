@@ -7,10 +7,10 @@ branches:
   only:
     - py10
 
-before_script:
+before_install:
   - pip install -r requirements_origin.txt
 
-env: DJANGO_SETTINGS_MODULE="disquaire_project.settings.production"
+env: DJANGO_SETTINGS_MODULE="opynfact_web_project.settings.production"
 
 services:
   - postgresql
