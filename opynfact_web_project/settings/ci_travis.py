@@ -32,6 +32,6 @@ DATABASES['default'].update(db_from_env)
 
 STATIC_ROOT = os.path.join(PROJECT_DIR, 'staticfiles')
 
-STATICFILES_DIRS = (
-    os.path.join(PROJECT_DIR, 'staticfiles'),       #'static'
-)
+# STATICFILES_DIRS = (
+#     os.path.join(PROJECT_DIR, 'staticfiles'),       #'static'
+# )
