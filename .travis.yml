@@ -7,7 +7,8 @@ branches:
   only:
     - py10
 
-dist: xenial
+# dist: xenial
+
 addons:
   chrome: stable
 
@@ -29,7 +30,7 @@ services:
 
 script:
   python manage.py collectstatic
-  python manage.py migrate
+  # python manage.py migrate
   # python manage.py createsuperuser
   
   # pytest -s -Wa [--exitfirst] [--reuse-db] -vv --cov=./ --cov-report html
