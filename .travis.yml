@@ -29,4 +29,4 @@ script:
   # - ./manage.py test
   # pytest -s -Wa [--exitfirst] [--reuse-db] -vv --cov=./ --cov-report html
   # pytest -s -Wa -vv --cov=./ --cov-report html
-  ./manage.py initializedatabase 0
+  python manage.py initializedatabase 0
