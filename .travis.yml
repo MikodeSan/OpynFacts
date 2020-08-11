@@ -22,8 +22,8 @@ env: DJANGO_SETTINGS_MODULE="opynfact_web_project.settings.ci_travis"
 services:
   - postgresql
 
-before_script:
-  - psql -c 'create database travis_ci_test;' -U postgres
+# before_script:
+  # - psql -c 'create database travis_ci_test;' -U postgres
 
 script:
   # - ./manage.py test
