@@ -17,12 +17,16 @@ before_install:
   - google-chrome-stable --headless --disable-gpu --remote-debugging-port=9222 http://localhost &
 
 
-env: DJANGO_SETTINGS_MODULE="opynfact_web_project.settings"
+env: DJANGO_SETTINGS_MODULE="opynfact_web_project.settings.ci_travis"
 
 services:
   - postgresql
 
+before_script:
+  - psql -c 'create database travis_ci_test;' -U postgres
+
 script:
   # - ./manage.py test
   # pytest -s -Wa [--exitfirst] [--reuse-db] -vv --cov=./ --cov-report html
-  pytest -s -Wa -vv --cov=./ --cov-report html
+  # pytest -s -Wa -vv --cov=./ --cov-report html
+  ./manage.py initializedatabase 0
