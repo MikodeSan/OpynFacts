@@ -10,8 +10,10 @@ branches:
 dist: xenial
 addons:
   chrome: stable
+
 before_install:
   - pip install -r requirements_origin.txt
+  - pip freeze > requirements.txt
   
   # start your web application and listen on `localhost`
   - google-chrome-stable --headless --disable-gpu --remote-debugging-port=9222 http://localhost &
@@ -26,7 +28,10 @@ services:
   # - psql -c 'create database travis_ci_test;' -U postgres
 
 script:
-  # - ./manage.py test
+  python manage.py collectstatic
+  python manage.py migrate
+  # python manage.py createsuperuser
+  
   # pytest -s -Wa [--exitfirst] [--reuse-db] -vv --cov=./ --cov-report html
   # pytest -s -Wa -vv --cov=./ --cov-report html
-  python manage.py initializedatabase 0
+  # python manage.py initializedatabase 0
