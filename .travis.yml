@@ -29,6 +29,7 @@ after_install:
   - VERSION=$(curl http://chromedriver.storage.googleapis.com/LATEST_RELEASE)
   - curl http://chromedriver.storage.googleapis.com/$VERSION/chromedriver_$PLATFORM.zip | bsdtar -xvf - -C env/bin/
   - chromedriver
+  - ll -a ./env/bin/
 
 # before_script:
   # - psql -c 'create database travis_ci_test;' -U postgres
