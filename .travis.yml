@@ -31,7 +31,7 @@ services:
 
   # - python manage.py initializedatabase 0
 script:
-  python manage.py collectstatic << yes
+  python manage.py collectstatic <<< yes
   # python manage.py createsuperuser
   
   # pytest -s -Wa [--exitfirst] [--reuse-db] -vv --cov=./ --cov-report html
