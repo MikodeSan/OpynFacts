@@ -7,7 +7,7 @@ branches:
   only:
     - py10
 
-# dist: xenial
+dist: bionic
 
 services:
   - postgresql
@@ -27,19 +27,25 @@ before_install:
 before_script:
   - PLATFORM=linux64
   - VERSION=$(curl http://chromedriver.storage.googleapis.com/LATEST_RELEASE)
-  - curl http://chromedriver.storage.googleapis.com/$VERSION/chromedriver_$PLATFORM.zip | bsdtar -xvf - -C env/bin/
+  # - curl http://chromedriver.storage.googleapis.com/$VERSION/chromedriver_$PLATFORM.zip | bsdtar -xvf - -C env/bin/
+  - wget http://chromedriver.storage.googleapis.com/$VERSION/chromedriver_$PLATFORM.zip
+  - unzip chromedriver_linux64.zip -d ./env/bin/
+  - export CHROME_BIN=chromium-browser
   - chromedriver
   - ll -a ./env/bin/
 
-# before_script:
+  # python manage.py collectstatic <<< yes
+
   # - psql -c 'create database travis_ci_test;' -U postgres
   # python manage.py migrate
-
+  # python manage.py createsuperuser 
   # - python manage.py initializedatabase 0
+
 script:
-  python manage.py collectstatic <<< yes
-  # python manage.py createsuperuser
   
+  - whereis google-chrome-stable
+  - whereis chromedriver
+
   # pytest -s -Wa [--exitfirst] [--reuse-db] -vv --cov=./ --cov-report html
   # pytest -s -Wa -vv --cov=./ --cov-report html
 
