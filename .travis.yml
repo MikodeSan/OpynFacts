@@ -29,10 +29,10 @@ before_script:
   - VERSION=$(curl http://chromedriver.storage.googleapis.com/LATEST_RELEASE)
   # - curl http://chromedriver.storage.googleapis.com/$VERSION/chromedriver_$PLATFORM.zip | bsdtar -xvf - -C env/bin/
   - wget http://chromedriver.storage.googleapis.com/$VERSION/chromedriver_$PLATFORM.zip
-  - unzip chromedriver_linux64.zip -d ./env/bin/
+  - unzip chromedriver_linux64.zip -d ~/virtualenv/python3.6/bin/
   - export CHROME_BIN=chromium-browser
   - chromedriver
-  - ll -a ./env/bin/
+  - ll -a ~/virtualenv/python3.6/bin/
 
   # python manage.py collectstatic <<< yes
 
