@@ -324,9 +324,10 @@ def create_webdriver():
     """
     Create browser webdriver
     """
-    base = os.path.dirname(settings.BASE_DIR)
+    # base = os.path.dirname(settings.BASE_DIR)
+    # base = os.path.join(settings.BASE_DIR, )
     # with webdriver.Chrome(executable_path=os.path.join(base, 'chromedriver.exe')) as driver:
-    driver = webdriver.Chrome(executable_path=os.path.join(base, 'chromedriver.exe'))
+    driver = webdriver.Chrome(executable_path='~/virtualenv/python3.6/bin/chromedriver')
     # driver.implicitly_wait(10)
     # time.sleep(1)
 
