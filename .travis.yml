@@ -36,7 +36,7 @@ before_script:
   # - chromedriver &
   - ls -a /home
   - ls -a /home/travis
-  - ls -a /home/virtualenv/
+  - ls -a /home/travis/virtualenv
   - ls -a ~/virtualenv
   - ls -a ~/virtualenv/python3.6/bin/
 
