@@ -331,14 +331,14 @@ def create_webdriver():
 
     # base = os.path.dirname(settings.BASE_DIR)
     # with webdriver.Chrome(executable_path=os.path.join(base, 'chromedriver.exe')) as driver:
-    browzer = webdriver.Chrome(executable_path='/home/travis/virtualenv/python3.8/bin/chromedriver', options=chromeOptions)
+    browser = webdriver.Chrome(executable_path='/home/travis/virtualenv/python3.8/bin/chromedriver', options=chromeOptions)
     browser.get("http://linuxhint.com")
     print("Title: %s" % browser.title)
     # browser.quit()
-    # browzer.implicitly_wait(10)
+    # browser.implicitly_wait(10)
     # time.sleep(1)
 
-    return browzer
+    return browser
 
 def build_full_url(obj, relative_url_name, kwargs=None):
     """
