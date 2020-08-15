@@ -1,6 +1,6 @@
 language: python
 python:
-  - '3.6'
+  - '3.8'
 
 # safelist
 branches:
@@ -31,14 +31,16 @@ before_script:
   # - PYTHON_VERSION=$(python --version)
   # - curl http://chromedriver.storage.googleapis.com/$VERSION/chromedriver_$PLATFORM.zip | bsdtar -xvf - -C env/bin/
   - wget http://chromedriver.storage.googleapis.com/$VERSION/chromedriver_$PLATFORM.zip
-  - unzip chromedriver_linux64.zip -d ~/virtualenv/python3.6/bin/
+  - unzip chromedriver_linux64.zip -d ~/virtualenv/python3.8/bin/
   - export CHROME_BIN=chromium-browser
   # - chromedriver &
   - ls -a /home
   - ls -a /home/travis
   - ls -a /home/travis/virtualenv
   - ls -a ~/virtualenv
-  - ls -a ~/virtualenv/python3.6/bin/
+  - ls -a /home/travis/virtualenv/python3.8
+  - ls -a /home/travis/virtualenv/python3.8.1
+  - ls -a ~/virtualenv/python3.8/bin/
 
   # python manage.py collectstatic <<< yes
 
