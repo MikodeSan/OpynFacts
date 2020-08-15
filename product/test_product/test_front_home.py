@@ -22,8 +22,8 @@ import pytest
 
 
 # sys.path.append(os.path.dirname(os.path.dirname(__file__)))
-# BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-sys.path.append(BASE_DIR)
+base = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+sys.path.append(base)
 from test_util import *
 
 DEFAULT_TIMEOUT_S = 12
