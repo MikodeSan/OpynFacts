@@ -16,7 +16,6 @@ class TestFrontProductAnomymous(StaticLiveServerTestCase):
         super().setUpClass()
 
         # Create driver
-
         cls.WEB_DRIVER = create_webdriver()
         cls.WEB_DRIVER.maximize_window()
 
@@ -88,8 +87,7 @@ class TestFrontProductAuthenticated(StaticLiveServerTestCase):
         cls.USER = get_user_model().objects.create_user(username, email, cls.USER_PWD)
 
         # # Create driver
-        base = os.path.dirname(settings.BASE_DIR)
-        cls.WEB_DRIVER = webdriver.Chrome(executable_path=os.path.join(base, 'chromedriver.exe'))
+        cls.WEB_DRIVER = create_webdriver()
         cls.WEB_DRIVER.maximize_window()
 
 
