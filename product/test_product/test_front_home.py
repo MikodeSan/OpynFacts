@@ -326,7 +326,7 @@ def create_webdriver():
     Create browser webdriver
     """
 
-    chromeoption = Options()
+    chromeOptions = Options()
     chromeOptions.headless = True
 
     # base = os.path.dirname(settings.BASE_DIR)
