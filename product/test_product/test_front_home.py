@@ -15,6 +15,7 @@ from selenium import webdriver
 # from selenium.webdriver.firefox.webdriver import WebDriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
@@ -324,14 +325,20 @@ def create_webdriver():
     """
     Create browser webdriver
     """
+
+    chromeoption = Options()
+    chromeOptions.headless = True
+
     # base = os.path.dirname(settings.BASE_DIR)
-    base = os.path.dirname('/home/travis/virtualenv/python3.8/bin/chromedriver' )
     # with webdriver.Chrome(executable_path=os.path.join(base, 'chromedriver.exe')) as driver:
-    driver = webdriver.Chrome(executable_path=os.path.join(base, 'chromedriver'))
-    # driver.implicitly_wait(10)
+    browzer = webdriver.Chrome(executable_path='/home/travis/virtualenv/python3.8/bin/chromedriver', options=chromeOptions)
+    browser.get("http://linuxhint.com")
+    print("Title: %s" % browser.title)
+    # browser.quit()
+    # browzer.implicitly_wait(10)
     # time.sleep(1)
 
-    return driver
+    return browzer
 
 def build_full_url(obj, relative_url_name, kwargs=None):
     """
