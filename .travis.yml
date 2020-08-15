@@ -34,6 +34,10 @@ before_script:
   - unzip chromedriver_linux64.zip -d ~/virtualenv/python3.6/bin/
   - export CHROME_BIN=chromium-browser
   # - chromedriver &
+  - ls -a /home
+  - ls -a /home/travis
+  - ls -a /home/virtualenv/
+  - ls -a ~/virtualenv
   - ls -a ~/virtualenv/python3.6/bin/
 
   # python manage.py collectstatic <<< yes
@@ -49,5 +53,5 @@ script:
   - whereis chromedriver
 
   # pytest -s -Wa [--exitfirst] [--reuse-db] -vv --cov=./ --cov-report html
-  - pytest -s -Wa -v --cov=./ --cov-report html
+  - pytest -s -vv --cov=./ --cov-report html
 
