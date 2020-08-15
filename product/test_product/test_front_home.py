@@ -21,10 +21,11 @@ import pytest
 # from selenium.webdriver.support import expected_conditions as EC
 
 
-# sys.path.append(os.path.dirname(os.path.dirname(__file__)))
+from test_util import *
+
 base = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.path.append(settings.BASE_DIR)
-from test_util import *
+
 
 DEFAULT_TIMEOUT_S = 12
 SEARCH_TIMEOUT_S = 180
