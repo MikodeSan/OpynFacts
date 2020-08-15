@@ -20,7 +20,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
 
-DEFAULT_TIMEOUT_S = 7
+DEFAULT_TIMEOUT_S = 23
 SEARCH_TIMEOUT_S = 180
 DISABLE_TEST = True
 

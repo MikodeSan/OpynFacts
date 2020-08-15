@@ -333,20 +333,10 @@ class TestFrontProductAuthenticatedMisc(TestCase):
         self.assertEqual(response.status_code, 200)
 
 
-
-
-
-
-
-
-
-
 #     @pytest.mark.django_db(transaction=False)
 #     def test_my_user():
 #         me = User.objects.get(username='me')
 #         assert me.is_superuser
-
-
 
 # # Detail Page
 # class DetailPageTestCase(TestCase):
@@ -356,7 +346,6 @@ class TestFrontProductAuthenticatedMisc(TestCase):
     
 #         impossible = Album.objects.create(title="Transmission Impossible")
 #         self.album = Album.objects.get(title='Transmission Impossible')
-
 
 # # Booking Page
 # class BookingPageTestCase(TestCase):
@@ -368,7 +357,6 @@ class TestFrontProductAuthenticatedMisc(TestCase):
 #         impossible.artists.add(journey)
 #         self.album = Album.objects.get(title='Transmission Impossible')
 #         self.contact = Contact.objects.get(name='Freddie')
-
 
 #     def test_new_booking_is_registered(self):
 #         # test that a new booking is made

@@ -90,6 +90,7 @@ class TestFrontHomeAnomymous(StaticLiveServerTestCase):
 
         self.assertEqual(driver.current_url, self.live_server_url + '/#contact')
 
+    @unittest.skipIf(DISABLE_TEST, "ERROR:Random timeout by using WebDriverWait")
     def test_nav_search_bar_2_result_page(self):
         """
         Check navigation from search bar to product result page
