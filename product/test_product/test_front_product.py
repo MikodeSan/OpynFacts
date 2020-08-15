@@ -1,28 +1,10 @@
 import os
-import time
+import sys
 
+base = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+sys.path.append(base)
 
-from django.conf import settings
-from django.contrib.auth import get_user_model
-from django.urls import reverse
-
-import unittest
-from django.test import TestCase, Client
-from django.contrib.staticfiles.testing import StaticLiveServerTestCase
-# from django.test.utils import setup_test_environment
-import pytest
-from selenium import webdriver
-# from selenium.webdriver.firefox.webdriver import WebDriver
-from selenium.webdriver.common.by import By
-from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-
-# from .models import Album, Artist, Contact, Booking
-
-DEFAULT_TIMEOUT_S = 7
-SEARCH_TIMEOUT_S = 180
-DISABLE_TEST = True
+from test_util import *
 
 
 # Tests of Front for anomymous product pages
@@ -34,8 +16,8 @@ class TestFrontProductAnomymous(StaticLiveServerTestCase):
         super().setUpClass()
 
         # Create driver
-        base = os.path.dirname(settings.BASE_DIR)
-        cls.WEB_DRIVER = webdriver.Chrome(executable_path=os.path.join(base, 'chromedriver.exe'))
+
+        cls.WEB_DRIVER = create_webdriver()
         cls.WEB_DRIVER.maximize_window()
 
     @classmethod

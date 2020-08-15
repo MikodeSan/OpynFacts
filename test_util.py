@@ -1,6 +1,15 @@
+import time
+
+
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.urls import reverse
+
+import unittest
+from django.test import TestCase, Client
+from django.contrib.staticfiles.testing import StaticLiveServerTestCase
+# from django.test.utils import setup_test_environment
+import pytest
 
 from selenium import webdriver
 # from selenium.webdriver.firefox.webdriver import WebDriver
@@ -9,6 +18,11 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+
+
+DEFAULT_TIMEOUT_S = 7
+SEARCH_TIMEOUT_S = 180
+DISABLE_TEST = True
 
 
 def create_webdriver():

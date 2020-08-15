@@ -1,35 +1,10 @@
 import os
 import sys
-import time
-
-
-# from django.conf import settings
-# from django.contrib.auth import get_user_model
-# from django.urls import reverse
-
-import unittest
-from django.test import TestCase, Client
-from django.contrib.staticfiles.testing import StaticLiveServerTestCase
-# from django.test.utils import setup_test_environment
-import pytest
-# from selenium import webdriver
-# # from selenium.webdriver.firefox.webdriver import WebDriver
-# from selenium.webdriver.common.by import By
-# from selenium.webdriver.common.keys import Keys
-# from selenium.webdriver.chrome.options import Options
-# from selenium.webdriver.support.ui import WebDriverWait
-# from selenium.webdriver.support import expected_conditions as EC
-
-
-from test_util import *
 
 base = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-sys.path.append(settings.BASE_DIR)
+sys.path.append(base)
 
-
-DEFAULT_TIMEOUT_S = 12
-SEARCH_TIMEOUT_S = 180
-DISABLE_TEST = True
+from test_util import *
 
 
 # Front Base and Home Anomymous
