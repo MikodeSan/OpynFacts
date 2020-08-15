@@ -1,3 +1,7 @@
+from django.conf import settings
+from django.contrib.auth import get_user_model
+from django.urls import reverse
+
 from selenium import webdriver
 # from selenium.webdriver.firefox.webdriver import WebDriver
 from selenium.webdriver.common.by import By

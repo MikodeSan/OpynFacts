@@ -3,9 +3,9 @@ import sys
 import time
 
 
-from django.conf import settings
-from django.contrib.auth import get_user_model
-from django.urls import reverse
+# from django.conf import settings
+# from django.contrib.auth import get_user_model
+# from django.urls import reverse
 
 import unittest
 from django.test import TestCase, Client
@@ -23,7 +23,7 @@ import pytest
 
 # sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 base = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-sys.path.append(base)
+sys.path.append(settings.BASE_DIR)
 from test_util import *
 
 DEFAULT_TIMEOUT_S = 12
