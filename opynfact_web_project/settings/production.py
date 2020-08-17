@@ -116,3 +116,7 @@ sentry_sdk.init(
     # django.contrib.auth) you may enable sending PII data.
     send_default_pii=True
 )
+
+CRONJOBS = [
+    ('*/10   * * * *', 'django.core.management.call_command', ['initializedatabase']),
+]

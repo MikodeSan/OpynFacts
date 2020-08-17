@@ -43,7 +43,8 @@ INSTALLED_APPS = [
     'account.apps.AccountConfig',
     'django.contrib.staticfiles',
     'django_extensions',
-    'debug_toolbar',
+    'django_crontab',
+    'debug_toolbar',    
 ]
 
 MIDDLEWARE = [
@@ -142,3 +143,7 @@ STATIC_URL = '/static/'
 
 STATIC_ROOT = os.path.join(PROJECT_DIR, 'staticfiles')
 
+CRONJOBS = [
+    ('*/5 * * * *', 'product.cron.my_scheduled_job'),
+    # ('0   4 * * *', 'django.core.management.call_command', ['clearsessions']),
+]
