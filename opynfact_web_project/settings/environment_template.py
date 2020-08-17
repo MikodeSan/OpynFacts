@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 """
 
 from . import *
-from .envar import *
+from .zenvar import *
 
 import sentry_sdk
 from sentry_sdk.integrations.django import DjangoIntegration
