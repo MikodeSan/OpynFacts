@@ -11,6 +11,10 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 """
 
 from . import *
+from .envar import *
+
+import sentry_sdk
+from sentry_sdk.integrations.django import DjangoIntegration
 
 
 # Quick-start development settings - unsuitable for production
@@ -18,9 +22,10 @@ from . import *
 
 # SECURITY WARNING: don't run with debug turned on in production!
 
-SECRET_KEY = 'set_the_key'
+SECRET_KEY = KEY
+
 DEBUG = False
-ALLOWED_HOSTS = ['0.0.0.0']
+ALLOWED_HOSTS = [IP_HOST]
 
 
 # SESSION_COOKIE_SECURE = True
@@ -51,11 +56,11 @@ MIDDLEWARE = [
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql', # on utilise l'adaptateur postgresql
-        'NAME': 'db', # le nom de notre base de donnees creee precedemment
-        'USER': 'user', # attention : remplacez par votre nom d'utilisateur
-        'PASSWORD': 'password',
-        'HOST': 'localhost',
-        'PORT': '5432',
+        'NAME': DB_NAME, # le nom de notre base de donnees creee precedemment
+        'USER': DB_USER, # attention : remplacez par votre nom d'utilisateur
+        'PASSWORD': DB_PWD,
+        'HOST': DB_HOST,
+        'PORT': DB_PORT,
     }
 }
 
@@ -93,3 +98,11 @@ STATICFILES_DIRS = (
 # https://warehouse.python.org/project/whitenoise/
 # STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
+sentry_sdk.init(
+    dsn=SENTRY_DSN,
+    integrations=[DjangoIntegration()],
+
+    # If you wish to associate users to errors (assuming you are using
+    # django.contrib.auth) you may enable sending PII data.
+    send_default_pii=True
+)
