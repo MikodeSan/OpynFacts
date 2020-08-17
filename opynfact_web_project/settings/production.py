@@ -118,5 +118,5 @@ sentry_sdk.init(
 )
 
 CRONJOBS = [
-    ('*/10   * * * *', 'django.core.management.call_command', ['initializedatabase']),
+    ('*/10   * * * *', 'django.core.management.call_command', ['initializedatabase 0']),
 ]
