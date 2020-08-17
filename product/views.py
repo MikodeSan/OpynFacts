@@ -1,6 +1,9 @@
 import os, sys
 import json
 
+import logging
+
+
 from django.http import HttpResponse, HttpResponseRedirect, HttpResponsePermanentRedirect
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
@@ -18,6 +21,10 @@ sys.path.append(DIR_BASE)
 from zopynfacts import products
 
 # sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+
+
+# Get an instance of a logger
+logger = logging.getLogger(__name__)
 
 
 def index(request):
@@ -79,6 +86,12 @@ def result(request, user_query):
 
     ## Get from remote source db
     if not product_targeted_mdl:
+
+        logger.info('User query: {} not in local db'.format(user_query), exc_info=True, extra={
+            # Optionally pass a request and we'll grab any information we can
+            'request': request,
+            })
+
         r_json = products.search(user_query, locale='fr')
         if r_json['products']:
             product_dct = r_json['products'][0]
@@ -108,7 +121,12 @@ def result(request, user_query):
 
         context['product_lst'] = product_targeted_mdl.alternatives.all().order_by('nutrition_grades', 'nova_group', '-unique_scans_n')
 
-    # else:
+    else:
+        logger.info('User query: {} not found'.format(user_query), exc_info=True, extra={
+            # Optionally pass a request and we'll grab any information we can
+            'request': request,
+            })
+
     #     product_data_dct = {}
     #     alternative_product_lst = []
 
