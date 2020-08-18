@@ -13,7 +13,7 @@ def my_scheduled_job():
         'request': '1',
         })
 
-    logger.exception('test'.format(user_query), exc_info=True, extra={
+    logger.exception('test', exc_info=True, extra={
         # Optionally pass a request and we'll grab any information we can
         'request': 'toto',
         })
