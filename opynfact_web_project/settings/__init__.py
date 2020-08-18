@@ -146,5 +146,5 @@ STATIC_ROOT = os.path.join(PROJECT_DIR, 'staticfiles')
 CRONJOBS = [
     ('*/1 * * * *', 'product.cron.my_scheduled_job', '>> /tmp/scheduled_job.log'),
     # ('0   4 * * *', 'django.core.management.call_command', ['clearsessions']),   
-    ('*/5   * * * *', 'product.management.commands.initializedatabase', [0]),
+    ('*/5   * * * *', 'product.management.commands.initializedatabase', ['0'], '> /home/miket2/backups/last_sunday_auth_backup.json'),
 ]
