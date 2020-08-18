@@ -3,7 +3,7 @@ import logging
 
 
 # Get an instance of a logger
-logger = logging.getLogger('CRON')
+logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
 
@@ -17,6 +17,7 @@ def my_scheduled_job():
         })
 
     print(logger)
+    logger.warning('User query')
 
     logger.error('test', exc_info=True, extra={
         # Optionally pass a request and we'll grab any information we can
@@ -24,8 +25,8 @@ def my_scheduled_job():
         })
 
     print('Hello Cron Job')
-    a = 1 / 0
-    print(a)
+    # a = 1 / 0
+    # print(a)
 
     logger.critical('test exept', exc_info=True, extra={
         # Optionally pass a request and we'll grab any information we can

@@ -25,6 +25,7 @@ from zopynfacts import products
 
 # Get an instance of a logger
 logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
 
 
 def index(request):
