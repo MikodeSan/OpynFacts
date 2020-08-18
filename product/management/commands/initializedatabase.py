@@ -27,7 +27,8 @@ class Command(BaseCommand):
 
 
     def add_arguments(self, parser):
-        parser.add_argument('zargs', nargs='+', type=int)
+        # parser.add_argument('zargs', nargs='+', type=int)
+        pass
 
     def handle(self, *args, **options):
         """Init db"""
@@ -76,8 +77,8 @@ class Command(BaseCommand):
             else:
                 print('Category', category_db_id, 'not found in source')
 
-        for arg in options['zargs']:
-            self.stdout.write(self.style.SUCCESS('Successfully read arg "%s"' % arg))
+        # for arg in options['zargs']:
+        #     self.stdout.write(self.style.SUCCESS('Successfully read arg "%s"' % arg))
 
 
     def init_category_db(self):
