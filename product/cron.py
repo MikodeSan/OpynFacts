@@ -20,4 +20,4 @@ def my_scheduled_job():
 
     print('Hello Cron Job')
     a = 1 / 0
-    pass
+    print(a)
