@@ -3,7 +3,8 @@ import logging
 
 
 # Get an instance of a logger
-logger = logging.getLogger(__name__)
+logger = logging.getLogger('CRON')
+logger.setLevel(logging.DEBUG)
 
 
 def my_scheduled_job():
@@ -26,7 +27,7 @@ def my_scheduled_job():
     a = 1 / 0
     print(a)
 
-    logger.exception('test exept', exc_info=True, extra={
+    logger.critical('test exept', exc_info=True, extra={
         # Optionally pass a request and we'll grab any information we can
         'request': 'toto',
         })
