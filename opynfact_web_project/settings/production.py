@@ -104,8 +104,8 @@ STATICFILES_DIRS = (
 
 # All of this is already happening by default!
 sentry_logging = LoggingIntegration(
-    level=logging.INFO,        # Capture info and above as breadcrumbs
-    event_level=logging.ERROR  # Send errors as events
+    level=logging.DEBUG,        # Capture info and above as breadcrumbs
+    event_level=logging.INFO  # Send errors as events
 )
 
 sentry_sdk.init(
