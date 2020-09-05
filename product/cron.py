@@ -1,4 +1,5 @@
 import logging
+import datetime
 
 
 
@@ -9,7 +10,7 @@ logger.setLevel(logging.DEBUG)
 
 def my_scheduled_job():
 
-    print('IN')
+    print('IN', datetime.datetime.now())
 
     logger.info('User query', exc_info=True, extra={
         # Optionally pass a request and we'll grab any information we can
@@ -24,7 +25,7 @@ def my_scheduled_job():
         'request': 'toto',
         })
 
-    print('Hello Cron Job')
+    print('Hello Cron Job', datetime.datetime.now())
     # a = 1 / 0
     # print(a)
 
@@ -33,6 +34,6 @@ def my_scheduled_job():
         'request': 'toto',
         })
 
-    print('OUT')
+    print('OUT', datetime.datetime.now())
 
 

@@ -1,5 +1,7 @@
 import requests
 from operator import itemgetter
+import logging
+import datetime
 
 from django.core.management.base import BaseCommand, CommandError
 from django.core.exceptions import ObjectDoesNotExist
@@ -11,6 +13,10 @@ from product.models import ZCategory, ZProduct
 # from zopynfacts import products
 from zopynfacts import products as source
 
+
+# Get an instance of a logger
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
 
 
 class Command(BaseCommand):
@@ -32,6 +38,21 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         """Init db"""
+
+        print(logger, datetime.datetime.now())
+        logger.info('Initialize biggest category list into dbs', exc_info=True, extra={
+            # Optionally pass a request and we'll grab any information we can
+            'request': '1',
+            })
+        logger.warning('User query')
+        logger.error('test', exc_info=True, extra={
+            # Optionally pass a request and we'll grab any information we can
+            'request': 'toto',
+            })
+        logger.critical('test exept', exc_info=True, extra={
+            # Optionally pass a request and we'll grab any information we can
+            'request': 'toto',
+            })
 
         # Initialize biggest category list into db
         print('> Initialize biggest category list into dbs')

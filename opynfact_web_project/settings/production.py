@@ -94,7 +94,7 @@ STATIC_ROOT = os.path.join(PROJECT_DIR, 'staticfiles')
 
 # Extra places for collectstatic to find static files.
 STATICFILES_DIRS = (
-    os.path.join(PROJECT_DIR, 'staticfiles'),       #'static'
+    os.path.join(PROJECT_DIR, 'static'),       # 'staticfiles'
 )
 
 # Simplified static file serving.
@@ -118,8 +118,10 @@ sentry_sdk.init(
 )
 
 CRONJOBS = [
-    ('*/3 * * * *', 'migrate', '>> /tmp/sch_job.log'),
+    ('*/1 * * * *', 'product.cron.my_scheduled_job', '>> /tmp/scheduled_job.log'),
+    # ('*/3 * * * *', 'migrate', '>> /tmp/sch_job.log'),
     # ('*/3 * * * *', echo "la tete a toto", '>> /tmp/sch_job2.log'),
     # ('*/10   * * * *', 'django.core.management.call_command', ['initializedatabase 0']),
-    ('*/5   * * * *', 'product.management.commands.initializedatabase', ['0'], '> /home/miket2/backups/last_sunday_auth_backup.json'),
+    ('*/15 * * * *', 'django.core.management.call_command', ['initializedatabase 0'], {}, '>> /tmp/backups_3.log'),
+    # ('*/20 * * * *', 'product.management.commands.initializedatabase', ['0'], '> /home/miket2/backups/last_sunday_auth_backup.json'),
 ]
