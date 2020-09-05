@@ -118,10 +118,10 @@ sentry_sdk.init(
 )
 
 CRONJOBS = [
-    ('*/1 * * * *', 'product.cron.my_scheduled_job', '>> /tmp/scheduled_job.log'),
+    ('*/1 * * * *', 'product.cron.my_scheduled_job', '>> /tmp/scheduled_prd_job.log'),
     # ('*/3 * * * *', 'migrate', '>> /tmp/sch_job.log'),
     # ('*/3 * * * *', echo "la tete a toto", '>> /tmp/sch_job2.log'),
     # ('*/10   * * * *', 'django.core.management.call_command', ['initializedatabase 0']),
-    ('*/15 * * * *', 'django.core.management.call_command', ['initializedatabase'], {}, '>> /tmp/backups_3.log'),
+    ('*/15 * * * *', 'django.core.management.call_command', ['initializedatabase'], {}, '>> /tmp/backups_prd_3.log'),
     # ('*/20 * * * *', 'product.management.commands.initializedatabase', ['0'], '> /home/miket2/backups/last_sunday_auth_backup.json'),
 ]

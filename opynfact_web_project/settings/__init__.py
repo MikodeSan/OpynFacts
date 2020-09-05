@@ -144,9 +144,9 @@ STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(PROJECT_DIR, 'staticfiles')
 
 CRONJOBS = [
-    ('*/1 * * * *', 'product.cron.my_scheduled_job', '>> /tmp/scheduled_job.log'),
+    ('*/1 * * * *', 'product.cron.my_scheduled_job', '>> /tmp/scheduled_dbg_job.log'),
     # ('0   4 * * *', 'django.core.management.call_command', ['initializedatabase'], {}, '>>  /tmp/backups.log'),   
-    ('*/15 * * * *', 'django.core.management.call_command', ['initializedatabase'], {}, '>> /tmp/backups_2.log'),
+    ('*/15 * * * *', 'django.core.management.call_command', ['initializedatabase'], {}, '>> /tmp/backups_dbg_2.log'),
     # ('*/5   * * * *', 'product.management.commands.initializedatabase', [0], {}, '>> /tmp/backups/last_sunday_auth_backup.json'),
 ]
 
