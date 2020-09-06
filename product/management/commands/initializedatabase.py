@@ -18,6 +18,16 @@ from zopynfacts import products as source
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
+ch = logging.StreamHandler()
+ch.setLevel(logging.DEBUG)
+
+# create formatter
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+# add formatter to ch
+ch.setFormatter(formatter)
+
+logger.addHandler(ch)
+
 
 class Command(BaseCommand):
     help = 'Initialize or alternately Update Product module database'
@@ -40,16 +50,16 @@ class Command(BaseCommand):
         """Init db"""
 
         print(logger, datetime.datetime.now())
-        logger.info('Initialize biggest category list into dbs', exc_info=True, extra={
+        logger.info('Initialize biggest category list into db', exc_info=True, extra={
             # Optionally pass a request and we'll grab any information we can
             'request': '1',
             })
-        logger.warning('User query')
-        logger.error('test', exc_info=True, extra={
+        logger.warning('Initialize database')
+        logger.error('Initialize database', exc_info=True, extra={
             # Optionally pass a request and we'll grab any information we can
             'request': 'toto',
             })
-        logger.critical('test exept', exc_info=True, extra={
+        logger.critical('Initialize database', exc_info=True, extra={
             # Optionally pass a request and we'll grab any information we can
             'request': 'toto',
             })
@@ -147,7 +157,6 @@ class Command(BaseCommand):
                 print(idx, 'New category added to DB:', category_id, '-', category_dct['name'])
 
         print(len(new_category_lst), 'new categories added to DB')
-
 
         return category_lst, category_source_lst
 

@@ -15,11 +15,11 @@ ch.setLevel(logging.DEBUG)
 
 # create formatter
 formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-
 # add formatter to ch
 ch.setFormatter(formatter)
 
 logger.addHandler(ch)
+
 
 API_URL = "https://%s.openfoodfacts.org/"
 OBF_API_URL = "https://%s.openbeautyfacts.org/"
@@ -147,19 +147,14 @@ def fetch(path, json_file=True, app_name=None, system=None, app_version=None, we
     if json_file:
         path = "{}.json".format(path)
 
-    # zstr = ""
-    # if appname:
-    #     zstr += 
-
     zstr = " - ".join([el for el in [app_name, system, app_version, website] if el])
     hdr = {'user-agent': zstr}
     # print("FETCH", hdr)
     response = requests.get(path, headers=hdr)
-    print(response.status_code)
 
     if response.status_code != 200:
-        logger.critical('Reponse ERROR for {}'.format(path))
-        print(response)
+        logger.critical('Reponse: {} for url: {}'.format(response, path))
+        print('Reponse: {} for header {}, url: {}'.format(response, hdr, path))
         exit(1)
     
     # TODO: insert into request header [app_name, version, system, ...]
