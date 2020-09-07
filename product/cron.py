@@ -20,31 +20,31 @@ logger.addHandler(ch)
 def my_scheduled_job():
 
     print('Hello Cron JOB')
-    print('IN', datetime.datetime.now())
+    # print('IN', datetime.datetime.now())
 
-    logger.info('my_scheduled_job info', exc_info=True, extra={
-        # Optionally pass a request and we'll grab any information we can
-        'request': 'my_scheduled_job',
-        })
+    # logger.info('my_scheduled_job info', exc_info=True, extra={
+    #     # Optionally pass a request and we'll grab any information we can
+    #     'request': 'my_scheduled_job',
+    #     })
 
-    print(logger)
-    logger.warning('my_scheduled_job warning')
+    # print(logger)
+    # logger.warning('my_scheduled_job warning')
 
-    logger.error('my_scheduled_job error', exc_info=True, extra={
-        # Optionally pass a request and we'll grab any information we can
-        'request': 'my_scheduled_job',
-        })
+    # logger.error('my_scheduled_job error', exc_info=True, extra={
+    #     # Optionally pass a request and we'll grab any information we can
+    #     'request': 'my_scheduled_job',
+    #     })
 
-    print('Hello Cron Job', datetime.datetime.now())
-    # a = 1 / 0
-    # print(a)
+    # print('Hello Cron Job', datetime.datetime.now())
+    # # a = 1 / 0
+    # # print(a)
 
-    logger.critical('my_scheduled_job critical', exc_info=True, extra={
-        # Optionally pass a request and we'll grab any information we can
-        'request': 'my_scheduled_job',
-        })
+    # logger.critical('my_scheduled_job critical', exc_info=True, extra={
+    #     # Optionally pass a request and we'll grab any information we can
+    #     'request': 'my_scheduled_job',
+    #     })
 
-    print('OUT', datetime.datetime.now())
+    # print('OUT', datetime.datetime.now())
 
 
 if __name__ == '__main__':
