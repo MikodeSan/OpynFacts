@@ -147,6 +147,7 @@ CRONJOBS = [
     ('* * * * *', 'product.cron.my_scheduled_job', '>> /tmp/djg_cron_test_dbg.log'),
     # ('* * * * *', 'django.core.management.call_command', ['initializedatabase'], '>> /tmp/djg_cron_opnfct_initdata_dbg.log'),   
     # ('* * * * *', 'django.core.management.call_command', ['initializedatabase', 0], '>> /tmp/djg_cron_opnfct_initdata_dbg.log'),
-    ('* * * * *', 'product.management.commands.initializedatabase.Command.handle', [0], '>> /tmp/djg_cron_opnfct_initdata_dbg.log'),
+    # ('* * * * *', 'product.management.commands.initializedatabase.Command.handle', [0], '>> /tmp/djg_cron_opnfct_initdata_dbg.log'),
+    ('* * * * *', 'product.management.call_command', ['initializedatabase', 0], '>> /tmp/djg_cron_opnfct_initdata_dbg.log'),
     # ('* * * * *', 'django.core.management.call_command', ['dumpdata', 'auth'], {'indent': 4}, '>> /tmp/djg_cron_opnfct_auth_backup_dbg.json'),
 ]
