@@ -6,7 +6,7 @@ import sys
 
 def main():
     # os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'opynfact_web_project.settings')
-if os.environ.get('ENV') == 'PRODUCTION':
+    if os.environ.get('ENV') == 'PRODUCTION':
         os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'opynfact_web_project.settings.production')
     else:
         os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'opynfact_web_project.settings')
