@@ -1,20 +1,20 @@
-import logging
-import datetime
+# import logging
+# import datetime
 
 
-# Get an instance of a logger
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
+# # Get an instance of a logger
+# logger = logging.getLogger(__name__)
+# logger.setLevel(logging.DEBUG)
 
-ch = logging.StreamHandler()
-ch.setLevel(logging.DEBUG)
+# ch = logging.StreamHandler()
+# ch.setLevel(logging.DEBUG)
 
-# create formatter
-formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-# add formatter to ch
-ch.setFormatter(formatter)
+# # create formatter
+# formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+# # add formatter to ch
+# ch.setFormatter(formatter)
 
-logger.addHandler(ch)
+# logger.addHandler(ch)
 
 
 def my_scheduled_job():
