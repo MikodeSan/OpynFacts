@@ -146,7 +146,7 @@ STATIC_ROOT = os.path.join(PROJECT_DIR, 'staticfiles')
 CRONJOBS = [
     ('* * * * *', 'product.cron.my_scheduled_job', '>> /tmp/djg_cron_test_dbg.log'),
     # ('* * * * *', 'django.core.management.call_command', ['initializedatabase'], '>> /tmp/djg_cron_opnfct_initdata_dbg.log'),   
-    ('* * * * *', 'django.core.management.call_command', ['initializedatabase', 0], '>> /tmp/djg_cron_opnfct_initdata_dbg.log'),
-    # ('*/5 * * * *', 'product.management.commands.initializedatabase', [0]'>> /tmp/djg_cron_opnfct_initdata_dbg.log'),
+    # ('* * * * *', 'django.core.management.call_command', ['initializedatabase', 0], '>> /tmp/djg_cron_opnfct_initdata_dbg.log'),
+    ('* * * * *', 'product.management.commands.initializedatabase.handle', [0], '>> /tmp/djg_cron_opnfct_initdata_dbg.log'),
     # ('* * * * *', 'django.core.management.call_command', ['dumpdata', 'auth'], {'indent': 4}, '>> /tmp/djg_cron_opnfct_auth_backup_dbg.json'),
 ]
