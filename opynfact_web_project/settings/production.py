@@ -118,7 +118,7 @@ sentry_sdk.init(
 )
 
 CRONJOBS = [
-    ('* * * * *', 'product.cron.my_scheduled_job', '>> /tmp/djg_cron_test_prd.log'),
+    ('* * * * *', 'product.cron.my_scheduled_job', [], {}, '>> /tmp/djg_cron_test_prd.log'),
     # ('*/3 * * * *', echo "la tete a toto", '>> /tmp/sch_job2.log'),
     ('*/1 * * * *', 'django.core.management.call_command', ['initializedatabase'], '>> /tmp/djg_cron_opnfct_initdata_prd.log'),
     # ('*/15 * * * *', 'django.core.management.call_command', ['initializedatabase', 0], '>> /tmp/djg_cron_opnfct_initdata_prd.log'),
