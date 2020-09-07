@@ -1,3 +1,6 @@
+import os
+import sys
+
 import requests
 from operator import itemgetter
 import logging
@@ -5,11 +8,17 @@ import datetime
 
 from django.core.management.base import BaseCommand, CommandError
 from django.core.exceptions import ObjectDoesNotExist
+
+APP_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+B_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+print(APP_DIR)
+print(B_DIR)
+sys.path.append(APP_DIR)
+sys.path.append(B_DIR)
+
 from product.models import ZCategory, ZProduct
 
-# DIR_BASE = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-# print(DIR_BASE)
-# sys.path.append(DIR_BASE)
+
 # from zopynfacts import products
 from zopynfacts import products as source
 
@@ -291,3 +300,16 @@ def update_product_db(data_dct, force=False):
     #         # relation.save()
 
 
+
+if __name__ == '__main__':
+
+    # APP_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    # PJ_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+    # print(APP_DIR)
+    # print(B_DIR)
+    # sys.path.append(APP_DIR)
+    # sys.path.append(B_DIR)
+
+    # from product.models import ZCategory, ZProduct
+
+    Command.handle(0)
