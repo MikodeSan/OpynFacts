@@ -31,7 +31,7 @@ ch = logging.StreamHandler()
 ch.setLevel(logging.DEBUG)
 
 # create formatter
-formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+formatter = logging.Formatter('%(levelname)s - %(asctime)s - %(name)s - %(levelname)s - %(message)s')
 # add formatter to ch
 ch.setFormatter(formatter)
 
@@ -63,19 +63,19 @@ class Command(BaseCommand):
             # Optionally pass a request and we'll grab any information we can
             'request': '1',
             })
-        logger.warning('Initialize database')
-        logger.error('Initialize database', exc_info=True, extra={
-            # Optionally pass a request and we'll grab any information we can
-            'request': 'toto',
-            })
-        logger.critical('Initialize database', exc_info=True, extra={
-            # Optionally pass a request and we'll grab any information we can
-            'request': 'toto',
-            })
+        # logger.warning('Initialize database')
+        # logger.error('Initialize database', exc_info=True, extra={
+        #     # Optionally pass a request and we'll grab any information we can
+        #     'request': 'toto',
+        #     })
+        # logger.critical('Initialize database', exc_info=True, extra={
+        #     # Optionally pass a request and we'll grab any information we can
+        #     'request': 'toto',
+        #     })
 
         # Initialize biggest category list into db
         print('> Initialize biggest category list into dbs', datetime.datetime.now())
-        # category_lst, category_source_lst = self.init_category_db()
+        category_lst, category_source_lst = self.init_category_db()
 
         # # Update product db
         # print('> Update product into db')

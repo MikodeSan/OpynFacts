@@ -117,9 +117,12 @@ sentry_sdk.init(
     send_default_pii=True
 )
 
+# django-crontab
+# https://pypi.org/project/django-crontab
+# https://github.com/kraiz/django-crontab
 CRONJOBS = [
     ('*/5 * * * *', 'myapp.cron.my_scheduled_job', '>> /tmp/django_cron_test_prd.log'),
-    # ('*/5 * * * *', 'myapp.cron.other_scheduled_job', ['arg1', 'arg2'], {'verbose': 0}),
+    ('*/5 * * * *', 'myapp.cron.other_scheduled_job', ['arg1', 'arg2'], {'verbose': 0}),
     ('0   4 * * *', 'django.core.management.call_command', ['clearsessions']),
 
     # # format 1
@@ -127,6 +130,5 @@ CRONJOBS = [
 
     # # format 2
     # ('0   0 1 * *', 'myapp.cron.other_scheduled_job', ['myapp']),
-    # ('0   0 * * 0', 'django.core.management.call_command', ['dumpdata', 'auth'], {'indent': 4}, '> /home/john/backups/last_sunday_auth_backup.json'),
-    # ('* * * * *', 'django.core.management.call_command', ['dumpdata', 'auth'], {'indent': 4}, '>> /tmp/djg_cron_auth_backup_prd.json'),
+    # ('0   0 * * 0', 'django.core.management.call_command', ['dumpdata', 'auth'], {'indent': 4}, '> /tmp/djg_cron_auth_backup_prd.json'),
 ]

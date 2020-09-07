@@ -117,12 +117,12 @@ sentry_sdk.init(
     send_default_pii=True
 )
 
-CRONJOBS = [
-    ('* * * * *', 'product.cron.my_scheduled_job', [], {}, '>> /tmp/djg_cron_test_prd.log'),
-    ('* * * * *', 'crony.my_scheduled_job_2', '>> /tmp/djg_cron_test_2_prd.log'),
-    # ('*/3 * * * *', echo "la tete a toto", '>> /tmp/sch_job2.log'),
-    ('*/1 * * * *', 'django.core.management.call_command', ['initializedatabase'], '>> /tmp/djg_cron_opnfct_initdata_prd.log'),
-    # ('*/15 * * * *', 'django.core.management.call_command', ['initializedatabase', 0], '>> /tmp/djg_cron_opnfct_initdata_prd.log'),
-    # ('*/20 * * * *', 'product.management.commands.initializedatabase', [0]'>> /tmp/djg_cron_opnfct_initdata_prd.log'),
-    ('* * * * *', 'django.core.management.call_command', ['dumpdata', 'auth'], {'indent': 4}, '> /tmp/djg_cron_opnfct_auth_backup_prd.json'),
-]
+# CRONJOBS = [
+#     ('* * * * *', 'product.cron.my_scheduled_job', [], {}, '>> /tmp/djg_cron_test_prd.log'),
+#     ('* * * * *', 'crony.my_scheduled_job_2', '>> /tmp/djg_cron_test_2_prd.log'),
+#     # ('*/3 * * * *', echo "la tete a toto", '>> /tmp/sch_job2.log'),
+#     ('*/1 * * * *', 'django.core.management.call_command', ['initializedatabase'], '>> /tmp/djg_cron_opnfct_initdata_prd.log'),
+#     # ('*/15 * * * *', 'django.core.management.call_command', ['initializedatabase', 0], '>> /tmp/djg_cron_opnfct_initdata_prd.log'),
+#     # ('*/20 * * * *', 'product.management.commands.initializedatabase', [0]'>> /tmp/djg_cron_opnfct_initdata_prd.log'),
+#     ('* * * * *', 'django.core.management.call_command', ['dumpdata', 'auth'], {'indent': 4}, '> /tmp/djg_cron_opnfct_auth_backup_prd.json'),
+# ]
