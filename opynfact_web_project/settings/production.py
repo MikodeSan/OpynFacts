@@ -10,11 +10,14 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.0/ref/settings/
 """
 
+import logging
+
 from . import *
-from .envar import *
+from .zenvar import *
 
 import sentry_sdk
 from sentry_sdk.integrations.django import DjangoIntegration
+from sentry_sdk.integrations.logging import LoggingIntegration
 
 
 # Quick-start development settings - unsuitable for production
@@ -91,18 +94,33 @@ STATIC_ROOT = os.path.join(PROJECT_DIR, 'staticfiles')
 
 # Extra places for collectstatic to find static files.
 STATICFILES_DIRS = (
-    os.path.join(PROJECT_DIR, 'staticfiles'),       #'static'
+    os.path.join(PROJECT_DIR, 'static'),       # 'staticfiles'
 )
 
 # Simplified static file serving.
 # https://warehouse.python.org/project/whitenoise/
 # STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
+
+# All of this is already happening by default!
+sentry_logging = LoggingIntegration(
+    level=logging.DEBUG,        # Capture info and above as breadcrumbs
+    event_level=logging.INFO  # Send errors as events
+)
+
 sentry_sdk.init(
     dsn=SENTRY_DSN,
-    integrations=[DjangoIntegration()],
+    integrations=[DjangoIntegration(), sentry_logging],
 
     # If you wish to associate users to errors (assuming you are using
     # django.contrib.auth) you may enable sending PII data.
     send_default_pii=True
 )
+
+CRONJOBS = [
+    ('*/1 * * * *', 'product.cron.my_scheduled_job', '>> /tmp/django_cron_test_prd.log'),
+    # ('*/3 * * * *', echo "la tete a toto", '>> /tmp/sch_job2.log'),
+    ('*/1 * * * *', 'django.core.management.call_command', ['initializedatabase'], '>> /tmp/djg_cron_opnfct_initdata_prd.log'),
+    # ('*/15 * * * *', 'django.core.management.call_command', ['initializedatabase', 0], '>> /tmp/djg_cron_opnfct_initdata_prd.log'),
+    # ('*/20 * * * *', 'product.management.commands.initializedatabase', [0]'>> /tmp/djg_cron_opnfct_initdata_prd.log'),
+]

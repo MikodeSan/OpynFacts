@@ -1,5 +1,7 @@
 import requests
 from operator import itemgetter
+import logging
+import datetime
 
 from django.core.management.base import BaseCommand, CommandError
 from django.core.exceptions import ObjectDoesNotExist
@@ -11,6 +13,20 @@ from product.models import ZCategory, ZProduct
 # from zopynfacts import products
 from zopynfacts import products as source
 
+
+# Get an instance of a logger
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
+
+ch = logging.StreamHandler()
+ch.setLevel(logging.DEBUG)
+
+# create formatter
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+# add formatter to ch
+ch.setFormatter(formatter)
+
+logger.addHandler(ch)
 
 
 class Command(BaseCommand):
@@ -27,10 +43,26 @@ class Command(BaseCommand):
 
 
     def add_arguments(self, parser):
-        parser.add_argument('zargs', nargs='+', type=int)
+        # parser.add_argument('zargs', nargs='+', type=int)
+        pass
 
     def handle(self, *args, **options):
         """Init db"""
+
+        print(logger, datetime.datetime.now())
+        logger.info('Initialize biggest category list into db', exc_info=True, extra={
+            # Optionally pass a request and we'll grab any information we can
+            'request': '1',
+            })
+        logger.warning('Initialize database')
+        logger.error('Initialize database', exc_info=True, extra={
+            # Optionally pass a request and we'll grab any information we can
+            'request': 'toto',
+            })
+        logger.critical('Initialize database', exc_info=True, extra={
+            # Optionally pass a request and we'll grab any information we can
+            'request': 'toto',
+            })
 
         # Initialize biggest category list into db
         print('> Initialize biggest category list into dbs')
@@ -76,8 +108,8 @@ class Command(BaseCommand):
             else:
                 print('Category', category_db_id, 'not found in source')
 
-        for arg in options['zargs']:
-            self.stdout.write(self.style.SUCCESS('Successfully read arg "%s"' % arg))
+        # for arg in options['zargs']:
+        #     self.stdout.write(self.style.SUCCESS('Successfully read arg "%s"' % arg))
 
 
     def init_category_db(self):
@@ -125,7 +157,6 @@ class Command(BaseCommand):
                 print(idx, 'New category added to DB:', category_id, '-', category_dct['name'])
 
         print(len(new_category_lst), 'new categories added to DB')
-
 
         return category_lst, category_source_lst
 
