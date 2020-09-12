@@ -9,41 +9,103 @@ Alert si echec
 
 screen shot of config
 
+#### set production setting / separate environment / env. variable
+
+
 ## Deployment
 
-### Host: [DigitalOcean](https://www.digitalocean.com)
+### Host
 
-#### Droplet Creation
+An Infrastructure as a Service (IAAS) is rented and used as a virtual/cloud server to host the web application.
+With this solution, every required software tool can be installed according to the system administrator's needs.  
+The chosen IAAS is [DigitalOcean](https://www.digitalocean.com)
 
-Image : Digital Ocean peut installer, à votre place, le système d'exploitation de votre choix.
+#### Server Configuration: Droplet
 
-Taille : caractéristiques du serveur à réserver. Vous choisissez l'espace alloué à votre application : la mémoire vive (CPU), la RAM et la bande passante. Sélectionnez l'option la moins chère pour l'exercice.
+A server space, also called ___Droplet___ by DigitalOcean, is created and defined by:
 
-Ajouter un bloc de stockage : laissez vide, vous n'en avez pas besoin.
+* An __image__ which is the Operating System distribution to install. Linux _Ubuntu 20.04 (LTS) x64_ is selected.
+* __Memory and computer ressources__ where the number of CPU, RAM size, Disk size and bandwidth for data transfer are chosen according to the application expected performances. The selected configuration is 1 CPU, 1 GB RAM, 25 GB SSD Disk, 1000 GB transfer.
+* An extra __Block storage__ can be added but it is not usefull for our web application.
+* The __Server Localization__ is chosen in order to be nearest to the end-users's localization. So London is a good place.
 
-Localisation des serveurs : sélectionnez Amsterdam ou Londres. Le serveur doit être le plus proche possible des utilisateurs finaux.
-
-
-#### Remote connection
+### SSH Remote connection
 
 SSH server
 
+#### Generate key
+
+/!\ Be careful about generated key format uncompatible with linux server /!\ -> [solution](https://www.digitalocean.com/docs/droplets/how-to/add-ssh-keys/create-with-putty)
+
+#### Connect with root
+
+#### Connect with new user
+
+### Install web application
+
+#### set production setting / separate environment / env. variable
+
+#### Install libraries
+
 [IP address](https://134.209.185.7) of APP
+
+#### Clone Git repository
+
+#### Set virtual env and install requirement
+
+#### Database
+
+Create database
+
+##### migrate django database
+
+Configuration file
+migrate command
+
+loaddata
+create superuser
+
+#### Generate static file
+
+
+### Web server
+
+#### HTTP server: NGINX
+
+Directives pour Nginx
+
+Servir des fichiers statiques avec Nginx
+
+Diriger le trafic vers une application Django
+
+#### Web application server: Gunicorn
+
+##### supervisor 
+reload service automaticaly
+
 
 
 ## Monitoring
 
-### [Sentry](https://sentry.io)
+### Server ressources and performances
 
-### [NewRelic](https://newrelic.fr/)
+#### DigitalOcean monitoring
+
+#### [NewRelic](https://newrelic.fr/)
+
+### Logging 
+
+#### [Sentry](https://sentry.io)
+
 
 
 ## Automation
 
 ### Cronjob
 
-#### Crontab
+#### Crontab - django crontab
 
 
 ## Domain Name
 
+NA
