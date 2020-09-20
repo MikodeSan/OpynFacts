@@ -2,7 +2,7 @@
 
 ## Environment
 
-In order to separate deployment to development settings, a _settings_ module is defined where the default settings for development are placed into the ___init__.py_.
+In order to separate deployment to development settings, a _settings_ module is defined where the default settings for development are placed into the `__init__.py`.
 A _production.py_ can contain all the development settings and redefine some constant values.  
 The private CONSTANT values (secret key, database credential, static files configuration, etc.) are defined in a _envar.py_ that is not tracked by _git_.  
 By moving the setttings files, the application directory path is also redefine:  
@@ -13,12 +13,6 @@ By moving the setttings files, the application directory path is also redefine:
 Connected to the GitHub account, [Travis](https://docs.travis-ci.com/user/languages/python) is configured to build tests on the specified repository branch.
 The _.travis.yml_ define the Django settings module to the Travis settings file and the chome driver to use for tests:
 `- google-chrome-stable --headless --disable-gpu --remote-debugging-port=9222 https://www.chromestatus.com &`
-
-### set production setting / separate environment / env. variable
-
-Modification du fichier de configuration
-Set config file for prod
-database
 
 ## Deployment
 
