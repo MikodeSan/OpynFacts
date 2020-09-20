@@ -94,7 +94,7 @@ STATIC_ROOT = os.path.join(PROJECT_DIR, 'staticfiles')
 
 # Extra places for collectstatic to find static files.
 STATICFILES_DIRS = (
-    os.path.join(PROJECT_DIR, 'staticfiles'),       #'static'
+    os.path.join(PROJECT_DIR, 'static'),       # 'staticfiles'
 )
 
 # Simplified static file serving.
@@ -104,8 +104,8 @@ STATICFILES_DIRS = (
 
 # All of this is already happening by default!
 sentry_logging = LoggingIntegration(
-    level=logging.INFO,        # Capture info and above as breadcrumbs
-    event_level=logging.ERROR  # Send errors as events
+    level=logging.DEBUG,        # Capture info and above as breadcrumbs
+    event_level=logging.INFO  # Send errors as events
 )
 
 sentry_sdk.init(
@@ -116,3 +116,13 @@ sentry_sdk.init(
     # django.contrib.auth) you may enable sending PII data.
     send_default_pii=True
 )
+
+# CRONJOBS = [
+#     ('* * * * *', 'product.cron.my_scheduled_job', [], {}, '>> /tmp/djg_cron_test_prd.log'),
+#     ('* * * * *', 'crony.my_scheduled_job_2', '>> /tmp/djg_cron_test_2_prd.log'),
+#     # ('*/3 * * * *', echo "la tete a toto", '>> /tmp/sch_job2.log'),
+#     ('*/1 * * * *', 'django.core.management.call_command', ['initializedatabase'], '>> /tmp/djg_cron_opnfct_initdata_prd.log'),
+#     # ('*/15 * * * *', 'django.core.management.call_command', ['initializedatabase', 0], '>> /tmp/djg_cron_opnfct_initdata_prd.log'),
+#     # ('*/20 * * * *', 'product.management.commands.initializedatabase', [0]'>> /tmp/djg_cron_opnfct_initdata_prd.log'),
+#     ('* * * * *', 'django.core.management.call_command', ['dumpdata', 'auth'], {'indent': 4}, '> /tmp/djg_cron_opnfct_auth_backup_prd.json'),
+# ]

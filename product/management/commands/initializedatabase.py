@@ -1,16 +1,41 @@
+import os
+import sys
+
 import requests
 from operator import itemgetter
+import logging
+import datetime
 
 from django.core.management.base import BaseCommand, CommandError
 from django.core.exceptions import ObjectDoesNotExist
+
+APP_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+B_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+print(APP_DIR)
+print(B_DIR)
+sys.path.append(APP_DIR)
+sys.path.append(B_DIR)
+
 from product.models import ZCategory, ZProduct
 
-# DIR_BASE = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-# print(DIR_BASE)
-# sys.path.append(DIR_BASE)
+
 # from zopynfacts import products
 from zopynfacts import products as source
 
+
+# Get an instance of a logger
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
+
+ch = logging.StreamHandler()
+ch.setLevel(logging.DEBUG)
+
+# create formatter
+formatter = logging.Formatter('%(levelname)s - %(asctime)s - %(name)s - %(levelname)s - %(message)s')
+# add formatter to ch
+ch.setFormatter(formatter)
+
+logger.addHandler(ch)
 
 
 class Command(BaseCommand):
@@ -28,53 +53,69 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument('zargs', nargs='+', type=int)
+        pass
 
     def handle(self, *args, **options):
         """Init db"""
 
+        print(logger, datetime.datetime.now())
+        logger.info('Initialize biggest category list into db', exc_info=True, extra={
+            # Optionally pass a request and we'll grab any information we can
+            'request': '1',
+            })
+        # logger.warning('Initialize database')
+        # logger.error('Initialize database', exc_info=True, extra={
+        #     # Optionally pass a request and we'll grab any information we can
+        #     'request': 'toto',
+        #     })
+        # logger.critical('Initialize database', exc_info=True, extra={
+        #     # Optionally pass a request and we'll grab any information we can
+        #     'request': 'toto',
+        #     })
+
         # Initialize biggest category list into db
-        print('> Initialize biggest category list into dbs')
+        print('> Initialize biggest category list into dbs', datetime.datetime.now())
         category_lst, category_source_lst = self.init_category_db()
 
-        # Update product db
-        print('> Update product into db')
-        self.init_product_db(category_lst)
+        # # Update product db
+        # print('> Update product into db')
+        # self.init_product_db(category_lst)
 
-        # Update category fields
-        print('> Update category fields')
-        category_update_lst = []
+        # # Update category fields
+        # print('> Update category fields')
+        # category_update_lst = []
         
-        # ## Method #1: scan each category from source list then check and update existing category from db
-        # for idx, category_src_dct in enumerate(category_source_lst):
+        # # ## Method #1: scan each category from source list then check and update existing category from db
+        # # for idx, category_src_dct in enumerate(category_source_lst):
             
-        #     try:
-        #         category_db = ZCategory.objects.get(identifier=category_src_dct['id'])
-        #     except ObjectDoesNotExist:
-        #         pass
-        #     except :
-        #         print('CRITICAL EXCEPTION: exit from category fields update')
-        #         exit(1)
-        #     else:
+        # #     try:
+        # #         category_db = ZCategory.objects.get(identifier=category_src_dct['id'])
+        # #     except ObjectDoesNotExist:
+        # #         pass
+        # #     except :
+        # #         print('CRITICAL EXCEPTION: exit from category fields update')
+        # #         exit(1)
+        # #     else:
+        # #         category_name = category_src_dct['name']
+        # #         ZCategory.objects.filter(identifier=category_src_dct['id']).update(label=category_name)
+        # #         category_update_lst.append(category_name)
+        # #         print(len(category_update_lst), idx, 'Update category name', category_name)
+
+        # ## Method #2: scan each category from db then check and update existing category from source
+        # category_lst_db = ZCategory.objects.all()
+
+        # for idx, category_db in enumerate(category_lst_db):
+        #     category_db_id = category_db.identifier
+
+        #     category_src_dct = next((category_dct for idx, category_dct in enumerate(category_source_lst) if category_dct["id"] == category_db_id), None)
+        #     # category_lst = list(filter(lambda category_dct: category_dct['id'] == category_db_id, category_source_lst))
+        #     if category_src_dct:
         #         category_name = category_src_dct['name']
         #         ZCategory.objects.filter(identifier=category_src_dct['id']).update(label=category_name)
         #         category_update_lst.append(category_name)
         #         print(len(category_update_lst), idx, 'Update category name', category_name)
-
-        ## Method #2: scan each category from db then check and update existing category from source
-        category_lst_db = ZCategory.objects.all()
-
-        for idx, category_db in enumerate(category_lst_db):
-            category_db_id = category_db.identifier
-
-            category_src_dct = next((category_dct for idx, category_dct in enumerate(category_source_lst) if category_dct["id"] == category_db_id), None)
-            # category_lst = list(filter(lambda category_dct: category_dct['id'] == category_db_id, category_source_lst))
-            if category_src_dct:
-                category_name = category_src_dct['name']
-                ZCategory.objects.filter(identifier=category_src_dct['id']).update(label=category_name)
-                category_update_lst.append(category_name)
-                print(len(category_update_lst), idx, 'Update category name', category_name)
-            else:
-                print('Category', category_db_id, 'not found in source')
+        #     else:
+        #         print('Category', category_db_id, 'not found in source')
 
         for arg in options['zargs']:
             self.stdout.write(self.style.SUCCESS('Successfully read arg "%s"' % arg))
@@ -125,7 +166,6 @@ class Command(BaseCommand):
                 print(idx, 'New category added to DB:', category_id, '-', category_dct['name'])
 
         print(len(new_category_lst), 'new categories added to DB')
-
 
         return category_lst, category_source_lst
 
@@ -260,3 +300,16 @@ def update_product_db(data_dct, force=False):
     #         # relation.save()
 
 
+
+if __name__ == '__main__':
+
+    # APP_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    # PJ_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+    # print(APP_DIR)
+    # print(B_DIR)
+    # sys.path.append(APP_DIR)
+    # sys.path.append(B_DIR)
+
+    # from product.models import ZCategory, ZProduct
+
+    Command.handle(0)

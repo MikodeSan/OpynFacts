@@ -446,10 +446,11 @@ def get_categories(locale='world', language=None):
         geo_url = utils.ENTITY_MAP['food'] % geo_code
         geo_url += 'categories/{}'.format(idx)
         print(geo_url)
-
         response = utils.fetch(geo_url, json_file=True, app_name='zopynfact', system='django', app_version='Version 1.0', website=None)
+        print(response)
 
         idx += 1
+
 
         ## Join categories list
         lst = response['tags']
@@ -460,6 +461,7 @@ def get_categories(locale='world', language=None):
                 is_valid = False
         else:
             is_valid = False
+            print('/!\\ FALSE - CATEGORY RESPONSE: {}/{}'.format(len(category_lst), response))
 
     ## Return categories list
     return category_lst
