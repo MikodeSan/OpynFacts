@@ -2,7 +2,23 @@ import requests
 import getpass
 import sys
 import urllib
+import logging
 from enum import Enum, IntEnum, auto
+
+
+# Get an instance of a logger
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
+
+ch = logging.StreamHandler()
+ch.setLevel(logging.DEBUG)
+
+# create formatter
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+# add formatter to ch
+ch.setFormatter(formatter)
+
+logger.addHandler(ch)
 
 
 API_URL = "https://%s.openfoodfacts.org/"
@@ -131,19 +147,16 @@ def fetch(path, json_file=True, app_name=None, system=None, app_version=None, we
     if json_file:
         path = "{}.json".format(path)
 
-    # zstr = ""
-    # if appname:
-    #     zstr += 
-
     zstr = " - ".join([el for el in [app_name, system, app_version, website] if el])
     hdr = {'user-agent': zstr}
     # print("FETCH", hdr)
     response = requests.get(path, headers=hdr)
-    if response.status_code != 200:
-        exit(1)
-    # print(response)
-    # print(response.json())
 
+    if response.status_code != 200:
+        logger.critical('Reponse: {} for url: {}'.format(response, path))
+        print('Reponse: {} for header {}, url: {}'.format(response, hdr, path))
+        exit(1)
+    
     # TODO: insert into request header [app_name, version, system, ...]
 
     return response.json()

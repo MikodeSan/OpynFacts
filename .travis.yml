@@ -1,0 +1,59 @@
+language: python
+python:
+  - '3.8'
+
+# safelist
+branches:
+  only:
+    - py10
+
+dist: bionic
+
+services:
+  - postgresql
+
+addons:
+  chrome: stable
+
+env: DJANGO_SETTINGS_MODULE="opynfact_web_project.settings.ci_travis"
+
+before_install:
+  - pip install -r requirements_origin.txt
+  - pip freeze > requirements.txt
+  
+  # start your web application and listen on `localhost`
+  - google-chrome-stable --headless --disable-gpu --remote-debugging-port=9222 https://www.chromestatus.com & # http://localhost &
+
+before_script:
+  - PLATFORM=linux64
+  - VERSION=$(curl http://chromedriver.storage.googleapis.com/LATEST_RELEASE)
+  - python --version
+  # - PYTHON_VERSION=$(python --version)
+  # - curl http://chromedriver.storage.googleapis.com/$VERSION/chromedriver_$PLATFORM.zip | bsdtar -xvf - -C env/bin/
+  - wget http://chromedriver.storage.googleapis.com/$VERSION/chromedriver_$PLATFORM.zip
+  - unzip chromedriver_linux64.zip -d ~/virtualenv/python3.8/bin/
+  - export CHROME_BIN=chromium-browser
+  # - chromedriver &
+  - ls -a /home
+  - ls -a /home/travis
+  - ls -a /home/travis/virtualenv
+  - ls -a ~/virtualenv
+  - ls -a /home/travis/virtualenv/python3.8
+  - ls -a /home/travis/virtualenv/python3.8.1
+  - ls -a ~/virtualenv/python3.8/bin/
+
+  # python manage.py collectstatic <<< yes
+
+  # - psql -c 'create database travis_ci_test;' -U postgres
+  # python manage.py migrate
+  # python manage.py createsuperuser 
+  # - python manage.py initializedatabase 0
+
+script:
+  
+  - whereis google-chrome-stable
+  - whereis chromedriver
+
+  # pytest -s -Wa [--exitfirst] [--reuse-db] -vv --cov=./ --cov-report html
+  - pytest -s -vv --cov=./ --cov-report html
+

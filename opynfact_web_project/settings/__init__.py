@@ -16,6 +16,7 @@ import dj_database_url
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+PROJECT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
 # Quick-start development settings - unsuitable for production
@@ -42,7 +43,8 @@ INSTALLED_APPS = [
     'account.apps.AccountConfig',
     'django.contrib.staticfiles',
     'django_extensions',
-    'debug_toolbar',
+    'django_crontab',
+    'debug_toolbar',    
 ]
 
 MIDDLEWARE = [
@@ -125,7 +127,7 @@ LOGIN_URL = 'account/sign-in/'
 
 LANGUAGE_CODE = 'fr-FR'
 
-TIME_ZONE = 'UTC'       # 'Europe/Paris'
+TIME_ZONE = 'Europe/Paris'      # 'UTC'
 
 USE_I18N = True
 
@@ -138,3 +140,14 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
 STATIC_URL = '/static/'
+
+STATIC_ROOT = os.path.join(PROJECT_DIR, 'staticfiles')
+
+# CRONJOBS = [
+#     ('* * * * *', 'product.cron.my_scheduled_job', '>> /tmp/djg_cron_test_dbg.log'),
+#     # ('* * * * *', 'django.core.management.call_command', ['initializedatabase'], '>> /tmp/djg_cron_opnfct_initdata_dbg.log'),   
+#     # ('* * * * *', 'django.core.management.call_command', ['initializedatabase', 0], '>> /tmp/djg_cron_opnfct_initdata_dbg.log'),
+#     # ('* * * * *', 'product.management.commands.initializedatabase.Command.handle', [0], '>> /tmp/djg_cron_opnfct_initdata_dbg.log'),
+#     ('* * * * *', 'product.management.call_command', ['initializedatabase', 0], '>> /tmp/djg_cron_opnfct_initdata_dbg.log'),
+#     # ('* * * * *', 'django.core.management.call_command', ['dumpdata', 'auth'], {'indent': 4}, '>> /tmp/djg_cron_opnfct_auth_backup_dbg.json'),
+# ]
