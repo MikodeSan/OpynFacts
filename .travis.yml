@@ -5,7 +5,7 @@ python:
 # safelist
 branches:
   only:
-    - py10
+    - py11
 
 dist: bionic
 
