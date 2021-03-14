@@ -45,7 +45,7 @@ class TestFrontProductAnomymous(StaticLiveServerTestCase):
         # data = {
         #     'user_query': 'kinder bueno',
         # }
-        response = self.client.get(reverse('product:result', args=['kinder bueno'])) # kwargs=data
+        response = self.client.post(reverse('product:result', args=['kinder bueno'])) # kwargs=data
         self.assertEqual(response.status_code, 200)
 
     @unittest.skipIf(DISABLE_TEST, "[TODO]")
