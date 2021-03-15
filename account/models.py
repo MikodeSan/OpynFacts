@@ -7,13 +7,14 @@ from django.utils import timezone
 
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
+
 # from django.contrib.auth.models.CustomUser import USERNAME_FIELD, EMAIL_FIELD, REQUIRED_FIELDS
 
 # from django.contrib.auth.backends import BaseBackend
 
 
 # class ZUserManager(BaseUserManager):
-    
+
 #     def create_user(self, email, nickname, password=None):
 #         """
 #         Create and save a User with the given email, nickname and password.
@@ -113,8 +114,11 @@ from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 #         except User.DoesNotExist:
 #             return None
 
+
 class ZProfil(models.Model):
-    user = models.OneToOneField(get_user_model(), on_delete=models.CASCADE)     # settings.AUTH_USER_MODEL
+    user = models.OneToOneField(
+        get_user_model(), on_delete=models.CASCADE
+    )  # settings.AUTH_USER_MODEL
     site_web = models.URLField(blank=True)
     avatar = models.ImageField(null=True, blank=True, upload_to="avatars/")
     signature = models.TextField(blank=True)
@@ -152,17 +156,16 @@ class ZRole(models.Model):
 
 class Question(models.Model):
     question_text = models.CharField(max_length=200)
-    pub_date = models.DateTimeField('date published')
+    pub_date = models.DateTimeField("date published")
 
     def __str__(self):
         return self.question_text
 
     def was_published_recently(self):
-            return self.pub_date >= timezone.now() - datetime.timedelta(days=1)
+        return self.pub_date >= timezone.now() - datetime.timedelta(days=1)
+
 
 class Choice(models.Model):
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
     choice_text = models.CharField(max_length=200)
     votes = models.IntegerField(default=0)
-
-

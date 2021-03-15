@@ -6,10 +6,12 @@ import sys
 
 def main():
     # os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'opynfact_web_project.settings')
-    if os.environ.get('ENV') == 'PRODUCTION':
-        os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'opynfact_web_project.settings.production')
+    if os.environ.get("ENV") == "PRODUCTION":
+        os.environ.setdefault(
+            "DJANGO_SETTINGS_MODULE", "opynfact_web_project.settings.production"
+        )
     else:
-        os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'opynfact_web_project.settings')
+        os.environ.setdefault("DJANGO_SETTINGS_MODULE", "opynfact_web_project.settings")
     try:
         from django.core.management import execute_from_command_line
     except ImportError as exc:
@@ -20,5 +22,6 @@ def main():
         ) from exc
     execute_from_command_line(sys.argv)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()

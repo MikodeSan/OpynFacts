@@ -19,7 +19,7 @@
 
 def my_scheduled_job_2():
 
-    print('HELLO CRON JOB 2')
+    print("HELLO CRON JOB 2")
     # print('IN', datetime.datetime.now())
 
     # logger.info('my_scheduled_job info', exc_info=True, extra={
@@ -47,6 +47,6 @@ def my_scheduled_job_2():
     # print('OUT', datetime.datetime.now())
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
 
     my_scheduled_job_2()

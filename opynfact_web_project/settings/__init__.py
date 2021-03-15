@@ -28,72 +28,72 @@ DEBUG = True
 ALLOWED_HOSTS = []
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'rrkt%ps7yqw*)o6gol*i(@c)ciu_7+f)p1h-!-d@xev!wd5yv+'
+SECRET_KEY = "rrkt%ps7yqw*)o6gol*i(@c)ciu_7+f)p1h-!-d@xev!wd5yv+"
 
 
 # Application definition
 
 INSTALLED_APPS = [
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'product.apps.ProductConfig',
-    'account.apps.AccountConfig',
-    'django.contrib.staticfiles',
-    'django_extensions',
-    'django_crontab',
-    'debug_toolbar',    
+    "django.contrib.admin",
+    "django.contrib.auth",
+    "django.contrib.contenttypes",
+    "django.contrib.sessions",
+    "django.contrib.messages",
+    "product.apps.ProductConfig",
+    "account.apps.AccountConfig",
+    "django.contrib.staticfiles",
+    "django_extensions",
+    "django_crontab",
+    "debug_toolbar",
 ]
 
 MIDDLEWARE = [
-    'django.middleware.security.SecurityMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'django.middleware.locale.LocaleMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',
-    'debug_toolbar.middleware.DebugToolbarMiddleware',
+    "django.middleware.security.SecurityMiddleware",
+    "django.contrib.sessions.middleware.SessionMiddleware",
+    "django.middleware.common.CommonMiddleware",
+    "django.middleware.csrf.CsrfViewMiddleware",
+    "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "django.contrib.messages.middleware.MessageMiddleware",
+    "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "django.middleware.locale.LocaleMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
+    "debug_toolbar.middleware.DebugToolbarMiddleware",
 ]
 
-ROOT_URLCONF = 'opynfact_web_project.urls'
+ROOT_URLCONF = "opynfact_web_project.urls"
 
 INTERNAL_IPS = [
     # ...
-    '127.0.0.1',
+    "127.0.0.1",
     # ...
 ]
 
 TEMPLATES = [
     {
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
-        'APP_DIRS': True,
-        'OPTIONS': {
-            'context_processors': [
-                'django.template.context_processors.debug',
-                'django.template.context_processors.request',
-                'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages',
+        "BACKEND": "django.template.backends.django.DjangoTemplates",
+        "DIRS": [],
+        "APP_DIRS": True,
+        "OPTIONS": {
+            "context_processors": [
+                "django.template.context_processors.debug",
+                "django.template.context_processors.request",
+                "django.contrib.auth.context_processors.auth",
+                "django.contrib.messages.context_processors.messages",
             ],
         },
     },
 ]
 
-WSGI_APPLICATION = 'opynfact_web_project.wsgi.application'
+WSGI_APPLICATION = "opynfact_web_project.wsgi.application"
 
 
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+    "default": {
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": os.path.join(BASE_DIR, "db.sqlite3"),
     }
 }
 
@@ -106,28 +106,28 @@ DATABASES = {
 
 AUTH_PASSWORD_VALIDATORS = [
     {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+        "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+        "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+        "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
     },
 ]
 
-LOGIN_URL = 'account/sign-in/'
+LOGIN_URL = "account/sign-in/"
 
 
 # Internationalization
 # https://docs.djangoproject.com/en/3.0/topics/i18n/
 
-LANGUAGE_CODE = 'fr-FR'
+LANGUAGE_CODE = "fr-FR"
 
-TIME_ZONE = 'Europe/Paris'      # 'UTC'
+TIME_ZONE = "Europe/Paris"  # 'UTC'
 
 USE_I18N = True
 
@@ -139,13 +139,13 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
-STATIC_URL = '/static/'
+STATIC_URL = "/static/"
 
-STATIC_ROOT = os.path.join(PROJECT_DIR, 'staticfiles')
+STATIC_ROOT = os.path.join(PROJECT_DIR, "staticfiles")
 
 # CRONJOBS = [
 #     ('* * * * *', 'product.cron.my_scheduled_job', '>> /tmp/djg_cron_test_dbg.log'),
-#     # ('* * * * *', 'django.core.management.call_command', ['initializedatabase'], '>> /tmp/djg_cron_opnfct_initdata_dbg.log'),   
+#     # ('* * * * *', 'django.core.management.call_command', ['initializedatabase'], '>> /tmp/djg_cron_opnfct_initdata_dbg.log'),
 #     # ('* * * * *', 'django.core.management.call_command', ['initializedatabase', 0], '>> /tmp/djg_cron_opnfct_initdata_dbg.log'),
 #     # ('* * * * *', 'product.management.commands.initializedatabase.Command.handle', [0], '>> /tmp/djg_cron_opnfct_initdata_dbg.log'),
 #     ('* * * * *', 'product.management.call_command', ['initializedatabase', 0], '>> /tmp/djg_cron_opnfct_initdata_dbg.log'),
