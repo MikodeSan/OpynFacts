@@ -6,6 +6,7 @@ python:
 branches:
   only:
     - py11
+    - feat/error
 
 dist: bionic
 
