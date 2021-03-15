@@ -6,17 +6,17 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('product', '0001_initial'),
+        ("product", "0001_initial"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='zcategory',
-            name='hierarchy_index',
+            model_name="zcategory",
+            name="hierarchy_index",
         ),
         migrations.AddField(
-            model_name='zcategory_product',
-            name='hierarchy_index',
+            model_name="zcategory_product",
+            name="hierarchy_index",
             field=models.PositiveSmallIntegerField(default=0),
         ),
     ]

@@ -4,7 +4,11 @@ import json
 import logging
 
 
-from django.http import HttpResponse, HttpResponseRedirect, HttpResponsePermanentRedirect
+from django.http import (
+    HttpResponse,
+    HttpResponseRedirect,
+    HttpResponsePermanentRedirect,
+)
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
 
@@ -36,59 +40,61 @@ def index(request):
     # album = get_object_or_404(Album, pk=album_id)
     # artists = [artist.name for artist in album.artists.all()]
     # artists_name = " ".join(artists)
-    
+
     # context = {
     #     'album_title': album.title,
     #     'artists_name': artists_name,
     #     'album_id': album.id,
     #     'thumbnail': album.picture
     # }
-    
-    context = {'page': 'home'}
+
+    context = {"page": "home"}
     user_query = ""
     response = None
 
-    if request.method == 'POST':
+    if request.method == "POST":
         # POST method
-        
+
         form = QueryForm(request.POST)
-        context['page'] = 'result'
-        context['query'] = user_query
+        context["page"] = "result"
+        context["query"] = user_query
         if form.is_valid():
             # Form is correct.
             # We can proceed to booking.
-            user_query = request.POST.get('query')
+            user_query = request.POST.get("query")
 
             # return HttpResponseRedirect(reverse('product:result', args=[user_query]))
-            response = redirect('product:result', user_query=user_query)
+            response = redirect("product:result", user_query=user_query)
 
-        else:   # [TODO]: is not necessary
+        else:  # [TODO]: is not necessary
             # Form data doesn't match the expected format.
             # Add errors to the template.
-            context['errors'] = form.errors.items()
-            print('Form error')
-            response = render(request, 'product/list.html', context)
+            context["errors"] = form.errors.items()
+            print("Form error")
+            response = render(request, "product/list.html", context)
     else:
         # GET method.
-        
-        response = render(request, 'product/index.html', context)
-    
+
+        response = render(request, "product/index.html", context)
+
     return response
 
 
-@login_required()      # By default, use LOGIN_URL in settings
+@login_required()  # By default, use LOGIN_URL in settings
 def favorite(request):
 
-    product_lst = request.user.favorites.order_by('name')[:]
+    product_lst = request.user.favorites.order_by("name")[:]
 
-    context = {'page':'favorite'}
-    context['product_lst'] = product_lst
-    context['favorite_lst'] = product_lst
+    context = {"page": "favorite"}
+    context["product_lst"] = product_lst
+    context["favorite_lst"] = product_lst
 
-    return render(request, 'product/list.html', context)
+    return render(request, "product/list.html", context)
 
 
-def product(request, product_id, page_origin=None, product_id_origin=None, user_query=None):
+def product(
+    request, product_id, page_origin=None, product_id_origin=None, user_query=None
+):
 
     if request.user.is_authenticated:
         # Get user's favorite product
@@ -99,23 +105,25 @@ def product(request, product_id, page_origin=None, product_id_origin=None, user_
     except ZProduct.DoesNotExist:
         message = "Unkown product id"
     else:
-        message = "This is the product #{}-{} description page".format(product_id, product.name)
+        message = "This is the product #{}-{} description page".format(
+            product_id, product.name
+        )
 
-    return render(request, 'product/product.html', locals())
+    return render(request, "product/product.html", locals())
 
 
 def parse_favorite(request):
-    
+
     context = {}
 
-    if request.method == 'POST':
+    if request.method == "POST":
 
-        code = int(request.POST.get('code'))
-        favorite = request.POST.get('favorite')
+        code = int(request.POST.get("code"))
+        favorite = request.POST.get("favorite")
         print(type(code), code)
         print(type(favorite), favorite)
 
-        if favorite == 'true':
+        if favorite == "true":
             favorite = True
         else:
             favorite = False
@@ -140,14 +148,14 @@ def parse_favorite(request):
             print(favorite)
 
         print(user_mdl.favorites.all())
-        context = {'code' : code, 'favorite' : favorite}
+        context = {"code": code, "favorite": favorite}
 
-    return HttpResponse( json.dumps( context ) )
+    return HttpResponse(json.dumps(context))
 
 
 def notice(request):
 
-    return render(request, 'product/notice.html', locals())
+    return render(request, "product/notice.html", locals())
 
 
 #     id = int(album_id) # make sure we have an integer.

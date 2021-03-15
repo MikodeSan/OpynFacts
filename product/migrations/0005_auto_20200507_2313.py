@@ -6,18 +6,18 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('product', '0004_auto_20200405_0429'),
+        ("product", "0004_auto_20200405_0429"),
     ]
 
     operations = [
         migrations.RenameField(
-            model_name='zproduct',
-            old_name='nutrition_score',
-            new_name='nutrition_score_fr',
+            model_name="zproduct",
+            old_name="nutrition_score",
+            new_name="nutrition_score_fr",
         ),
         migrations.AddField(
-            model_name='zproduct',
-            name='nutrition_score_uk',
-            field=models.SmallIntegerField(null=True, verbose_name='Nutrition score'),
+            model_name="zproduct",
+            name="nutrition_score_uk",
+            field=models.SmallIntegerField(null=True, verbose_name="Nutrition score"),
         ),
     ]

@@ -13,6 +13,7 @@ from enum import Enum, auto
 
 # from ..product.models import ZSearch
 
+
 class ZSign(Enum):
     UP = auto()
     CONFIRM = auto()
@@ -24,26 +25,26 @@ class ZSign(Enum):
 
 
 def signup(request):
-    
+
     sign_id = ZSign.UP
     sign_enum = ZSign.__members__
-    template = 'account/index.html'
+    template = "account/index.html"
 
     if request.method == "POST":
         form = SignUpForm(request.POST, error_class=ParagraphErrorList)
         if form.is_valid():
-            new_email = form.cleaned_data['user_mail']
+            new_email = form.cleaned_data["user_mail"]
 
             try:
                 user = User.objects.get(username=new_email)
                 print(user)
             except ObjectDoesNotExist:
-                print('ObjectDoesNotExist')
+                print("ObjectDoesNotExist")
                 sign_id = ZSign.PASSWORD
-                pwd_form = SignUpPasswordForm(initial={'user_mail': new_email})
+                pwd_form = SignUpPasswordForm(initial={"user_mail": new_email})
                 # form.fields['user_mail'].initial = new_email
             else:
-                errors = {'err': 'email déjà existant'}.items()
+                errors = {"err": "email déjà existant"}.items()
 
             # password = form.cleaned_data['user_password']
         else:
@@ -59,36 +60,36 @@ def signup_password(request):
 
     sign_id = ZSign.PASSWORD
     sign_enum = ZSign.__members__
-    template = 'account/index.html'
+    template = "account/index.html"
 
     if request.method == "POST":
         pwd_form = SignUpPasswordForm(request.POST, error_class=ParagraphErrorList)
         if pwd_form.is_valid():
-            email = pwd_form.cleaned_data['user_mail']
-            password = pwd_form.cleaned_data['user_password']
-            password_confirmed = pwd_form.cleaned_data['user_password_confirm']
+            email = pwd_form.cleaned_data["user_mail"]
+            password = pwd_form.cleaned_data["user_password"]
+            password_confirmed = pwd_form.cleaned_data["user_password_confirm"]
 
             if password == password_confirmed:
                 user = User.objects.create_user(email, email, password)
                 if user:
                     login(request, user)
-                    return HttpResponseRedirect(reverse('product:home'))
+                    return HttpResponseRedirect(reverse("product:home"))
                 else:
-                    errors = {'err': "Critical error: User not logged in"}.items()
+                    errors = {"err": "Critical error: User not logged in"}.items()
             else:
-                errors = {'err': "Mots de passe différents"}.items()
+                errors = {"err": "Mots de passe différents"}.items()
         else:
             errors = pwd_form.errors.items()
     else:
-        errors = {'err': "Erreur d'initialisation"}.items()
+        errors = {"err": "Erreur d'initialisation"}.items()
         print("/!\\ Sign-up password: Initialisation Error /!\\")
-        return HttpResponseRedirect(reverse('account:signup'))
+        return HttpResponseRedirect(reverse("account:signup"))
 
     return render(request, template, locals())
 
 
 def signin(request):
-    
+
     error = False
     sign_id = ZSign.IN
     sign_enum = ZSign.__members__
@@ -98,20 +99,22 @@ def signin(request):
     # user.save()
     # return render(request, 'account/confirm.html')
 
-    template = 'account/index.html'
+    template = "account/index.html"
 
     if request.method == "POST":
         form = ConnectionForm(request.POST)
         if form.is_valid():
             username = form.cleaned_data["username"]
             password = form.cleaned_data["password"]
-            user = authenticate(username=username, password=password)  # Nous vérifions si les données sont correctes
+            user = authenticate(
+                username=username, password=password
+            )  # Nous vérifions si les données sont correctes
             if user:  # Si l'objet renvoyé n'est pas None
                 login(request, user)  # nous connectons l'utilisateur
-                template = 'account/profil.html'
+                template = "account/profil.html"
                 # return HttpResponseRedirect(reverse('account:profile', kwargs={'user_id': user.id}))
-                return HttpResponseRedirect(reverse('account:profile'))
-            else: # sinon une erreur sera affichée
+                return HttpResponseRedirect(reverse("account:profile"))
+            else:  # sinon une erreur sera affichée
                 error = True
     else:
         form = ConnectionForm()
@@ -119,27 +122,21 @@ def signin(request):
     return render(request, template, locals())
 
 
-@login_required()      # By default, use LOGIN_URL in settings
+@login_required()  # By default, use LOGIN_URL in settings
 def signout_request(request):
-    
+
     sign_id = ZSign.OUT
     sign_enum = ZSign.__members__
 
-    return render(request, 'account/profil.html', locals())
+    return render(request, "account/profil.html", locals())
 
 
 def signout(request):
 
     logout(request)
-    return HttpResponseRedirect(reverse('product:home'))
+    return HttpResponseRedirect(reverse("product:home"))
 
 
 @login_required()
 def profile(request, user_id=0):
-    return render(request, 'account/profil.html', locals())
-
-
-
-
-
-
+    return render(request, "account/profil.html", locals())

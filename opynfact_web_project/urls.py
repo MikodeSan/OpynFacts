@@ -19,27 +19,26 @@ from django.urls import include, path, re_path
 from django.conf import settings
 from django.conf.urls import include, url  # For django versions before 2.0
 
+
 def trigger_error(request):
     division_by_zero = 1 / 0
 
 
 urlpatterns = [
     # url(r'^$', include('product.urls')),
-    path('', include('product.urls')),
-    path('account/', include('account.urls')),
-    path('zadmyn/', admin.site.urls),
+    path("", include("product.urls")),
+    path("account/", include("account.urls")),
+    path("zadmyn/", admin.site.urls),
     # re_path(r'^zadmyn/$', admin.site.urls)
-    path('sentry-debug/', trigger_error),
+    path("sentry-debug/", trigger_error),
 ]
-
 
 
 if settings.DEBUG:
     import debug_toolbar
-    urlpatterns = [
-        path('__debug__/', include(debug_toolbar.urls)),
 
+    urlpatterns = [
+        path("__debug__/", include(debug_toolbar.urls)),
         # For django versions before 2.0:
         # url(r'^__debug__/', include(debug_toolbar.urls)),
     ] + urlpatterns
-

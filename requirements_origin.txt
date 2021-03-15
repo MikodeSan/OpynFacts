@@ -5,8 +5,6 @@
 
 ## -- Web --
 
-# Flask
-# flask_sqlalchemy
 django
 django-debug-toolbar
 django-extensions
@@ -34,6 +32,7 @@ mysql-connector-python		# do not use mysql-connector
 
 pycodestyle
 pylint
+black
 
 pytest
 pytest-cov

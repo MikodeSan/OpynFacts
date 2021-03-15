@@ -40,16 +40,16 @@ ALLOWED_HOSTS = [IP_HOST]
 # Application definition
 
 MIDDLEWARE = [
-    'django.middleware.security.SecurityMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'django.middleware.locale.LocaleMiddleware',
+    "django.middleware.security.SecurityMiddleware",
+    "django.contrib.sessions.middleware.SessionMiddleware",
+    "django.middleware.common.CommonMiddleware",
+    "django.middleware.csrf.CsrfViewMiddleware",
+    "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "django.contrib.messages.middleware.MessageMiddleware",
+    "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "django.middleware.locale.LocaleMiddleware",
     # 'whitenoise.middleware.WhiteNoiseMiddleware',
-    'debug_toolbar.middleware.DebugToolbarMiddleware',
+    "debug_toolbar.middleware.DebugToolbarMiddleware",
 ]
 
 
@@ -57,18 +57,18 @@ MIDDLEWARE = [
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql', # on utilise l'adaptateur postgresql
-        'NAME': DB_NAME, # le nom de notre base de donnees creee precedemment
-        'USER': DB_USER, # attention : remplacez par votre nom d'utilisateur
-        'PASSWORD': DB_PWD,
-        'HOST': DB_HOST,
-        'PORT': DB_PORT,
+    "default": {
+        "ENGINE": "django.db.backends.postgresql",  # on utilise l'adaptateur postgresql
+        "NAME": DB_NAME,  # le nom de notre base de donnees creee precedemment
+        "USER": DB_USER,  # attention : remplacez par votre nom d'utilisateur
+        "PASSWORD": DB_PWD,
+        "HOST": DB_HOST,
+        "PORT": DB_PORT,
     }
 }
 
 db_from_env = dj_database_url.config(conn_max_age=500)
-DATABASES['default'].update(db_from_env)
+DATABASES["default"].update(db_from_env)
 
 
 # AUTH_USER_MODEL = 'account.ZUser'
@@ -78,24 +78,19 @@ DATABASES['default'].update(db_from_env)
 # https://docs.djangoproject.com/en/3.0/ref/settings/#auth-password-validators
 
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/3.0/topics/i18n/
-
 
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
 
-    
 # Static files settings
-STATIC_ROOT = os.path.join(PROJECT_DIR, 'staticfiles')
+STATIC_ROOT = os.path.join(PROJECT_DIR, "staticfiles")
 
 # Extra places for collectstatic to find static files.
-STATICFILES_DIRS = (
-    os.path.join(PROJECT_DIR, 'static'),       # 'staticfiles'
-)
+STATICFILES_DIRS = (os.path.join(PROJECT_DIR, "static"),)  # 'staticfiles'
 
 # Simplified static file serving.
 # https://warehouse.python.org/project/whitenoise/
@@ -104,17 +99,16 @@ STATICFILES_DIRS = (
 
 # All of this is already happening by default!
 sentry_logging = LoggingIntegration(
-    level=logging.DEBUG,        # Capture info and above as breadcrumbs
-    event_level=logging.INFO  # Send errors as events
+    level=logging.DEBUG,  # Capture info and above as breadcrumbs
+    event_level=logging.INFO,  # Send errors as events
 )
 
 sentry_sdk.init(
     dsn=SENTRY_DSN,
     integrations=[DjangoIntegration(), sentry_logging],
-
     # If you wish to associate users to errors (assuming you are using
     # django.contrib.auth) you may enable sending PII data.
-    send_default_pii=True
+    send_default_pii=True,
 )
 
 # CRONJOBS = [

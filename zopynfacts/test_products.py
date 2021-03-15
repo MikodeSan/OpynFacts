@@ -98,4 +98,3 @@ import requests
 #                 "page_size":"20"
 #             })
 #         self.assertEqual(res["products"],["Diet Coke"])
-

@@ -6,12 +6,12 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('product', '0002_auto_20200405_0321'),
+        ("product", "0002_auto_20200405_0321"),
     ]
 
     operations = [
         migrations.RemoveConstraint(
-            model_name='zproduct',
-            name='product_identifier_unique',
+            model_name="zproduct",
+            name="product_identifier_unique",
         ),
     ]

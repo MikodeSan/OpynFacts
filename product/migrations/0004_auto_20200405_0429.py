@@ -6,46 +6,46 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('product', '0003_auto_20200405_0325'),
+        ("product", "0003_auto_20200405_0325"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='zproduct',
-            name='firstSearchDate',
+            model_name="zproduct",
+            name="firstSearchDate",
         ),
         migrations.RemoveField(
-            model_name='zproduct',
-            name='lastSearchDate',
+            model_name="zproduct",
+            name="lastSearchDate",
         ),
         migrations.AlterField(
-            model_name='zproduct',
-            name='brands',
-            field=models.CharField(max_length=256, null=True, verbose_name='Marque'),
+            model_name="zproduct",
+            name="brands",
+            field=models.CharField(max_length=256, null=True, verbose_name="Marque"),
         ),
         migrations.AlterField(
-            model_name='zproduct',
-            name='name',
-            field=models.CharField(max_length=256, verbose_name='Nom'),
+            model_name="zproduct",
+            name="name",
+            field=models.CharField(max_length=256, verbose_name="Nom"),
         ),
         migrations.AlterField(
-            model_name='zproduct',
-            name='nova_group',
-            field=models.SmallIntegerField(null=True, verbose_name='Nova'),
+            model_name="zproduct",
+            name="nova_group",
+            field=models.SmallIntegerField(null=True, verbose_name="Nova"),
         ),
         migrations.AlterField(
-            model_name='zproduct',
-            name='nutrition_grades',
-            field=models.CharField(max_length=1, null=True, verbose_name='Nutri-Score'),
+            model_name="zproduct",
+            name="nutrition_grades",
+            field=models.CharField(max_length=1, null=True, verbose_name="Nutri-Score"),
         ),
         migrations.AlterField(
-            model_name='zproduct',
-            name='stores',
-            field=models.CharField(max_length=256, null=True, verbose_name='Stores'),
+            model_name="zproduct",
+            name="stores",
+            field=models.CharField(max_length=256, null=True, verbose_name="Stores"),
         ),
         migrations.AlterField(
-            model_name='zproduct',
-            name='url',
-            field=models.URLField(null=True, verbose_name='URL'),
+            model_name="zproduct",
+            name="url",
+            field=models.URLField(null=True, verbose_name="URL"),
         ),
     ]

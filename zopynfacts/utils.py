@@ -14,7 +14,7 @@ ch = logging.StreamHandler()
 ch.setLevel(logging.DEBUG)
 
 # create formatter
-formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 # add formatter to ch
 ch.setFormatter(formatter)
 
@@ -30,29 +30,27 @@ API_LANGUAGE_CODE = "en"
 FILE_TYPE_MAP = {
     "mongodb": "openfoodfacts-mongodbdump.tar.gz",
     "csv": "en.openfoodfacts.org.products.csv",
-    "rdf": "en.openfoodfacts.org.products.rdf"
+    "rdf": "en.openfoodfacts.org.products.rdf",
 }
 
-ENTITY_MAP = {
-    "food": API_URL,
-    "beauty": OBF_API_URL,
-    "pet": OPFF_API_URL
-}
+ENTITY_MAP = {"food": API_URL, "beauty": OBF_API_URL, "pet": OPFF_API_URL}
 
 
 class NutritionGrade(Enum):
-    A = 'a'
-    B = 'b'
-    C = 'c'
-    D = 'd'
-    E = 'e'
-    UNKNOWN = 'unkown'
+    A = "a"
+    B = "b"
+    C = "c"
+    D = "d"
+    E = "e"
+    UNKNOWN = "unkown"
+
 
 class Nova(IntEnum):
     NOVA_1 = auto()
     NOVA_2 = auto()
     NOVA_3 = auto()
     NOVA_4 = auto()
+
 
 def login_into_OFF():
     username = raw_input("Username:")
@@ -95,8 +93,9 @@ def download_data(file_type="mongodb"):
                 target_file.write(chunk)
 
 
-def build_url(geography="world", service=None,
-              resource_type=None, parameters=None, entity="food"):
+def build_url(
+    geography="world", service=None, resource_type=None, parameters=None, entity="food"
+):
 
     if entity not in ENTITY_MAP:
         raise ValueError("Product not recognized!")
@@ -106,11 +105,7 @@ def build_url(geography="world", service=None,
 
     if service == "api":
         version = "v0"
-        base_url = "/".join([geo_url,
-                             service,
-                             version,
-                             resource_type,
-                             parameters])
+        base_url = "/".join([geo_url, service, version, resource_type, parameters])
 
     elif service == "data":
         base_url = "/".join([geo_url, service, resource_type])
@@ -129,7 +124,7 @@ def build_url(geography="world", service=None,
         if type(resource_type) == list:
             resource_type = "/".join(resource_type)
         if resource_type == "ingredients":
-            resource_type = "/".join(["state",  "complete", resource_type])
+            resource_type = "/".join(["state", "complete", resource_type])
             parameters = "1"
         base_url = "/".join(filter(None, (geo_url, resource_type, parameters)))
 
@@ -139,7 +134,9 @@ def build_url(geography="world", service=None,
     return base_url
 
 
-def fetch(path, json_file=True, app_name=None, system=None, app_version=None, website=None):
+def fetch(
+    path, json_file=True, app_name=None, system=None, app_version=None, website=None
+):
     """
     Fetch data at a given path assuming that target match a json file and is
     located on the OFF API.
@@ -148,25 +145,27 @@ def fetch(path, json_file=True, app_name=None, system=None, app_version=None, we
         path = "{}.json".format(path)
 
     zstr = " - ".join([el for el in [app_name, system, app_version, website] if el])
-    hdr = {'user-agent': zstr}
+    hdr = {"user-agent": zstr}
     # print("FETCH", hdr)
     response = requests.get(path, headers=hdr)
 
     if response.status_code != 200:
-        logger.critical('Reponse: {} for url: {}'.format(response, path))
-        print('Reponse: {} for header {}, url: {}'.format(response, hdr, path))
+        logger.critical("Reponse: {} for url: {}".format(response, path))
+        print("Reponse: {} for header {}, url: {}".format(response, hdr, path))
         exit(1)
-    
+
     # TODO: insert into request header [app_name, version, system, ...]
 
     return response.json()
 
 
-def get_ocr_json_url_for_an_image(first_three_digits,
-                                  second_three_digits,
-                                  third_three_digits,
-                                  fourth_three_digits,
-                                  image_name):
+def get_ocr_json_url_for_an_image(
+    first_three_digits,
+    second_three_digits,
+    third_three_digits,
+    fourth_three_digits,
+    image_name,
+):
     """
     Get the URL of a JSON file given a barcode in 4 chunks of 3 digits and an
     image name (1, 2, 3, front_fr...).
@@ -177,6 +176,6 @@ def get_ocr_json_url_for_an_image(first_three_digits,
         second_three_digits,
         third_three_digits,
         fourth_three_digits,
-        image_name
+        image_name,
     )
     return url
