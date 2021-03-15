@@ -5,8 +5,6 @@ from django.urls import reverse
 
 from django.contrib.auth import get_user_model
 
-# from .models import Album, Artist, Contact, Booking
-
 
 # Front Anomymous
 class TestFrontAnomymous(TestCase):

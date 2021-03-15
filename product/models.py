@@ -32,6 +32,7 @@ class ZProduct(models.Model):
     alternatives = models.ManyToManyField('self', related_name='substituted', symmetrical=False, blank=True)
 
     class Meta:
+        # app_label = 'product'
         verbose_name = "Produit"
         verbose_name_plural = "Produits"
         # constraints = [
@@ -71,22 +72,3 @@ class ZSearch(models.Model):
     favorite_alternatives = models.ManyToManyField(ZFavorite, related_name='zsearches', blank=True)
 
     date = models.DateTimeField(auto_now=True)
-
-
-# class Booking(models.Model):
-#     created_at = models.DateTimeField(auto_now_add=True)
-#     contacted = models.BooleanField(default=False)
-#     album = models.OneToOneField(Album)
-#     contact = models.ForeignKey(Contact, on_delete=models.CASCADE)
-
-
-# class ZContact(models.Model):
-#     name = models.CharField(max_length=200)
-#     email = models.EmailField(max_length=100)
-
-#     def __str__(self):
-#         return self.name
-
-#     class Meta:
-#         verbose_name = "Utilisateur"
-#         verbose_name_plural = "Utilisateurs"

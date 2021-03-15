@@ -1,5 +1,4 @@
 import os, sys
-import json
 
 import logging
 
@@ -8,17 +7,12 @@ from django.conf import settings as project_settings
 from django.shortcuts import render
 
 
-# DIR_BASE = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-# print(DIR_BASE)
-# sys.path.append(DIR_BASE)
-
-from ..models import ZProduct, ZCategory, ZSearch, ZCategory_Product
-
 sys.path.append(project_settings.BASE_DIR)
-from zopynfacts import products
+sys.path.append(project_settings.PROJECT_DIR)
+sys.path.append(os.path.join(project_settings.BASE_DIR, 'product'))
+
 
 from zopynfacts import products
-
 
 
 # Get an instance of a logger

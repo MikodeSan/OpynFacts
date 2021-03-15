@@ -23,7 +23,7 @@ Bonjour,
 
 Comme convenu le bug de "_redirection_" a été corrigé, tous les tests sont de nouveau exécutés avec succès.  
 J'en ai profité pour refactorer le code relatif afin de le rendre plus lisible et modulaire.  
-Les modifications associées sont consultables sur la révision eadfe56.... du [dépôt git](https://github.com/MikodeSan/OpynFacts).
+Les modifications associées sont consultables sur la révision ___86e458b___ du [dépôt git](https://github.com/MikodeSan/OpynFacts).
 
 Je vous laisse prendre acte de la résolution du problème et revenir vers moi en cas de besoin.  
 Sans retour de votre part sous une semaine, la correction apportée sera concidérée acceptée et validée.
